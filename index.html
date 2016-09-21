@@ -21,6 +21,8 @@
       display: flex;
 
       overflow: hidden;
+
+      font-family: monospace;
     }
 
     textarea.link-box {
@@ -39,6 +41,89 @@
 
       &.show {
         display: block;
+      }
+    }
+
+    mathbox {
+      @keyframes fade-color-out {
+        0% {
+          // color: rgba(255, 255, 255, 1);
+          transform: scale(1);
+        }
+        100% {
+          color: rgba(255, 215, 0, 0);
+          transform: scale(1);
+        }
+      }
+
+      @keyframes fade-background-out {
+        0% {
+          background-color: rgba(0, 0, 0, 1);
+          transform: scale(1);
+        }
+        100% {
+          background-color: rgba(0, 0, 0, 0);
+          transform: scale(0);
+        }
+      }
+
+      notice {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+
+        font-size: 5vw;
+
+        z-index: 2;
+
+        transform: scale(0);
+
+        animation: fade-color-out 9s ease-out;
+
+        screen {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+
+          z-index: 1;
+
+          background-color: rgba(0, 0, 0, 1);
+
+          animation: fade-background-out 10s ease-in-out forwards;
+        }
+
+        message {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+
+          z-index: 2;
+
+          display: flex;
+
+          color: rgba(255, 255, 255, 1);
+
+          animation: fade-color-out 6s ease-out forwards;
+
+          align-items: center;
+          justify-content: center;
+
+          trump {
+            margin: 0 1vw;
+            font-size: 7vw;
+
+            text-shadow: 2px 2px 2px rgba(0, 0, 0, 1);
+            color: rgba(255, 215, 0, 1);
+
+            animation: fade-color-out 5s 4s ease-out forwards;
+          }
+        }
       }
     }
 
@@ -189,39 +274,6 @@
         }
       }
     }
-
-    @keyframes fade-out {
-      0% {
-        color: rgba(255, 255, 255, 1);
-        background-color: rgba(0, 0, 0, 1);
-        transform: scale(1);
-      }
-      100% {
-        color: rgba(255, 255, 255, 0);
-        background-color: rgba(0, 0, 0, 0);
-        transform: scale(0);
-      }
-    }
-
-    notice {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-
-      display: flex;
-
-      align-items: center;
-      justify-content: center;
-
-      color: rgba(255, 255, 255, 1);
-      background-color: rgba(0, 0, 0, 1);
-
-      font-size: 5em;
-
-      animation: fade-out 5s ease-in-out forwards;
-    }
     </style>
   </head>
   <body>
@@ -229,6 +281,7 @@
     <script src="lib/mathbox-bundle.min.js"></script>
 
     <mathbox tabindex="2">
+      <notice class="fade-out"><screen></screen><message>entering <trump>TRUMP</trump> orbit<message></notice>
       <script type="mathbox/jsx">
         const trump = [[[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0]],
         [[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[1.00392,0.83137,0.8,1],[1.24706,0.97255,0.76078,1],[1.40392,1.11373,0.78431,1],[1.4902,1.21569,0.87059,1],[1.52941,1.26275,0.94118,1],[1.41961,1.19216,0.91765,1],[1.40392,1.21569,0.98039,1],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0]],
@@ -273,7 +326,7 @@
             this.gravity = gravity;
           }
 
-          get size() { return 1000 * (Math.log2(this.mass + 1)) / 3; }
+          get size() { return 1000 * Math.log2(this.mass + 1); }
 
           positionHalfTick(ticksPerSecond) {
             const {position, velocity} = this;
@@ -284,12 +337,12 @@
         }
 
         const universe = [
-          new Mass(100000, [255, 255,   0, 0]),
-          new Mass(100,    [  0,   0, 255, 1], [   1000,  0,   30], [   0,  0.5,  -200]),
-          new Mass(100,    [255,   0, 255, 1], [  -1000,  0, -900], [   0,  0.5,   200]),
-          new Mass(0.015,  [255,   0,   0, 1], [      0,  0, 1980], [ 330,    5,     0]),
-          new Mass(0.25,   [255, 255, 255, 1], [      0,  0, 2020], [ 330,    5,     0]),
-          new Mass(1000,   [0,   255, 255, 1], [      0,  0, 2000], [ 330,   -1,     0])
+          new Mass(1000, [255, 255,   0, 0]),
+          new Mass(1,    [  0,   0, 255, 1], [   1000,  0,   30],   [   0,  0.5,  -35]),
+          new Mass(1,    [255,   0, 255, 1], [  -1000,  0, -900],   [   0,  0.5,   35]),
+          new Mass(0.015,  [255,   0,   0, 1], [      0,  0, 1950], [ 35,    5,     0]),
+          new Mass(0.25,   [255, 255, 255, 1], [      0,  0, 2050], [ 35,    5,     0]),
+          new Mass(10,   [0,   255, 255, 1], [      0,  0, 2000],   [ 35,   -1,     0])
         ];
 
         const [
@@ -326,7 +379,7 @@
           <camera proxy={false}
                   position={t => [universe[positionIndex].position[0], universe[positionIndex].position[1] + 1000, universe[positionIndex].position[2]]}
                   lookAt={t => universe[lookAtIndex].position}
-                  fov={90} />
+                  fov={60} />
           <cartesian range={[[-1, 1], [-1, 1], [-1, 1]]}
                      scale={[1, 1, 1]}>
             <cartesian range={[[-1, 1], [-1, 1], [-1, 1]]}
@@ -341,7 +394,7 @@
               <point points="<<" colors="<" size={1000 * trumpScaleFactor} shape="square" opacity={1}/>
             </cartesian>
 
-            <array id="players"
+            <array id="positions"
                    width={universe.length}
                    channels={3}
                    history={1}
@@ -493,6 +546,7 @@
         module.exports = {
           editorPanel: false,
           plugins: ['core', 'controls'],
+          camera: {far: 1000000},
           controls: [
             [['A'], 'left'],
             [['D'], 'right'],
@@ -501,6 +555,8 @@
             [['Q'], 'up'],
             [['Z'], 'down'],
             [['H'], 'toggleHistory'],
+            [['T'], 'fakeTweet'],
+            [['L'], 'lookAtTrump'],
             [[190], 'speedUp'],
             [[188], 'slowDown'],
             [[32], 'changePlayer'],
@@ -516,13 +572,32 @@
             'up': () => velocities[selectedMassIndex][1]++,
             'down': () => velocities[selectedMassIndex][1]--,
             'toggleHistory': {
-              '#players': {
+              '#positions': {
                 'history'() {
                   // doesn't work :(
                   return 1;
                 }
               }
             },
+            'fakeTweet': {
+              '#positions': {
+                'width'() {
+                  lookAtIndex = universe.length;
+                  addMass(new Mass(100, [0, 1, 1.2, 1], [universe[0].position[0] + 600, universe[0].position[1], universe[0].position[2]], [0, 0, 50]))
+                  return universe.length;
+                }
+              },
+              '#colors': {
+                'width'() { return universe.length; }
+              },
+              '#velocities': {
+                'width'() { return universe.length; }
+              },
+              '#sizes': {
+                'width'() { return universe.length; }
+              }
+            },
+            'lookAtTrump': () => lookAtIndex = 0,
             'speedUp': () => ticksPerStep++,
             'slowDown': () => ticksPerStep = Math.max(1, --ticksPerStep),
             'changePlayer'() {
@@ -531,9 +606,9 @@
               selectMass(selectedMassIndex);
             },
             'newMass': {
-              '#players': {
+              '#positions': {
                 'width'() {
-                  addMass(new Mass(10, [255, 255, 255, 1], [universe[0].position[0] + 0, universe[0].position[1] + 0, 2000], [universe[0].position[2] + 330, Math.random() * 200 - 10, 0]));
+                  addMass(new Mass(1, [255, 255, 255, 1], [universe[0].position[0], universe[0].position[1], 2000], [universe[0].velocity[0] + 35, universe[0].velocity[1], universe[1].velocity[2]]));
                   return universe.length;
                 }
               },
@@ -573,6 +648,5 @@
         }
       </script>
     </mathbox>
-    <notice class="fade-out">now entering TRUMP orbit</notice>
   </body>
 </html>
