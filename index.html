@@ -3,11 +3,11 @@
     <title>mathbox/jsx</title>
 
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:site" content="@BlakeLaPierre" />
-    <meta name="twitter:title" content="MathBox^2 Scenes Using JSX" />
-    <meta name="twitter:description" content="Create, share, and view MathBox^2 scenes using JSX" />
-    <meta name="twitter:image" content="https://blakelapierre.github.io/jsxbox/images/282x278.png" />
-    <meta name="og:image" content="https://blakelapierre.github.io/jsxbox/images/282x278.png" />
+    <meta name="twitter:site" content="@TRUMPorbit" />
+    <meta name="twitter:title" content="TRUMPorbit" />
+    <meta name="twitter:description" content="enter TRUMP orbit" />
+    <meta name="twitter:image" content="https://blakelapierre.github.io/trumporbit/images/image.png" />
+    <meta name="og:image" content="https://blakelapierre.github.io/jsxbox/images/image.png" />
 
     <script>less = {async: true}; //wot</script>
 
@@ -44,7 +44,35 @@
       }
     }
 
-    mathbox {
+    hud {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 100%;
+      bottom: 100%;
+
+      margin: 1vw;
+
+      trump-mass {
+        position: absolute;
+
+        display: inline-block;
+
+        top: 0;
+        left: 0;
+
+        white-space: pre;
+
+        color: rgba(255, 255, 255, 1);
+      }
+    }
+
+    trump {
+      text-shadow: 2px 2px 2px rgba(0, 0, 0, 1);
+      color: rgba(255, 215, 0, 1);
+    }
+
+    // mathbox {
       @keyframes fade-color-out {
         0% {
           // color: rgba(255, 255, 255, 1);
@@ -52,6 +80,7 @@
         }
         100% {
           color: rgba(255, 215, 0, 0);
+          text-shadow: 2px 2px 2px rgba(0, 0, 0, 0);
           transform: scale(1);
         }
       }
@@ -76,11 +105,11 @@
 
         font-size: 5vw;
 
-        z-index: 2;
+        // z-index: 2;
 
         transform: scale(0);
 
-        animation: fade-color-out 9s ease-out;
+        animation: fade-color-out 18s ease-out;
 
         screen {
           position: absolute;
@@ -89,11 +118,13 @@
           right: 0;
           bottom: 0;
 
-          z-index: 1;
+          // z-index: 1;
+
+          border-radius: 1vw;
 
           background-color: rgba(0, 0, 0, 1);
 
-          animation: fade-background-out 10s ease-in-out forwards;
+          animation: fade-background-out 9s 6s ease-in-out forwards;
         }
 
         message {
@@ -103,13 +134,13 @@
           right: 0;
           bottom: 0;
 
-          z-index: 2;
+          // z-index: 2;
 
           display: flex;
 
           color: rgba(255, 255, 255, 1);
 
-          animation: fade-color-out 6s ease-out forwards;
+          animation: fade-color-out 6s 1s ease-out forwards;
 
           align-items: center;
           justify-content: center;
@@ -118,14 +149,11 @@
             margin: 0 1vw;
             font-size: 7vw;
 
-            text-shadow: 2px 2px 2px rgba(0, 0, 0, 1);
-            color: rgba(255, 215, 0, 1);
-
-            animation: fade-color-out 5s 4s ease-out forwards;
+            animation: fade-color-out 6s 3s ease-out forwards;
           }
         }
       }
-    }
+    // }
 
     mathbox {
       display: flex;
@@ -281,7 +309,6 @@
     <script src="lib/mathbox-bundle.min.js"></script>
 
     <mathbox tabindex="2">
-      <notice class="fade-out"><screen></screen><message>entering <trump>TRUMP</trump> orbit<message></notice>
       <script type="mathbox/jsx">
         const trump = [[[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0]],
         [[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[1.00392,0.83137,0.8,1],[1.24706,0.97255,0.76078,1],[1.40392,1.11373,0.78431,1],[1.4902,1.21569,0.87059,1],[1.52941,1.26275,0.94118,1],[1.41961,1.19216,0.91765,1],[1.40392,1.21569,0.98039,1],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0]],
@@ -337,12 +364,12 @@
         }
 
         const universe = [
-          new Mass(1000, [255, 255,   0, 0]),
-          new Mass(1,    [  0,   0, 255, 1], [   1000,  0,   30],   [   0,  0.5,  -35]),
-          new Mass(1,    [255,   0, 255, 1], [  -1000,  0, -900],   [   0,  0.5,   35]),
-          new Mass(0.015,  [255,   0,   0, 1], [      0,  0, 1950], [ 35,    5,     0]),
-          new Mass(0.25,   [255, 255, 255, 1], [      0,  0, 2050], [ 35,    5,     0]),
-          new Mass(10,   [0,   255, 255, 1], [      0,  0, 2000],   [ 35,   -1,     0])
+          new Mass(1000,  [255, 255,   0, 0]),
+          new Mass(1,     [  0,   0, 255, 1], [  1000,  0,   30], [  0,  0.5, -35]),
+          new Mass(1,     [255,   0, 255, 1], [ -1000,  0, -900], [  0,  0.5,  35]),
+          new Mass(0.015, [255,   0,   0, 1], [     0,  0, 1985], [ 35,   -5,   0]),
+          new Mass(0.25,  [255, 255, 255, 1], [     0,  0, 2015], [ 35,    5,   0]),
+          new Mass(10,    [  0, 255, 255, 1], [     0,  0, 2000], [ 35,   -1,   0])
         ];
 
         const [
@@ -391,7 +418,7 @@
                       width={trump[0].length}
                       height={trump.length}
                       data={trump} />
-              <point points="<<" colors="<" size={1000 * trumpScaleFactor} shape="square" opacity={1}/>
+              <point points="<<" colors="<" size={1200 * trumpScaleFactor} shape="square" opacity={1}/>
             </cartesian>
 
             <array id="positions"
@@ -411,11 +438,35 @@
           </cartesian>
         </root>
 
-        let ticksPerStep = 1,
-            stepsPerSecond = 60,
-            ticksPerSecond = stepsPerSecond * ticksPerStep;
+        function runner(universe, startTime = new Date().getTime()) {
+          let currentTick = 0;
 
-        setInterval(step, 1000 / stepsPerSecond);
+          return currentTime => {
+            const dt = currentTime - startTime,
+                  t = Math.ceil((dt / 1000) * ticksPerSecond);
+
+            for (let i = currentTick; i < t; i++) {
+              tick();
+              currentTick++;
+            }
+          };
+        }
+
+        const run = runner(universe);
+
+        window.requestAnimationFrame(animate);
+
+        function animate() {
+          run(new Date().getTime());
+          window.requestAnimationFrame(animate);
+        }
+
+
+        let ticksPerSecond = 60,
+            ticksPerStep = 10,
+            stepsPerSecond = 1;
+
+        // setInterval(step, 1000 / ticksPerStep);
 
         let currentStep = 0;
         function step() {
@@ -448,28 +499,28 @@
         function tick() {
           currentTick++;
 
-          universe.map(u => u.positionHalfTick(ticksPerSecond));
+          universe.map(u => u.positionHalfTick(ticksPerStep));
 
         //  for (let i = 0; i < universe.length; i++) positionHalfTick(universe[i]);
 
           for (let i = 0; i < universe.length; i++) {
             const {
-              position,
-              velocity,
-              acceleration,
-              gravity,
-              mass,
-              size
+              position: p1,
+              velocity: v1,
+              acceleration: a1,
+              gravity: g1,
+              mass: m1,
+              size: s1
             } = universe[i];
 
-            gravity[0] = 0;
-            gravity[1] = 0;
-            gravity[2] = 0;
+            g1[0] = 0;
+            g1[1] = 0;
+            g1[2] = 0;
 
             // can be optimized quite a bit?
             const collapseList = [];
             const pullVector = [0, 0, 0],
-                  oldOtherPosition = [0, 0, 0],
+                  oldp2 = [0, 0, 0],
                   difference = [0, 0, 0];
             const speedlimit = 300000;
             for (let j = i + 1; j < universe.length; j++) updatePair(universe[i], universe[j]);
@@ -478,44 +529,46 @@
               if (i === j) continue;
 
               const {
-                position: otherPosition,
-                velocity: otherVelocity,
-                acceleration: otherAcceleration,
-                mass: otherMass,
-                size: otherSize
+                position: p2,
+                velocity: v2,
+                acceleration: a2,
+                mass: m2,
+                size: s2
               } = universe[j];
 
-              difference[0] = position[0] - otherPosition[0];
-              difference[1] = position[1] - otherPosition[1];
-              difference[2] = position[2] - otherPosition[2];
+              difference[0] = p1[0] - p2[0];
+              difference[1] = p1[1] - p2[1];
+              difference[2] = p1[2] - p2[2];
 
               const time = -magnitude(difference) / (speedlimit * speedlimit),
-                    offset = time / ticksPerSecond; // 0; //time - (ticksPerSecond/1000);
+                    offset = time / ticksPerStep; // 0; //time - (ticksPerStep/1000);
 
-              oldOtherPosition[0] = otherPosition[0] + offset * (otherVelocity[0] + (otherVelocity[0] + offset * (otherAcceleration[0] /*+ gravity[0]*/)) / 2);
-              oldOtherPosition[1] = otherPosition[1] + offset * (otherVelocity[1] + (otherVelocity[1] + offset * (otherAcceleration[1] /*+ gravity[1]*/)) / 2);
-              oldOtherPosition[2] = otherPosition[2] + offset * (otherVelocity[2] + (otherVelocity[2] + offset * (otherAcceleration[2] /*+ gravity[2]*/)) / 2);
+              oldp2[0] = p2[0] + offset * (v2[0] + (v2[0] + offset * (a2[0] /*+ gravity[0]*/)) / 2);
+              oldp2[1] = p2[1] + offset * (v2[1] + (v2[1] + offset * (a2[1] /*+ gravity[1]*/)) / 2);
+              oldp2[2] = p2[2] + offset * (v2[2] + (v2[2] + offset * (a2[2] /*+ gravity[2]*/)) / 2);
 
-              pullVector[0] = oldOtherPosition[0] - position[0];
-              pullVector[1] = oldOtherPosition[1] - position[1];
-              pullVector[2] = oldOtherPosition[2] - position[2];
+              pullVector[0] = oldp2[0] - p1[0];
+              pullVector[1] = oldp2[1] - p1[1];
+              pullVector[2] = oldp2[2] - p1[2];
 
               const distance = magnitude(pullVector);
 
               // could handle collisions here?
 
               if (distance > 0) {
-                const factor = (mass * otherMass) / (distance * distance);
-                gravity[0] += pullVector[0] * factor;
-                gravity[1] += pullVector[1] * factor;
-                gravity[2] += pullVector[2] * factor;
+                const factor = (m1 * m2) / (distance * distance);
+                g1[0] += pullVector[0] * factor;
+                g1[1] += pullVector[1] * factor;
+                g1[2] += pullVector[2] * factor;
               }
+
+              if (distance < Math.log(s1 + s2)) console.log('collision', i, j, s1, s2, distance, Math.log(s1 + s2));
             }
 
             // F = ma ... a = F/m
-            gravity[0] = gravity[0] / mass;
-            gravity[1] = gravity[1] / mass;
-            gravity[2] = gravity[2] / mass;
+            g1[0] = g1[0] / m1;
+            g1[1] = g1[1] / m1;
+            g1[2] = g1[2] / m1;
           }
 
           for (let i = 0; i < universe.length; i++) {
@@ -526,11 +579,11 @@
               gravity
             } = universe[i];
 
-            velocity[0] += (acceleration[0] + gravity[0]) / ticksPerSecond;
-            velocity[1] += (acceleration[1] + gravity[1]) / ticksPerSecond;
-            velocity[2] += (acceleration[2] + gravity[2]) / ticksPerSecond;
+            velocity[0] += (acceleration[0] + gravity[0]) / ticksPerStep;
+            velocity[1] += (acceleration[1] + gravity[1]) / ticksPerStep;
+            velocity[2] += (acceleration[2] + gravity[2]) / ticksPerStep;
 
-            universe[i].positionHalfTick(ticksPerSecond);
+            universe[i].positionHalfTick(ticksPerStep);
           }
         }
 
@@ -542,6 +595,10 @@
 
         let selectedMassIndex = 0, savedColor = [0, 0, 0];
         selectMass(selectedMassIndex);
+
+        const trumpMassQuantityEl = document.querySelector('trump-mass-quantity');
+
+        trumpMassQuantityEl.innerHTML = universe[0].mass;
 
         module.exports = {
           editorPanel: false,
@@ -557,8 +614,10 @@
             [['H'], 'toggleHistory'],
             [['T'], 'fakeTweet'],
             [['L'], 'lookAtTrump'],
-            [[190], 'speedUp'],
-            [[188], 'slowDown'],
+            [[190], 'speed+'],
+            [[188], 'speed-'],
+            [['0'], 'ticks+'],
+            [['9'], 'ticks-'],
             [[32], 'changePlayer'],
             [[13], 'newMass'],
             [[221], 'nextPosition'],
@@ -598,8 +657,10 @@
               }
             },
             'lookAtTrump': () => lookAtIndex = 0,
-            'speedUp': () => ticksPerStep++,
-            'slowDown': () => ticksPerStep = Math.max(1, --ticksPerStep),
+            'speed+': () => ++stepsPerSecond,
+            'speed-': () => stepsPerSecond = Math.max(1, stepsPerSecond - 1),
+            'ticks+': () => ++ticksPerStep,
+            'ticks-': () => ticksPerStep = Math.max(1, ticksPerStep - 1),
             'changePlayer'() {
               unselectMass(selectedMassIndex);
               (selectedMassIndex = (selectedMassIndex + 1) % positions.length);
@@ -648,5 +709,9 @@
         }
       </script>
     </mathbox>
+    <hud>
+      <trump-mass><trump>TRUMP</trump>'s mass: <trump-mass-quantity></trump-mass-quantity></trump-mass>
+    </hud>
+    <notice class="fade-out"><screen></screen><message>entering <trump>TRUMP</trump> orbit<message></notice>
   </body>
 </html>
