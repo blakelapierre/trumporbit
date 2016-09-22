@@ -67,10 +67,11 @@ class Scene {
 }
 
 export default function attachMathBox(code, parentNode) {
-  const compressedCode = window.location.search || window.location.hash;
-  if (compressedCode) {
-    code = decompressFromEncodedURIComponent(compressedCode.substr(1));
-  }
+  // this needs to be pushed somewhere else (whatever calls attach?)
+  // const compressedCode = window.location.search || window.location.hash;
+  // if (compressedCode) {
+  //   code = decompressFromEncodedURIComponent(compressedCode.substr(1));
+  // }
 
   const newScene = new Scene();
 
