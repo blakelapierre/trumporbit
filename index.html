@@ -177,6 +177,14 @@
 
         animation: glow 20s 30s ease-in-out infinite;
       }
+
+      help-content {
+        display: none;
+
+        &.show {
+          display: block;
+        }
+      }
     }
 
     trump {
@@ -732,11 +740,13 @@
         orbitStatisticsQuantityEl.innerHTML = Math.max(0, universe.length - 1);
 
         const tagEl = document.querySelector('tag'),
-              commandsEl = document.querySelector('commands');
+              commandsEl = document.querySelector('commands'),
+              helpEl = document.querySelector('help'),
+              helpContentEl = document.querySelector('help-content');
 
-        tagEl.addEventListener('click', () => {
-          commandsEl.classList.toggle('show');
-        });
+        tagEl.addEventListener('click', () => commandsEl.classList.toggle('show'));
+
+        helpEl.addEventListener('click', () => helpContentEl.classList.toggle('show'));
 
         module.exports = {
           editorPanel: false,
