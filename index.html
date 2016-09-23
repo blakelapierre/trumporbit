@@ -669,7 +669,10 @@
                 'width'() {
                   lookAtIndex = universe.length;
                   // this should be calculated based on current trump mass (and, maybe, positions/velocities of orbiting masses?)
-                  addMass(new Mass(75, [0, 1, 1.2, 1], [universe[0].position[0], universe[0].position[1], universe[0].position[2] + 200], [330, 5, 0]))
+                  addMass(new Mass(800, [0, 1, 1.2, 1], [universe[0].position[0], universe[0].position[1], universe[0].position[2] + 100], [380, 5, 0]));
+
+                  // CNN orbit
+                  addMass(new Mass(5, [2, 2, 2, 1], [universe[0].position[0] + 100, universe[0].position[1], universe[0].position[2] + 40], [380, 5, 0]))
                   return universe.length;
                 }
               },
