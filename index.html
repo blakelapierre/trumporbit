@@ -482,14 +482,19 @@
 
         window.requestAnimationFrame(animate);
 
+        function add (result, v1, v2) {
+          result[0] = v1[0] + v2[0];
+          result[1] = v1[1] + v2[1];
+          result[2] = v1[2] + v2[2];
+          return result;
+        }
+
         const cameraPosition = [0, 0, 0];
         let cameraOffset = [0, 1000, 0];
         function animate() {
           run();
 
-          cameraPosition[0] = universe[positionIndex].position[0] + cameraOffset[0];
-          cameraPosition[1] = universe[positionIndex].position[1] + cameraOffset[1];
-          cameraPosition[2] = universe[positionIndex].position[2] + cameraOffset[2];
+          add(cameraPosition, universe[positionIndex].position, cameraOffset);
 
           window.requestAnimationFrame(animate);
         }
