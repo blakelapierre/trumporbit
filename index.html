@@ -51,9 +51,15 @@
       right: 100%;
       bottom: 100%;
 
-      color: rgba(255, 255, 255, 1);
+      color: rgba(255, 255, 255, 0.5);
 
       white-space: pre;
+
+      transition: color 2s ease-in-out;
+
+      &:hover {
+        color: rgba(255, 255, 255, 1);
+      }
 
       trump-mass {
         position: fixed;
@@ -75,6 +81,74 @@
         right: 0;
 
         margin: 1vw;
+      }
+
+      commands {
+        position: fixed;
+        left: 0;
+        bottom: 1vw;
+
+        margin: 1vw;
+
+        height: 0;
+        width: 0;
+
+        display: flex;
+        flex-wrap: wrap;
+
+        justify-content: space-between;
+        align-items: center;
+
+        border: solid 0px rgba(0, 0, 0, 0.7);
+
+        overflow: hidden;
+
+        transition: all 0.4s ease-in-out;
+
+        &.show {
+          height: 30vh;
+          width: 90vw;
+
+          border: solid 1px rgba(128, 128, 128, 0.4);
+        }
+
+        button {
+          flex: 1 1 auto;
+
+          padding: 0.5em;
+          margin: 0 0.1em;
+
+          font-size: 2em;
+
+          background-color: rgba(128, 128, 128, 0.1);
+
+          border: solid 1px rgba(128, 128, 128, 0.5);
+          border: none;
+
+          color: #fff;
+        }
+      }
+
+      tag {
+        position: fixed;
+
+        bottom: 0;
+        left: 0;
+
+        margin: 1vw;
+
+        font-size: 0.4em;
+
+        color: rgba(255, 255, 255, 0.5);
+
+        cursor: default;
+
+        user-select: none;
+        -webkit-user-select: none;
+
+        &:hover {
+          text-shadow: 0px 0px 1em rgba(255, 215, 0, 0.5);
+        }
       }
     }
 
@@ -630,6 +704,13 @@
         trumpMassQuantityEl.innerHTML = universe[0].mass;
         orbitStatisticsQuantityEl.innerHTML = Math.max(0, universe.length - 1);
 
+        const tagEl = document.querySelector('tag'),
+              commandsEl = document.querySelector('commands');
+
+        tagEl.addEventListener('click', () => {
+          commandsEl.classList.toggle('show');
+        });
+
         module.exports = {
           editorPanel: false,
           plugins: ['core', 'controls', 'cursor'],
@@ -732,11 +813,15 @@
               cameraDistance = 1000;
               return positionIndex = (positionIndex + 1) % universe.length;
             }
-          },
-          callback: (view, controls) => {
-
           }
         };
+
+        function button(text) {
+          const b = document.createElement('button');
+          b.innerHTML = text;
+          return b;
+        }
+
 
         // might want in the future, saves typing
         function randomMass() {
@@ -764,6 +849,8 @@
       <trump-mass><trump>TRUMP</trump>'s mass: <trump-mass-quantity></trump-mass-quantity></trump-mass>
       <orbit-statistics><orbit-statistics-quantity></orbit-statistics-quantity> masses in orbit</orbit-statistics>
       <catch-up><catch-up-quantity></catch-up-quantity> ticks behind</catch-up>
+      <commands></commands>
+      <tag><trump>TRUMP</trump>orbit <brand>alpha preview</brand> <version>uncommitted</version></tag>
     </hud>
     <notice class="fade-out"><screen></screen><message>entering <trump>TRUMP</trump> orbit<message></notice>
   </body>
