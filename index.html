@@ -483,13 +483,13 @@
         window.requestAnimationFrame(animate);
 
         const cameraPosition = [0, 0, 0];
-        let cameraDistance = 1000;
+        let cameraOffset = [0, 1000, 0];
         function animate() {
           run();
 
-          cameraPosition[0] = universe[positionIndex].position[0];
-          cameraPosition[1] = universe[positionIndex].position[1] + cameraDistance;
-          cameraPosition[2] = universe[positionIndex].position[2];
+          cameraPosition[0] = universe[positionIndex].position[0] + cameraOffset[0];
+          cameraPosition[1] = universe[positionIndex].position[1] + cameraOffset[1];
+          cameraPosition[2] = universe[positionIndex].position[2] + cameraOffset[2];
 
           window.requestAnimationFrame(animate);
         }
@@ -640,6 +640,8 @@
             [['T'], 'fakeTweet'],
             [['L'], 'lookAtTrump'],
             [['O'], 'overview'],
+            [['F'], 'frontview'],
+            [['S'], 'sideview'],
             [[190], 'speed+'],
             [[188], 'speed-'],
             [['0'], 'ticks+'],
@@ -687,7 +689,9 @@
               }
             },
             'lookAtTrump': () => lookAtIndex = 0,
-            'overview': () => {lookAtIndex = 0; positionIndex = 0; cameraDistance = 5000;},
+            'overview': () => {lookAtIndex = 0; positionIndex = 0; cameraOffset = [0, 5000, 0];},
+            'frontview': () => {lookAtIndex = 0; positionIndex = 0; cameraOffset = [0, 0, 5000];},
+            'sideview': () => {lookAtIndex = 0; positionIndex = 0; cameraOffset = [-5000, 0, 0];},
             'speed+': () => ++stepsPerSecond,
             'speed-': () => stepsPerSecond = Math.max(1, stepsPerSecond - 1),
             'ticks+': () => ++ticksPerStep,
@@ -723,6 +727,9 @@
               cameraDistance = 1000;
               return positionIndex = (positionIndex + 1) % universe.length;
             }
+          },
+          callback: (view, controls) => {
+
           }
         };
 
