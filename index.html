@@ -489,6 +489,8 @@
           }
         }
 
+        class Tweet extends Mass {};
+
         const universe = [
           new Mass(10000, [ 255,   255,    0, 0]),
           new Mass(1,     [   2,  0.33, 0.33, 1], [  1000,  0,   30], [  0,  0.5, -120]),
@@ -496,7 +498,7 @@
           new Mass(0.015, [ 255,     0,    0, 1], [     0,  0, 1985], [ 120,   -5,   0]),
           new Mass(0.25,  [ 255,   255,  255, 1], [     0,  0, 2015], [ 120,    5,   0]),
           new Mass(10,    [   0,   255,  255, 1], [     0,  0, 2000], [ 120,   -1,   0])
-        ];
+        ], tweets = [], media = [];
 
         const [
           positions,
@@ -526,6 +528,86 @@
 
           // get this out of here asap!
           orbitStatisticsQuantityEl.innerHTML = Math.max(0, universe.length - 1);
+        }
+
+        function addTweet() {
+          lookAtIndex = universe.length;
+          // this should be calculated based on current trump mass (and, maybe, positions/velocities of orbiting masses?)
+
+          const tweet = new Tweet(800, [0, 1, 1.2, 1],
+                                      [universe[0].position[0], universe[0].position[1], universe[0].position[2] + 100],
+                                      [380, 5, 0]),
+                cnn = new Mass(5, [2, 2, 2, 1],
+                                  [universe[0].position[0] + 100, universe[0].position[1], universe[0].position[2] + 40],
+                                  [380, 5, 0]);
+
+          addMass(tweet);
+          addMass(cnn);
+
+          tweets.push(tweet);
+          media.push(cnn);
+        }
+
+        function addRetweet() {
+           const tweet = tweets[tweets.length - 1];
+
+          if (!tweet) throw new Error('No tweet!!!!!!@!');
+
+          const {position: p} = tweet,
+                {position: tp, velocity: tv} = universe[0];
+
+          const x = 10;
+
+          const d = [0, 0, 0];
+
+          d[0] = tp[0] - p[0];
+          d[1] = tp[1] - p[1];
+          d[2] = tp[2] - p[2];
+
+          const m = magnitude(d);
+
+          const position = [p[0] + d[0] / m * (50 + 100 * Math.random())
+                           ,p[1] + d[1] / m * (50 + 100 * Math.random())
+                           ,p[2] + d[2] / m * (50 + 100 * Math.random())];
+
+          const d2 = [tp[0] - position[0]
+                     ,tp[1] - position[1]
+                     ,tp[2] - position[2]];
+
+          addMass(new Mass(1, [25 / 128, 207 / 128, 134 / 128, 1],
+                              position,
+                              [tv[0] + d2[0]/x, tv[1] + d2[1]/x, tv[2] + d2[2]/x]));
+        }
+
+        function addLike() {
+          const tweet = tweets[tweets.length - 1];
+
+          if (!tweet) throw new Error('No tweet!!!!!!@!');
+
+          const {position: p} = tweet,
+                {position: tp, velocity: tv} = universe[0];
+
+          const x = 10;
+
+          const d = [0, 0, 0];
+
+          d[0] = tp[0] - p[0];
+          d[1] = tp[1] - p[1];
+          d[2] = tp[2] - p[2];
+
+          const m = magnitude(d);
+
+          const position = [p[0] + d[0] / m * (50 + 100 * Math.random())
+                           ,p[1] + d[1] / m * (50 + 100 * Math.random())
+                           ,p[2] + d[2] / m * (50 + 100 * Math.random())];
+
+          const d2 = [tp[0] - position[0]
+                     ,tp[1] - position[1]
+                     ,tp[2] - position[2]];
+
+          addMass(new Mass(1, [190 / 128, 25 / 128, 49 / 128, 1],
+                              position,
+                              [tv[0] + d[0]/x, tv[1] + d[1]/x, tv[2] + d[2]/x]));
         }
 
         let trumpScaleFactor = 5;
@@ -765,6 +847,8 @@
             [['Z'], 'down'],
             [['H'], 'toggleHistory'],
             [['T'], 'fakeTweet'],
+            [['R'], 'fakeRetweet'],
+            [['K'], 'fakeLike'],
             [['L'], 'lookAtTrump'],
             [['O'], 'overview'],
             [['F'], 'frontview'],
@@ -796,12 +880,41 @@
             'fakeTweet': {
               '#positions': {
                 'width'() {
-                  lookAtIndex = universe.length;
-                  // this should be calculated based on current trump mass (and, maybe, positions/velocities of orbiting masses?)
-                  addMass(new Mass(800, [0, 1, 1.2, 1], [universe[0].position[0], universe[0].position[1], universe[0].position[2] + 100], [380, 5, 0]));
-
-                  // CNN orbit
-                  addMass(new Mass(5, [2, 2, 2, 1], [universe[0].position[0] + 100, universe[0].position[1], universe[0].position[2] + 40], [380, 5, 0]))
+                  addTweet();
+                  return universe.length;
+                }
+              },
+              '#colors': {
+                'width'() { return universe.length; }
+              },
+              '#velocities': {
+                'width'() { return universe.length; }
+              },
+              '#sizes': {
+                'width'() { return universe.length; }
+              }
+            },
+            'fakeRetweet': {
+              '#positions': {
+                'width'() {
+                  addRetweet();
+                  return universe.length;
+                }
+              },
+              '#colors': {
+                'width'() { return universe.length; }
+              },
+              '#velocities': {
+                'width'() { return universe.length; }
+              },
+              '#sizes': {
+                'width'() { return universe.length; }
+              }
+            },
+            'fakeLike': {
+              '#positions': {
+                'width'() {
+                  addLike();
                   return universe.length;
                 }
               },
@@ -904,6 +1017,8 @@
            ] 'nextPosition
            [ 'prevPosition
            T 'fakeTweet
+           R 'fakeRetweet
+           K 'fakeLike
        ENTER 'newMass
        SPACE 'change movement target
            A 'left
