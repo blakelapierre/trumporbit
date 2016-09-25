@@ -51,6 +51,8 @@
       right: 100%;
       bottom: 100%;
 
+      z-index: 1;
+
       color: rgba(255, 255, 255, 0.5);
 
       white-space: pre;
@@ -225,11 +227,11 @@
 
         font-size: 5vw;
 
-        // z-index: 2;
+        z-index: 2;
 
         transform: scale(0);
 
-        animation: fade-color-out 9s ease-out;
+        animation: fade-color-out 9s ease-in-out;
 
         &.no-intro {
           display: none;
@@ -248,7 +250,7 @@
 
           background-color: rgba(0, 0, 0, 1);
 
-          animation: fade-background-out 9s 6s ease-in-out forwards;
+          animation: fade-background-out 6s 3s ease-in-out forwards;
         }
 
         message {
@@ -264,7 +266,7 @@
 
           color: rgba(255, 255, 255, 1);
 
-          animation: fade-color-out 6s 1s ease-out forwards;
+          animation: fade-color-out 6s 1s ease-in-out forwards;
 
           align-items: center;
           justify-content: center;
@@ -273,7 +275,7 @@
             margin: 0 1vw;
             font-size: 7vw;
 
-            animation: fade-color-out 6s 3s ease-out forwards;
+            animation: fade-color-out 6s 3s ease-in-out forwards;
           }
         }
       }
@@ -713,6 +715,8 @@
               gravity
             } = universe[i];
 
+            // add(velocity, velocity, s)
+
             velocity[0] += (acceleration[0] + gravity[0]) / ticksPerStep;
             velocity[1] += (acceleration[1] + gravity[1]) / ticksPerStep;
             velocity[2] += (acceleration[2] + gravity[2]) / ticksPerStep;
@@ -885,36 +889,36 @@
         }
 
       </script>
+       <hud>
+         <trump-mass><trump>TRUMP</trump>'s mass: <trump-mass-quantity></trump-mass-quantity></trump-mass>
+         <orbit-statistics><orbit-statistics-quantity></orbit-statistics-quantity> masses in orbit</orbit-statistics>
+         <catch-up><catch-up-quantity></catch-up-quantity> ticks behind</catch-up>
+         <commands></commands>
+         <tag><trump>TRUMP</trump>orbit <brand>alpha preview</brand> <version>uncommitted</version></tag>
+         <help>?</help>
+         <help-content>
+           O 'overview
+           F 'frontview
+           S 'sideview
+           L 'lookAtTrump
+           ] 'nextPosition
+           [ 'prevPosition
+           T 'fakeTweet
+       ENTER 'newMass
+       SPACE 'change movement target
+           A 'left
+           D 'right
+           W 'forward
+           S 'backward
+           Q 'up
+           Z 'down
+           . 'speed+
+           , 'speed-
+           0 'ticks+
+           9 'ticks-
+         </help-content>
+       </hud>
     </mathbox>
-    <hud>
-      <trump-mass><trump>TRUMP</trump>'s mass: <trump-mass-quantity></trump-mass-quantity></trump-mass>
-      <orbit-statistics><orbit-statistics-quantity></orbit-statistics-quantity> masses in orbit</orbit-statistics>
-      <catch-up><catch-up-quantity></catch-up-quantity> ticks behind</catch-up>
-      <commands></commands>
-      <tag><trump>TRUMP</trump>orbit <brand>alpha preview</brand> <version>uncommitted</version></tag>
-      <help>?</help>
-      <help-content>
-        O 'overview
-        F 'frontview
-        S 'sideview
-        L 'lookAtTrump
-        ] 'nextPosition
-        [ 'prevPosition
-        T 'fakeTweet
-    ENTER 'newMass
-    SPACE 'change movement target
-        A 'left
-        D 'right
-        W 'forward
-        S 'backward
-        Q 'up
-        Z 'down
-        . 'speed+
-        , 'speed-
-        0 'ticks+
-        9 'ticks-
-      </help-content>
-    </hud>
     <notice class="fade-out"><screen></screen><message>entering <trump>TRUMP</trump> orbit<message></notice>
   </body>
 </html>
