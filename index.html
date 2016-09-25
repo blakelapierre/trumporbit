@@ -535,10 +535,10 @@
           // this should be calculated based on current trump mass (and, maybe, positions/velocities of orbiting masses?)
 
           const tweet = new Tweet(800, [0, 1, 1.2, 1],
-                                      [universe[0].position[0], universe[0].position[1], universe[0].position[2] + 100],
+                                      [universe[0].position[0], universe[0].position[1], universe[0].position[2] + 250],
                                       [380, 5, 0]),
                 cnn = new Mass(5, [2, 2, 2, 1],
-                                  [universe[0].position[0] + 100, universe[0].position[1], universe[0].position[2] + 40],
+                                  [universe[0].position[0] + 250, universe[0].position[1] + 0, universe[0].position[2] + 250],
                                   [380, 5, 0]);
 
           addMass(tweet);
@@ -556,7 +556,7 @@
           const {position: p} = tweet,
                 {position: tp, velocity: tv} = universe[0];
 
-          const x = 10;
+          const x = 20;
 
           const d = [0, 0, 0];
 
@@ -587,7 +587,7 @@
           const {position: p} = tweet,
                 {position: tp, velocity: tv} = universe[0];
 
-          const x = 10;
+          const x = 20;
 
           const d = [0, 0, 0];
 
@@ -684,6 +684,8 @@
 
         const cameraPosition = [0, 0, 0];
         let cameraOffset = [0, 1000, 0];
+        const collisionList = []; // where should this go?
+
         function animate() {
           run();
 
@@ -745,6 +747,7 @@
               const t = -magnitude(d) / (speedlimit * speedlimit),
                     o = t / ticksPerStep; // 0; //t2 - (ticksPerStep/1000);
 
+              // Probably a better way to do this?
               oldp1[0] = p1[0] + o * (v1[0] + (v1[0] + o * (a1[0] /*+ g1[0]*/)) / 2);
               oldp1[1] = p1[1] + o * (v1[1] + (v1[1] + o * (a1[1] /*+ g1[1]*/)) / 2);
               oldp1[2] = p1[2] + o * (v1[2] + (v1[2] + o * (a1[2] /*+ g1[2]*/)) / 2);
@@ -781,6 +784,9 @@
                 g1[2] += pv2[2] * factor;
               }
 
+              const threshold = Math.log2(s1 + s2);
+              if (d1 < threshold || d2 < threshold) collisionList.push([s1 < s2, universe[i], universe[j], s1 < s2 ? i : j]);
+
               // if (d1 < Math.log(s1 + s2)) console.log('collision', i, j, s1, s2, d1, Math.log(s1 + s2));
             }
 
@@ -805,6 +811,38 @@
 
             universe[i].positionHalfTick(ticksPerStep);
           }
+
+          for (let i = collisionList.length - 1; i >= 0; i--) {
+            const [firstSmaller, mass1, mass2] = collisionList[i],
+                  smallerMass = firstSmaller ? mass1 : mass2,
+                  greaterMass = firstSmaller ? mass2 : mass1;
+
+            greaterMass.mass += smallerMass.mass;
+          }
+
+          for (let i = collisionList.length - 1; i >= 0; i--) {
+            const [firstSmaller, mass1, mass2, smallerIndex] = collisionList[i],
+                  smallerMass = firstSmaller ? mass1 : mass2;
+
+            if (typeof smallerMass === Tweet) {
+              tweets.splice(tweets.indexOf(smallerMass), 1);
+            }
+
+            universe.splice(smallerIndex, 1);
+            positions.splice(smallerIndex, 1);
+            velocities.splice(smallerIndex, 1);
+            accelerations.splice(smallerIndex, 1);
+            gravities.splice(smallerIndex, 1);
+            masses.splice(smallerIndex, 1);
+            sizes.splice(smallerIndex, 1);
+            colors.splice(smallerIndex, 1);
+
+            if (positionIndex >= smallerIndex && positionIndex > 0) positionIndex--;
+            if (lookAtIndex >= smallerIndex) lookAtIndex--;
+          }
+
+          updateMassesGUI();
+          collisionList.splice(0);
         }
 
         function magnitude(vector) {
@@ -822,8 +860,12 @@
               orbitStatisticsQuantityEl = document.querySelector('orbit-statistics-quantity'),
               catchUpQuantityEl = document.querySelector('catch-up-quantity');
 
-        trumpMassQuantityEl.innerHTML = universe[0].mass;
-        orbitStatisticsQuantityEl.innerHTML = Math.max(0, universe.length - 1);
+        updateMassesGUI();
+
+        function updateMassesGUI() {
+          trumpMassQuantityEl.innerHTML = universe[0].mass;
+          orbitStatisticsQuantityEl.innerHTML = Math.max(0, universe.length - 1);
+        }
 
         const tagEl = document.querySelector('tag'),
               commandsEl = document.querySelector('commands'),
