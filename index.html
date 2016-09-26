@@ -599,6 +599,11 @@
           orbitStatisticsQuantityEl.innerHTML = Math.max(0, universe.length - 1);
         }
 
+        function addObserver() {
+          lookAtIndex = universe.length;
+          addMass(new Mass(1, [255, 255, 255, 1], [universe[0].position[0], universe[0].position[1], universe[0].position[2] + 3000], [143, -1, 0]));
+        }
+
         function addTweet() {
           lookAtIndex = universe.length;
           // this should be calculated based on current trump mass (and, maybe, positions/velocities of orbiting masses?)
@@ -1078,8 +1083,7 @@
             'newMass': {
               '#positions': {
                 'width'() {
-                  lookAtIndex = universe.length;
-                  addMass(new Mass(1, [255, 255, 255, 1], [universe[0].position[0], universe[0].position[1], universe[0].position[2] + 3000], [143, -1, 0]));
+                  addObserver();
                   return universe.length;
                 }
               },
