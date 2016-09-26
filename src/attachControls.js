@@ -18,7 +18,7 @@ export default function attachControls(view, controls, commands) {
           forEach(props, updateProp);
 
           function updateProp(propName, action) {
-            console.log('updateProp', propName, typeof action, action);
+            // console.log('updateProp', propName, typeof action, action);
             let isComplex = typeof action !== 'function',
                 getNewValue = isComplex ? getComplexPropValue : action;
 

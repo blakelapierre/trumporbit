@@ -85,6 +85,58 @@
         margin: 1vw;
       }
 
+      @keyframes fade-and-hide {
+        0% {
+          opacity: 1;
+          // display: block;
+        }
+        100% {
+          opacity: 0;
+          // display: none;
+        }
+      }
+
+      trump-tweet {
+        display: none;
+
+        position: fixed;
+
+        top: 20%;
+        width: 100%;
+
+        font-size: 2em;
+
+        text-align: center;
+
+        color: #fff;
+
+        opacity: 0;
+
+        white-space: normal;
+
+        &.show {
+          display: block;
+
+          animation: fade-and-hide 15s ease-in-out forwards;
+
+          warning {
+            animation: fade-and-hide 7s ease-in-out forwards;
+          }
+
+          info {
+            animation: fade-and-hide 11s 1.5s ease-in-out forwards;
+          }
+        }
+
+        info {
+          display: block;
+
+          margin-top: 1em;
+
+          opacity: 0;
+        }
+      }
+
       commands {
         position: fixed;
         left: 0;
@@ -250,7 +302,11 @@
 
           background-color: rgba(0, 0, 0, 1);
 
+<<<<<<< HEAD
           animation: fade-background-out 6s s3 ease-in-out forwards;
+=======
+          animation: fade-background-out 6s 3s ease-in-out forwards;
+>>>>>>> builder_working
         }
 
         message {
@@ -489,6 +545,8 @@
           }
         }
 
+        class Tweet extends Mass {};
+
         const universe = [
           new Mass(10000, [ 255,   255,    0, 0]),
           new Mass(1,     [   2,  0.33, 0.33, 1], [  1000,  0,   30], [  0,  0.5, -120]),
@@ -496,7 +554,7 @@
           new Mass(0.015, [ 255,     0,    0, 1], [     0,  0, 1985], [ 120,   -5,   0]),
           new Mass(0.25,  [ 255,   255,  255, 1], [     0,  0, 2015], [ 120,    5,   0]),
           new Mass(10,    [   0,   255,  255, 1], [     0,  0, 2000], [ 120,   -1,   0])
-        ];
+        ], tweets = [], media = [], events = [];
 
         const [
           positions,
@@ -526,6 +584,88 @@
 
           // get this out of here asap!
           orbitStatisticsQuantityEl.innerHTML = Math.max(0, universe.length - 1);
+        }
+
+        function addTweet() {
+          lookAtIndex = universe.length;
+          // this should be calculated based on current trump mass (and, maybe, positions/velocities of orbiting masses?)
+
+          const tweet = new Tweet(800, [0, 1, 1.2, 1],
+                                      [universe[0].position[0], universe[0].position[1], universe[0].position[2] + 250],
+                                      [300, 5, 0]),
+                cnn = new Mass(5, [2, 2, 2, 1],
+                                  [universe[0].position[0] + 200, universe[0].position[1] + 0, universe[0].position[2] + 250],
+                                  [300, 5, 0]);
+
+          addMass(tweet);
+          addMass(cnn);
+
+          tweets.push(tweet);
+          media.push(cnn);
+
+          events.push('new_tweet');
+        }
+
+        function addRetweet() {
+           const tweet = tweets[tweets.length - 1];
+
+          if (!tweet) throw new Error('No tweet!!!!!!@!');
+
+          const {position: p} = tweet,
+                {position: tp, velocity: tv} = universe[0];
+
+          const x = 20;
+
+          const d = [0, 0, 0];
+
+          d[0] = tp[0] - p[0];
+          d[1] = tp[1] - p[1];
+          d[2] = tp[2] - p[2];
+
+          const m = magnitude(d);
+
+          const position = [p[0] + d[0] / m * (50 + 100 * Math.random())
+                           ,p[1] + d[1] / m * (50 + 100 * Math.random())
+                           ,p[2] + d[2] / m * (50 + 100 * Math.random())];
+
+          const d2 = [tp[0] - position[0]
+                     ,tp[1] - position[1]
+                     ,tp[2] - position[2]];
+
+          addMass(new Mass(1, [25 / 128, 207 / 128, 134 / 128, 1],
+                              position,
+                              [tv[0] + d2[0]/x, tv[1] + d2[1]/x, tv[2] + d2[2]/x]));
+        }
+
+        function addLike() {
+          const tweet = tweets[tweets.length - 1];
+
+          if (!tweet) throw new Error('No tweet!!!!!!@!');
+
+          const {position: p} = tweet,
+                {position: tp, velocity: tv} = universe[0];
+
+          const x = 20;
+
+          const d = [0, 0, 0];
+
+          d[0] = tp[0] - p[0];
+          d[1] = tp[1] - p[1];
+          d[2] = tp[2] - p[2];
+
+          const m = magnitude(d);
+
+          const position = [p[0] + d[0] / m * (50 + 100 * Math.random())
+                           ,p[1] + d[1] / m * (50 + 100 * Math.random())
+                           ,p[2] + d[2] / m * (50 + 100 * Math.random())];
+
+          const d2 = [tp[0] - position[0]
+                     ,tp[1] - position[1]
+                     ,tp[2] - position[2]];
+
+          addMass(new Mass(1, [190 / 128, 25 / 128, 49 / 128, 1],
+                              position,
+                              [tv[0] + d[0]/x, tv[1] + d[1]/x, tv[2] + d[2]/x]));
         }
 
         let trumpScaleFactor = 5;
@@ -602,10 +742,21 @@
 
         const cameraPosition = [0, 0, 0];
         let cameraOffset = [0, 1000, 0];
+        const collisionList = []; // where should this go?
+
         function animate() {
           run();
 
           add(cameraPosition, universe[positionIndex].position, cameraOffset);
+
+          void trumpTweetEl.offsetWidth;
+          for (let i = 0; i < events.length; i++) {
+            const event = events[i];
+
+            if (event === 'new_tweet') trumpTweetEl.classList.add('show');
+          }
+
+          events.splice(0);
 
           window.requestAnimationFrame(animate);
         }
@@ -663,6 +814,7 @@
               const t = -magnitude(d) / (speedlimit * speedlimit),
                     o = t / ticksPerStep; // 0; //t2 - (ticksPerStep/1000);
 
+              // Probably a better way to do this?
               oldp1[0] = p1[0] + o * (v1[0] + (v1[0] + o * (a1[0] /*+ g1[0]*/)) / 2);
               oldp1[1] = p1[1] + o * (v1[1] + (v1[1] + o * (a1[1] /*+ g1[1]*/)) / 2);
               oldp1[2] = p1[2] + o * (v1[2] + (v1[2] + o * (a1[2] /*+ g1[2]*/)) / 2);
@@ -699,6 +851,9 @@
                 g1[2] += pv2[2] * factor;
               }
 
+              const threshold = 4 * Math.log2(s1 + s2) / 3;
+              if (d1 < threshold || d2 < threshold) collisionList.push([s1 < s2, universe[i], universe[j], s1 < s2 ? i : j]);
+
               // if (d1 < Math.log(s1 + s2)) console.log('collision', i, j, s1, s2, d1, Math.log(s1 + s2));
             }
 
@@ -723,6 +878,46 @@
 
             universe[i].positionHalfTick(ticksPerStep);
           }
+
+          for (let i = collisionList.length - 1; i >= 0; i--) {
+            const [firstSmaller, mass1, mass2] = collisionList[i],
+                  smallerMass = firstSmaller ? mass1 : mass2,
+                  greaterMass = firstSmaller ? mass2 : mass1;
+
+            greaterMass.mass += smallerMass.mass;
+          }
+
+          for (let i = collisionList.length - 1; i >= 0; i--) {
+            const [firstSmaller, mass1, mass2, smallerIndex] = collisionList[i],
+                  smallerMass = firstSmaller ? mass1 : mass2;
+
+            if (typeof smallerMass === Tweet) {
+              tweets.splice(tweets.indexOf(smallerMass), 1);
+            }
+
+            universe.splice(smallerIndex, 1);
+            positions.splice(smallerIndex, 1);
+            velocities.splice(smallerIndex, 1);
+            accelerations.splice(smallerIndex, 1);
+            gravities.splice(smallerIndex, 1);
+            masses.splice(smallerIndex, 1);
+            sizes.splice(smallerIndex, 1);
+            colors.splice(smallerIndex, 1);
+
+            if (positionIndex >= smallerIndex && positionIndex > 0) positionIndex--;
+            if (lookAtIndex >= smallerIndex) lookAtIndex--;
+          }
+
+          updateMassesGUI();
+          collisionList.splice(0);
+
+          for (let i = 0; i < events.length; i++) {
+            const event = events[i];
+
+            if (event === 'new_tweet') {
+              trumpTweetEl.classList.remove('show');
+            }
+          }
         }
 
         function magnitude(vector) {
@@ -738,10 +933,15 @@
 
         const trumpMassQuantityEl = document.querySelector('trump-mass-quantity'),
               orbitStatisticsQuantityEl = document.querySelector('orbit-statistics-quantity'),
-              catchUpQuantityEl = document.querySelector('catch-up-quantity');
+              catchUpQuantityEl = document.querySelector('catch-up-quantity'),
+              trumpTweetEl = document.querySelector('trump-tweet');
 
-        trumpMassQuantityEl.innerHTML = universe[0].mass;
-        orbitStatisticsQuantityEl.innerHTML = Math.max(0, universe.length - 1);
+        updateMassesGUI();
+
+        function updateMassesGUI() {
+          trumpMassQuantityEl.innerHTML = universe[0].mass;
+          orbitStatisticsQuantityEl.innerHTML = Math.max(0, universe.length - 1);
+        }
 
         const tagEl = document.querySelector('tag'),
               commandsEl = document.querySelector('commands'),
@@ -765,6 +965,8 @@
             [['Z'], 'down'],
             [['H'], 'toggleHistory'],
             [['T'], 'fakeTweet'],
+            [['R'], 'fakeRetweet'],
+            [['K'], 'fakeLike'],
             [['L'], 'lookAtTrump'],
             [['O'], 'overview'],
             [['F'], 'frontview'],
@@ -796,12 +998,41 @@
             'fakeTweet': {
               '#positions': {
                 'width'() {
-                  lookAtIndex = universe.length;
-                  // this should be calculated based on current trump mass (and, maybe, positions/velocities of orbiting masses?)
-                  addMass(new Mass(800, [0, 1, 1.2, 1], [universe[0].position[0], universe[0].position[1], universe[0].position[2] + 100], [380, 5, 0]));
-
-                  // CNN orbit
-                  addMass(new Mass(5, [2, 2, 2, 1], [universe[0].position[0] + 100, universe[0].position[1], universe[0].position[2] + 40], [380, 5, 0]))
+                  addTweet();
+                  return universe.length;
+                }
+              },
+              '#colors': {
+                'width'() { return universe.length; }
+              },
+              '#velocities': {
+                'width'() { return universe.length; }
+              },
+              '#sizes': {
+                'width'() { return universe.length; }
+              }
+            },
+            'fakeRetweet': {
+              '#positions': {
+                'width'() {
+                  addRetweet();
+                  return universe.length;
+                }
+              },
+              '#colors': {
+                'width'() { return universe.length; }
+              },
+              '#velocities': {
+                'width'() { return universe.length; }
+              },
+              '#sizes': {
+                'width'() { return universe.length; }
+              }
+            },
+            'fakeLike': {
+              '#positions': {
+                'width'() {
+                  addLike();
                   return universe.length;
                 }
               },
@@ -893,6 +1124,10 @@
          <trump-mass><trump>TRUMP</trump>'s mass: <trump-mass-quantity></trump-mass-quantity></trump-mass>
          <orbit-statistics><orbit-statistics-quantity></orbit-statistics-quantity> masses in orbit</orbit-statistics>
          <catch-up><catch-up-quantity></catch-up-quantity> ticks behind</catch-up>
+         <trump-tweet>
+           <warning><trump>TRUMP</trump> has tweeted, watch out!</warning>
+           <info>Don't worry, CNN is in orbit!</info>
+         </trump-tweet>
          <commands></commands>
          <tag><trump>TRUMP</trump>orbit <brand>alpha preview</brand> <version>uncommitted</version></tag>
          <help>?</help>
@@ -904,6 +1139,8 @@
            ] 'nextPosition
            [ 'prevPosition
            T 'fakeTweet
+           R 'fakeRetweet
+           K 'fakeLike
        ENTER 'newMass
        SPACE 'change movement target
            A 'left
