@@ -85,6 +85,58 @@
         margin: 1vw;
       }
 
+      @keyframes fade-and-hide {
+        0% {
+          opacity: 1;
+          // display: block;
+        }
+        100% {
+          opacity: 0;
+          // display: none;
+        }
+      }
+
+      trump-tweet {
+        display: none;
+
+        position: fixed;
+
+        top: 20%;
+        width: 100%;
+
+        font-size: 2em;
+
+        text-align: center;
+
+        color: #fff;
+
+        opacity: 0;
+
+        white-space: normal;
+
+        &.show {
+          display: block;
+
+          animation: fade-and-hide 15s ease-in-out forwards;
+
+          warning {
+            animation: fade-and-hide 7s ease-in-out forwards;
+          }
+
+          info {
+            animation: fade-and-hide 11s 1.5s ease-in-out forwards;
+          }
+        }
+
+        info {
+          display: block;
+
+          margin-top: 1em;
+
+          opacity: 0;
+        }
+      }
+
       commands {
         position: fixed;
         left: 0;
@@ -498,7 +550,7 @@
           new Mass(0.015, [ 255,     0,    0, 1], [     0,  0, 1985], [ 120,   -5,   0]),
           new Mass(0.25,  [ 255,   255,  255, 1], [     0,  0, 2015], [ 120,    5,   0]),
           new Mass(10,    [   0,   255,  255, 1], [     0,  0, 2000], [ 120,   -1,   0])
-        ], tweets = [], media = [];
+        ], tweets = [], media = [], events = [];
 
         const [
           positions,
@@ -538,7 +590,7 @@
                                       [universe[0].position[0], universe[0].position[1], universe[0].position[2] + 250],
                                       [300, 5, 0]),
                 cnn = new Mass(5, [2, 2, 2, 1],
-                                  [universe[0].position[0] + 250, universe[0].position[1] + 0, universe[0].position[2] + 250],
+                                  [universe[0].position[0] + 200, universe[0].position[1] + 0, universe[0].position[2] + 250],
                                   [300, 5, 0]);
 
           addMass(tweet);
@@ -546,6 +598,8 @@
 
           tweets.push(tweet);
           media.push(cnn);
+
+          events.push('new_tweet');
         }
 
         function addRetweet() {
@@ -690,6 +744,15 @@
           run();
 
           add(cameraPosition, universe[positionIndex].position, cameraOffset);
+
+          void trumpTweetEl.offsetWidth;
+          for (let i = 0; i < events.length; i++) {
+            const event = events[i];
+
+            if (event === 'new_tweet') trumpTweetEl.classList.add('show');
+          }
+
+          events.splice(0);
 
           window.requestAnimationFrame(animate);
         }
@@ -843,6 +906,14 @@
 
           updateMassesGUI();
           collisionList.splice(0);
+
+          for (let i = 0; i < events.length; i++) {
+            const event = events[i];
+
+            if (event === 'new_tweet') {
+              trumpTweetEl.classList.remove('show');
+            }
+          }
         }
 
         function magnitude(vector) {
@@ -858,7 +929,8 @@
 
         const trumpMassQuantityEl = document.querySelector('trump-mass-quantity'),
               orbitStatisticsQuantityEl = document.querySelector('orbit-statistics-quantity'),
-              catchUpQuantityEl = document.querySelector('catch-up-quantity');
+              catchUpQuantityEl = document.querySelector('catch-up-quantity'),
+              trumpTweetEl = document.querySelector('trump-tweet');
 
         updateMassesGUI();
 
@@ -1048,6 +1120,10 @@
          <trump-mass><trump>TRUMP</trump>'s mass: <trump-mass-quantity></trump-mass-quantity></trump-mass>
          <orbit-statistics><orbit-statistics-quantity></orbit-statistics-quantity> masses in orbit</orbit-statistics>
          <catch-up><catch-up-quantity></catch-up-quantity> ticks behind</catch-up>
+         <trump-tweet>
+           <warning><trump>TRUMP</trump> has tweeted, watch out!</warning>
+           <info>Don't worry, CNN is in orbit!</info>
+         </trump-tweet>
          <commands></commands>
          <tag><trump>TRUMP</trump>orbit <brand>alpha preview</brand> <version>uncommitted</version></tag>
          <help>?</help>
