@@ -85,6 +85,19 @@
         margin: 1vw;
       }
 
+      catch-up {
+        position: fixed;
+
+        top: 75%;
+        width: 100%;
+
+        font-size: 2vw;
+
+        text-align: center;
+
+        color: #ddd;
+      }
+
       @keyframes fade-and-hide {
         0% {
           opacity: 1;
@@ -887,7 +900,7 @@
             const [firstSmaller, mass1, mass2, smallerIndex] = collisionList[i],
                   smallerMass = firstSmaller ? mass1 : mass2;
 
-            if (typeof smallerMass === Tweet) {
+            if (smallerMass instanceof Tweet) {
               tweets.splice(tweets.indexOf(smallerMass), 1);
             }
 
@@ -900,7 +913,10 @@
             sizes.splice(smallerIndex, 1);
             colors.splice(smallerIndex, 1);
 
-            if (positionIndex >= smallerIndex && positionIndex > 0) positionIndex--;
+            if (positionIndex >= smallerIndex && positionIndex > 0) {
+              if (positionIndex === smallerIndex) positionIndex = 0;
+              else positionIndex--;
+            }
             if (lookAtIndex >= smallerIndex) lookAtIndex--;
           }
 
@@ -1122,7 +1138,7 @@
          <catch-up><catch-up-quantity></catch-up-quantity> ticks behind</catch-up>
          <trump-tweet>
            <warning><trump>TRUMP</trump> has tweeted, watch out!</warning>
-           <info>Don't worry, CNN is in orbit!</info>
+           <info>Don't worry, CNN is orbiting it!</info>
          </trump-tweet>
          <commands></commands>
          <tag><trump>TRUMP</trump>orbit <brand>alpha preview</brand> <version>uncommitted</version></tag>
