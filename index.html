@@ -536,10 +536,10 @@
 
           const tweet = new Tweet(800, [0, 1, 1.2, 1],
                                       [universe[0].position[0], universe[0].position[1], universe[0].position[2] + 250],
-                                      [380, 5, 0]),
+                                      [300, 5, 0]),
                 cnn = new Mass(5, [2, 2, 2, 1],
                                   [universe[0].position[0] + 250, universe[0].position[1] + 0, universe[0].position[2] + 250],
-                                  [380, 5, 0]);
+                                  [300, 5, 0]);
 
           addMass(tweet);
           addMass(cnn);
@@ -784,7 +784,7 @@
                 g1[2] += pv2[2] * factor;
               }
 
-              const threshold = Math.log2(s1 + s2);
+              const threshold = 4 * Math.log2(s1 + s2) / 3;
               if (d1 < threshold || d2 < threshold) collisionList.push([s1 < s2, universe[i], universe[j], s1 < s2 ? i : j]);
 
               // if (d1 < Math.log(s1 + s2)) console.log('collision', i, j, s1, s2, d1, Math.log(s1 + s2));
