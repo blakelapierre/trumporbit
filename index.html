@@ -109,6 +109,23 @@
         }
       }
 
+      @keyframes flash-fade-and-hide {
+        0% {
+          text-shadow: 0px 0px 1em #fff;
+          opacity: 1;
+          // display: block;
+        }
+        5% {
+          text-shadow: 0px 0px 0px #fff;
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+          text-shadow: none;
+          // display: none;
+        }
+      }
+
       trump-tweet {
         display: none;
 
@@ -147,6 +164,31 @@
           margin-top: 1em;
 
           opacity: 0;
+        }
+      }
+
+      absorbed {
+        display: none;
+
+        position: fixed;
+
+        bottom: 20%;
+        width: 100%;
+
+        text-align: center;
+
+        font-size: 2vw;
+
+        color: #fff;
+
+        opacity: 0;
+
+        white-space: normal;
+
+        &.show {
+          display: block;
+
+          animation: flash-fade-and-hide 10s ease-in-out forwards;
         }
       }
 
@@ -544,6 +586,8 @@
             this.gravity = gravity;
           }
 
+          get name() { return 'Mass'; }
+
           get size() { return 1000 * Math.log2(this.mass + 1); }
 
           positionHalfTick(ticksPerSecond) {
@@ -555,10 +599,30 @@
         }
 
         class Trump extends Mass {
+          get name() { return '<trump>TRUMP</trump>'; }
           get size() { return 3 * this.mass; }
         }
 
-        class Tweet extends Mass {};
+        class Tweet extends Mass {
+          get name() { return 'Tweet'; }
+        };
+
+        class Like extends Mass {
+          get name() { return 'Like'; }
+        };
+
+        class ReTweet extends Mass {
+          get name() { return 'Re-Tweet'; }
+        };
+
+        class Media extends Mass {
+          constructor(mediaName, ...args) {
+            super(...args);
+            this.mediaName = mediaName;
+          }
+
+          get name() { return this.mediaName; }
+        };
 
         const universe = [
           new Trump(10000, [ 255,   255,    0, 0]),
@@ -610,10 +674,10 @@
 
           const tweet = new Tweet(800, [0, 1, 1.2, 1],
                                       [universe[0].position[0], universe[0].position[1], universe[0].position[2] + 250],
-                                      [300, 5, 0]),
-                cnn = new Mass(5, [2, 2, 2, 1],
+                                      [340, 5, 0]),
+                cnn = new Media('CNN', 5 ,[2, 2, 2, 1],
                                   [universe[0].position[0] + 200, universe[0].position[1] + 0, universe[0].position[2] + 250],
-                                  [300, 5, 0]);
+                                  [340, 5, 0]);
 
           addMass(tweet);
           addMass(cnn);
@@ -650,7 +714,7 @@
                      ,tp[1] - position[1]
                      ,tp[2] - position[2]];
 
-          addMass(new Mass(1, [25 / 128, 207 / 128, 134 / 128, 1],
+          addMass(new ReTweet(1, [25 / 128, 207 / 128, 134 / 128, 1],
                               position,
                               [tv[0] + d2[0]/x, tv[1] + d2[1]/x, tv[2] + d2[2]/x]));
         }
@@ -681,7 +745,7 @@
                      ,tp[1] - position[1]
                      ,tp[2] - position[2]];
 
-          addMass(new Mass(1, [190 / 128, 25 / 128, 49 / 128, 1],
+          addMass(new Like(1, [190 / 128, 25 / 128, 49 / 128, 1],
                               position,
                               [tv[0] + d[0]/x, tv[1] + d[1]/x, tv[2] + d[2]/x]));
         }
@@ -769,9 +833,16 @@
 
           void trumpTweetEl.offsetWidth;
           for (let i = 0; i < events.length; i++) {
-            const event = events[i];
+            const [name, ...args] = events[i];
 
-            if (event === 'new_tweet') trumpTweetEl.classList.add('show');
+            if (name === 'new_tweet') trumpTweetEl.classList.add('show');
+            else if (name === 'absorbed') {
+              const [absorbed, by] = args;
+
+              absorbedEl.classList.add('show');
+              absorbedNameEl.innerHTML = absorbed;
+              absorbedByNameEl.innerHTML = by;
+            }
           }
 
           events.splice(0);
@@ -871,8 +942,6 @@
 
               const threshold = 4 * Math.log2(s1 + s2) / 3;
               if (d1 < threshold || d2 < threshold) collisionList.push([s1 < s2, universe[i], universe[j], s1 < s2 ? i : j]);
-
-              // if (d1 < Math.log(s1 + s2)) console.log('collision', i, j, s1, s2, d1, Math.log(s1 + s2));
             }
 
             // F = ma ... a = F/m
@@ -907,11 +976,14 @@
 
           for (let i = collisionList.length - 1; i >= 0; i--) {
             const [firstSmaller, mass1, mass2, smallerIndex] = collisionList[i],
-                  smallerMass = firstSmaller ? mass1 : mass2;
+                  smallerMass = firstSmaller ? mass1 : mass2,
+                  greaterMass = firstSmaller ? mass2 : mass1;
 
             if (smallerMass instanceof Tweet) {
               tweets.splice(tweets.indexOf(smallerMass), 1);
             }
+
+            events.push(['absorbed', smallerMass.name, greaterMass.name]);
 
             universe.splice(smallerIndex, 1);
             positions.splice(smallerIndex, 1);
@@ -933,10 +1005,13 @@
           collisionList.splice(0);
 
           for (let i = 0; i < events.length; i++) {
-            const event = events[i];
+            const [name] = events[i];
 
-            if (event === 'new_tweet') {
+            if (name === 'new_tweet') {
               trumpTweetEl.classList.remove('show');
+            }
+            else if (name === 'absorbed') {
+              absorbedEl.classList.remove('show');
             }
           }
         }
@@ -955,7 +1030,10 @@
         const trumpMassQuantityEl = document.querySelector('trump-mass-quantity'),
               orbitStatisticsQuantityEl = document.querySelector('orbit-statistics-quantity'),
               catchUpQuantityEl = document.querySelector('catch-up-quantity'),
-              trumpTweetEl = document.querySelector('trump-tweet');
+              trumpTweetEl = document.querySelector('trump-tweet'),
+              absorbedEl = document.querySelector('absorbed'),
+              absorbedNameEl = document.querySelector('absorbed-name'),
+              absorbedByNameEl = document.querySelector('absorbed-by-name');
 
         updateMassesGUI();
 
@@ -1140,41 +1218,42 @@
         }
 
       </script>
-       <hud>
-         <trump-mass><trump>TRUMP</trump>'s mass: <trump-mass-quantity></trump-mass-quantity></trump-mass>
-         <orbit-statistics><orbit-statistics-quantity></orbit-statistics-quantity> masses in orbit</orbit-statistics>
-         <catch-up><catch-up-quantity></catch-up-quantity> ticks behind</catch-up>
-         <trump-tweet>
-           <warning><trump>TRUMP</trump> has tweeted, watch out!</warning>
-           <info>Don't worry, CNN is orbiting it!</info>
-         </trump-tweet>
-         <commands></commands>
-         <tag><trump>TRUMP</trump>orbit <brand>alpha preview</brand> <version>uncommitted</version></tag>
-         <help>?</help>
-         <help-content>
-           O 'overview
-           F 'frontview
-           S 'sideview
-           L 'lookAtTrump
-           ] 'nextPosition
-           [ 'prevPosition
-           T 'fakeTweet
-           R 'fakeRetweet
-           K 'fakeLike
-       ENTER 'newMass
-       SPACE 'change movement target
-           A 'left
-           D 'right
-           W 'forward
-           S 'backward
-           Q 'up
-           Z 'down
-           . 'speed+
-           , 'speed-
-           0 'ticks+
-           9 'ticks-
-         </help-content>
-       </hud>
+      <hud>
+        <trump-mass><trump>TRUMP</trump>'s mass: <trump-mass-quantity></trump-mass-quantity></trump-mass>
+        <orbit-statistics><orbit-statistics-quantity></orbit-statistics-quantity> masses in orbit</orbit-statistics>
+        <catch-up><catch-up-quantity></catch-up-quantity> ticks behind</catch-up>
+        <trump-tweet>
+         <warning><trump>TRUMP</trump> has tweeted, watch out!</warning>
+         <info>Don't worry, CNN is orbiting it!</info>
+        </trump-tweet>
+        <absorbed><absorbed-name></absorbed-name> absorbed by <absorbed-by-name></absorbed-by-name>!</absorbed>
+        <commands></commands>
+        <tag><trump>TRUMP</trump>orbit <brand>alpha preview</brand> <version>uncommitted</version></tag>
+        <help>?</help>
+        <help-content>
+         O 'overview
+         F 'frontview
+         S 'sideview
+         L 'lookAtTrump
+         ] 'nextPosition
+         [ 'prevPosition
+         T 'fakeTweet
+         R 'fakeRetweet
+         K 'fakeLike
+        ENTER 'newMass
+        SPACE 'change movement target
+         A 'left
+         D 'right
+         W 'forward
+         S 'backward
+         Q 'up
+         Z 'down
+         . 'speed+
+         , 'speed-
+         0 'ticks+
+         9 'ticks-
+        </help-content>
+      </hud>
     </mathbox>
     <notice class="fade-out"><screen></screen><message>entering <trump>TRUMP</trump> orbit<message></notice>
   </body>
