@@ -718,7 +718,7 @@
         }
 
         function addObserver(event, view) {
-          addMass(new Observer(1, [255, 255, 255, 1], [universe[0].position[0], universe[0].position[1], universe[0].position[2] + 3000], [143, -1, 0]), view);
+          addMass(new Observer(1, [255, 255, 255, 1], [universe[0].position[0], universe[0].position[1], universe[0].position[2] + 5000], [143, -1, 0]), view);
         }
 
         function addTweet(event, view) {
@@ -742,37 +742,14 @@
         }
 
         function addRetweet(event, view) {
-           const tweet = tweets[tweets.length - 1];
-
-          if (!tweet) throw new Error('No tweet!!!!!!@!');
-
-          const {position: p} = tweet,
-                {position: tp, velocity: tv} = universe[0];
-
-          const x = 20;
-
-          const d = [0, 0, 0];
-
-          d[0] = tp[0] - p[0];
-          d[1] = tp[1] - p[1];
-          d[2] = tp[2] - p[2];
-
-          const m = magnitude(d);
-
-          const position = [p[0] + d[0] / m * (50 + 100 * Math.random())
-                           ,p[1] + d[1] / m * (50 + 100 * Math.random())
-                           ,p[2] + d[2] / m * (50 + 100 * Math.random())];
-
-          const d2 = [tp[0] - position[0]
-                     ,tp[1] - position[1]
-                     ,tp[2] - position[2]];
-
-          addMass(new ReTweet(1, [25 / 128, 207 / 128, 134 / 128, 1],
-                              position,
-                              [tv[0] + d2[0]/x, tv[1] + d2[1]/x, tv[2] + d2[2]/x]), view);
+          addTweetSpawn(ReTweet, 1, [25 / 128, 207 / 128, 134 / 128, 1], view);
         }
 
         function addLike(event, view) {
+          addTweetSpawn(Like, 1, [190 / 128, 25 / 128, 49 / 128, 1], view);
+        }
+
+        function addTweetSpawn(constructor, mass, color, view) {
           const tweet = tweets[tweets.length - 1];
 
           if (!tweet) throw new Error('No tweet!!!!!!@!');
@@ -798,9 +775,8 @@
                      ,tp[1] - position[1]
                      ,tp[2] - position[2]];
 
-          addMass(new Like(1, [190 / 128, 25 / 128, 49 / 128, 1],
-                              position,
-                              [tv[0] + d[0]/x, tv[1] + d[1]/x, tv[2] + d[2]/x]), view);
+          addMass(new constructor(1, color, position,
+                          [tv[0] + d[0]/x, tv[1] + d[1]/x, tv[2] + d[2]/x]), view);
         }
 
         function addFollower() {
@@ -1255,10 +1231,11 @@
             add(cameraPosition, cameraPosition, cameraOffset);
 
             void trumpTweetEl.offsetWidth;
+
             for (let i = 0; i < events.length; i++) {
               const [name, ...args] = events[i];
 
-              if (name === 'new_tweet') trumpTweetEl.classList.add('show');
+              if (name === 'tweet') trumpTweetEl.classList.add('show');
               else if (name === 'absorbed') {
                 const [absorbed, by] = args;
 
