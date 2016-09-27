@@ -942,7 +942,6 @@
               size: s1
             } = universe[i];
 
-
             // can be optimized quite a bit?
             const pv1 = [0, 0, 0],
                   pv2 = [0, 0, 0],
@@ -1137,6 +1136,19 @@
             'backward': () => velocities[selectedMassIndex][2]++,
             'up': () => velocities[selectedMassIndex][1]++,
             'down': () => velocities[selectedMassIndex][1]--,
+            'lookAtTrump': () => lookAtIndex = 0,
+            'overview': () => {lookAtIndex = 0; positionIndex = 0; cameraOffset = [0, 5000, 0];},
+            'frontview': () => {lookAtIndex = 0; positionIndex = 0; cameraOffset = [0, 0, 5000];},
+            'sideview': () => {lookAtIndex = 0; positionIndex = 0; cameraOffset = [-5000, 0, 0];},
+            'speed+': () => ++stepsPerSecond,
+            'speed-': () => stepsPerSecond = Math.max(1, stepsPerSecond - 1),
+            'ticks+': () => ++ticksPerStep,
+            'ticks-': () => ticksPerStep = Math.max(1, ticksPerStep - 1),
+            'changePlayer'() {
+              unselectMass(selectedMassIndex);
+              (selectedMassIndex = (selectedMassIndex + 1) % positions.length);
+              selectMass(selectedMassIndex);
+            },
             'toggleHistory': {
               '#positions': {
                 'history'() {
@@ -1195,19 +1207,6 @@
               '#sizes': {
                 'width'() { return universe.length; }
               }
-            },
-            'lookAtTrump': () => lookAtIndex = 0,
-            'overview': () => {lookAtIndex = 0; positionIndex = 0; cameraOffset = [0, 5000, 0];},
-            'frontview': () => {lookAtIndex = 0; positionIndex = 0; cameraOffset = [0, 0, 5000];},
-            'sideview': () => {lookAtIndex = 0; positionIndex = 0; cameraOffset = [-5000, 0, 0];},
-            'speed+': () => ++stepsPerSecond,
-            'speed-': () => stepsPerSecond = Math.max(1, stepsPerSecond - 1),
-            'ticks+': () => ++ticksPerStep,
-            'ticks-': () => ticksPerStep = Math.max(1, ticksPerStep - 1),
-            'changePlayer'() {
-              unselectMass(selectedMassIndex);
-              (selectedMassIndex = (selectedMassIndex + 1) % positions.length);
-              selectMass(selectedMassIndex);
             },
             'newMass': {
               '#positions': {
