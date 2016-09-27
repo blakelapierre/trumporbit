@@ -117,7 +117,7 @@
           opacity: 1;
           // display: block;
         }
-        5% {
+        10% {
           text-shadow: 0px 0px 0px #fff;
           opacity: 1;
         }
@@ -190,7 +190,7 @@
         &.show {
           display: block;
 
-          animation: flash-fade-and-hide 10s ease-in-out forwards;
+          animation: flash-fade-and-hide 4s ease-in-out forwards;
         }
       }
 
@@ -651,17 +651,21 @@
           get size() { return 3 * this.mass; }
         }
 
+        class Observer extends Mass {
+          get name() { return 'Observer'; }
+        }
+
         class Tweet extends Mass {
           get name() { return 'Tweet'; }
-        };
+        }
 
         class Like extends Mass {
           get name() { return 'Like'; }
-        };
+        }
 
         class ReTweet extends Mass {
           get name() { return 'Re-Tweet'; }
-        };
+        }
 
         class Media extends Mass {
           constructor(mediaName, ...args) {
@@ -674,7 +678,7 @@
 
         const universe = [
           new Trump(10000, [ 255,   255,    0, 0])
-        ], tweets = [], media = [], events = [];
+        ], tweets = [], media = [], events = [['observer+']];
 
         const [
           positions,
@@ -686,8 +690,6 @@
           colors
         ] = map(universe, ['position', 'velocity', 'acceleration', 'gravity', 'mass', 'size', 'color']);
 
-        addObserver();
-
         let positionIndex = 1,
             lookAtIndex = 0;
 
@@ -695,7 +697,7 @@
           return properties.map(p => list.map(item => item[p]));
         }
 
-        function addMass(newMass) {
+        function addMass(newMass, view) { // don't want view here!
           const {position, velocity, acceleration, gravity, mass, size, color} = newMass;
 
           universe.push(newMass);
@@ -709,14 +711,17 @@
 
           // get this out of here asap!
           orbitStatisticsQuantityEl.innerHTML = Math.max(0, universe.length - 1);
+
+          view.select('#positions').set('width', positions.length);
+          view.select('#colors').set('width', colors.length);
+          view.select('#sizes').set('width', sizes.length);
         }
 
-        function addObserver() {
-          lookAtIndex = universe.length;
-          addMass(new Mass(1, [255, 255, 255, 1], [universe[0].position[0], universe[0].position[1], universe[0].position[2] + 3000], [143, -1, 0]));
+        function addObserver(event, view) {
+          addMass(new Observer(1, [255, 255, 255, 1], [universe[0].position[0], universe[0].position[1], universe[0].position[2] + 3000], [143, -1, 0]), view);
         }
 
-        function addTweet() {
+        function addTweet(event, view) {
           lookAtIndex = universe.length;
           // this should be calculated based on current trump mass (and, maybe, positions/velocities of orbiting masses?)
 
@@ -727,8 +732,8 @@
                                   [universe[0].position[0] + 200, universe[0].position[1] + 0, universe[0].position[2] + 250],
                                   [340, 5, 0]);
 
-          addMass(tweet);
-          addMass(cnn);
+          addMass(tweet, view);
+          addMass(cnn, view);
 
           tweets.push(tweet);
           media.push(cnn);
@@ -736,7 +741,7 @@
           events.push(['new_tweet']);
         }
 
-        function addRetweet() {
+        function addRetweet(event, view) {
            const tweet = tweets[tweets.length - 1];
 
           if (!tweet) throw new Error('No tweet!!!!!!@!');
@@ -764,10 +769,10 @@
 
           addMass(new ReTweet(1, [25 / 128, 207 / 128, 134 / 128, 1],
                               position,
-                              [tv[0] + d2[0]/x, tv[1] + d2[1]/x, tv[2] + d2[2]/x]));
+                              [tv[0] + d2[0]/x, tv[1] + d2[1]/x, tv[2] + d2[2]/x]), view);
         }
 
-        function addLike() {
+        function addLike(event, view) {
           const tweet = tweets[tweets.length - 1];
 
           if (!tweet) throw new Error('No tweet!!!!!!@!');
@@ -795,7 +800,15 @@
 
           addMass(new Like(1, [190 / 128, 25 / 128, 49 / 128, 1],
                               position,
-                              [tv[0] + d[0]/x, tv[1] + d[1]/x, tv[2] + d[2]/x]));
+                              [tv[0] + d[0]/x, tv[1] + d[1]/x, tv[2] + d[2]/x]), view);
+        }
+
+        function addFollower() {
+
+        }
+
+        function absorbed() {
+
         }
 
         let trumpScaleFactor = 5;
@@ -834,32 +847,7 @@
             <point points="<<<" colors="<<" sizes="<" shape="circle" opacity={0.9}/>
           </cartesian>
         </root>
-        function runner(universe, startTime = new Date().getTime(), maxTicksPerCall = 50) {
-          let currentTick = 0;
 
-          return (currentTime = new Date().getTime()) => {
-            const dt = currentTime - startTime,
-                  t = Math.ceil((dt / 1000) * ticksPerSecond),
-                  ticks = Math.min(maxTicksPerCall, t - currentTick);
-
-            for (let i = 0; i < ticks ; i++) {
-              tick();
-              currentTick++;
-            }
-
-            if (currentTick !== t) {
-              catchUpQuantityEl.parentElement.style.display = 'block';
-              catchUpQuantityEl.innerHTML = currentTick - t;
-            }
-            else {
-              catchUpQuantityEl.parentElement.style.display = 'none';
-            }
-          };
-        }
-
-        const run = runner(universe);
-
-        window.requestAnimationFrame(animate);
 
         function add (r, v1, v2) {
           r[0] = v1[0] + v2[0];
@@ -878,42 +866,6 @@
         const cameraPosition = [0, 0, 0];
         let cameraOffset = [0, 100, 0];
         const collisionList = []; // where should this go?
-
-        function animate() {
-          run();
-
-          const p = universe[positionIndex].position,
-                tp = universe[lookAtIndex].position,
-                d = [p[0]-tp[0], p[1]-tp[1], p[2]-tp[2]],
-                m = magnitude(d);
-
-          if (m > 0) {
-            d[0] /= m;
-            d[1] /= m;
-            d[2] /= m;
-          }
-
-          add(cameraPosition, p, scale(d, d, 300));
-          add(cameraPosition, cameraPosition, cameraOffset);
-
-          void trumpTweetEl.offsetWidth;
-          for (let i = 0; i < events.length; i++) {
-            const [name, ...args] = events[i];
-
-            if (name === 'new_tweet') trumpTweetEl.classList.add('show');
-            else if (name === 'absorbed') {
-              const [absorbed, by] = args;
-
-              absorbedEl.classList.add('show');
-              absorbedNameEl.innerHTML = absorbed;
-              absorbedByNameEl.innerHTML = by;
-            }
-          }
-
-          events.splice(0);
-
-          window.requestAnimationFrame(animate);
-        }
 
         let ticksPerSecond = 60,
             ticksPerStep = 10,
@@ -1046,7 +998,14 @@
               tweets.splice(tweets.indexOf(smallerMass), 1);
             }
 
-            events.push(['absorbed', smallerMass.name, greaterMass.name]);
+            if (smallerMass instanceof Tweet ||
+                smallerMass instanceof Media ||
+                smallerMass instanceof Trump ||
+                greaterMass instanceof Tweet ||
+                greaterMass instanceof Media ||
+                greaterMass instanceof Trump) {
+              events.push(['absorbed', smallerMass.name, greaterMass.name]);
+            }
 
             universe.splice(smallerIndex, 1);
             positions.splice(smallerIndex, 1);
@@ -1066,17 +1025,6 @@
 
           updateMassesGUI();
           collisionList.splice(0);
-
-          for (let i = 0; i < events.length; i++) {
-            const [name] = events[i];
-
-            if (name === 'new_tweet') {
-              trumpTweetEl.classList.remove('show');
-            }
-            else if (name === 'absorbed') {
-              absorbedEl.classList.remove('show');
-            }
-          }
         }
 
         function magnitude(vector) {
@@ -1104,6 +1052,7 @@
         module.exports = {
           editorPanel: false,
           plugins: ['core', 'controls', 'cursor'],
+          callback: start,
           camera: {far: 1000000},
           controls: [
             [['A'], 'left'],
@@ -1160,7 +1109,7 @@
             'fakeTweet': {
               '#positions': {
                 'width'() {
-                  addTweet();
+                  events.push(['tweet']);
                   return universe.length;
                 }
               },
@@ -1177,7 +1126,7 @@
             'fakeRetweet': {
               '#positions': {
                 'width'() {
-                  addRetweet();
+                  events.push(['retweet']);
                   return universe.length;
                 }
               },
@@ -1194,7 +1143,7 @@
             'fakeLike': {
               '#positions': {
                 'width'() {
-                  addLike();
+                  events.push(['like']);
                   return universe.length;
                 }
               },
@@ -1211,7 +1160,7 @@
             'newMass': {
               '#positions': {
                 'width'() {
-                  addObserver();
+                  events.push(['observer+']);
                   return universe.length;
                 }
               },
@@ -1240,12 +1189,90 @@
           }
         };
 
-        function button(text) {
-          const b = document.createElement('button');
-          b.innerHTML = text;
-          return b;
-        }
+        function start(view) {
+          const eevents = {
+            // external
+            'observer+': addObserver,
+            'observer-': event => {},
+            'tweet': (event, view) => addTweet(event, view) & trumpTweetEl.classList.remove('show'),
+            'like': addLike,
+            'retweet': addRetweet,
+            'follower+': addFollower,
+            'follower-': event => {}, //?
 
+            // internal
+            'absorbed': event => absorbed(event) & absorbedEl.classList.remove('show')
+          };
+
+          const run = runner(universe);
+
+          window.requestAnimationFrame(animate);
+
+          function runner(universe, startTime = new Date().getTime(), maxTicksPerCall = 50) {
+            let currentTick = 0;
+
+            return (currentTime = new Date().getTime()) => {
+              const dt = currentTime - startTime,
+                    t = Math.ceil((dt / 1000) * ticksPerSecond),
+                    ticks = Math.min(maxTicksPerCall, t - currentTick);
+
+              for (let i = 0; i < ticks ; i++) {
+                tick();
+                currentTick++;
+              }
+
+              if (currentTick !== t) {
+                catchUpQuantityEl.parentElement.style.display = 'block';
+                catchUpQuantityEl.innerHTML = currentTick - t;
+              }
+              else {
+                catchUpQuantityEl.parentElement.style.display = 'none';
+              }
+            };
+          }
+
+          function animate() {
+            run();
+
+            for (let i = 0; i < events.length; i++) {
+              const event = events[i];
+
+              (eevents[event[0]] || (() => {}))(event, view);
+            }
+
+            const p = universe[positionIndex].position,
+                  tp = universe[lookAtIndex].position,
+                  d = [p[0]-tp[0], p[1]-tp[1], p[2]-tp[2]],
+                  m = magnitude(d);
+
+            if (m > 0) {
+              d[0] /= m;
+              d[1] /= m;
+              d[2] /= m;
+            }
+
+            add(cameraPosition, p, scale(d, d, 300));
+            add(cameraPosition, cameraPosition, cameraOffset);
+
+            void trumpTweetEl.offsetWidth;
+            for (let i = 0; i < events.length; i++) {
+              const [name, ...args] = events[i];
+
+              if (name === 'new_tweet') trumpTweetEl.classList.add('show');
+              else if (name === 'absorbed') {
+                const [absorbed, by] = args;
+
+                absorbedEl.classList.add('show');
+                absorbedNameEl.innerHTML = absorbed;
+                absorbedByNameEl.innerHTML = by;
+              }
+            }
+
+            events.splice(0);
+
+            window.requestAnimationFrame(animate);
+          }
+        }
 
         // might want in the future, saves typing
         function randomMass() {
