@@ -316,6 +316,18 @@
         }
       }
 
+      @keyframes fade-color-in-and-out {
+        0% {
+          color: rgba(255, 255, 255, 0);
+        }
+        50% {
+          color: rgba(255, 255, 255, 1);
+        }
+        100% {
+          color: rgba(255, 255, 255, 0);
+        }
+      }
+
       @keyframes fade-background-out {
         0% {
           background-color: rgba(0, 0, 0, 1);
@@ -340,7 +352,9 @@
 
         transform: scale(0);
 
-        animation: fade-color-out 9s ease-in-out;
+        animation: fade-color-out 15s ease-in-out;
+
+        user-select: none;
 
         &.no-intro {
           display: none;
@@ -386,6 +400,25 @@
 
             animation: fade-color-out 6s 3s ease-in-out forwards;
           }
+        }
+
+        statement {
+          position: absolute;
+
+          left: 0;
+          right: 0;
+          bottom: 10%;
+
+          display: flex;
+
+          font-size: 2vw;
+
+          color: rgba(255, 255, 255, 0);
+
+          animation: fade-color-in-and-out 6s 5s ease-in-out;
+
+          align-items: center;
+          justify-content: center;
         }
       }
     // }
@@ -578,6 +611,19 @@
         [[0.15686,0.22745,0.41569,1],[0.18039,0.25098,0.41569,1],[0.20392,0.26667,0.40784,1],[0.15686,0.17255,0.29804,1],[0.09412,0.08627,0.21176,1],[0.49412,0.48627,0.52549,1],[1.92157,1.89804,1.81176,1],[1.9451,1.91373,1.85098,1],[1.82745,1.81176,1.75686,1],[1.50588,1.50588,1.45882,1],[1.00392,0.83922,0.82353,1],[0.82353,0.52549,0.4549,1],[0.64314,0.26667,0.22745,1],[0.43922,0.10196,0.09412,1],[0.26667,0.00784,0.01569,1],[0.3451,0.04706,0.04706,1],[0.59608,0.29804,0.29804,1],[1.12157,1.01176,1.00392,1],[1.78039,1.84314,1.87451,1],[2,2,2,0],[1.10588,1.16078,1.2549,1],[0.13333,0.18039,0.35294,1],[0.18824,0.23529,0.39216,1],[0.26667,0.30588,0.47843,1]],
         [[0.13333,0.18824,0.36078,1],[0.15686,0.22745,0.38431,1],[0.16471,0.22745,0.39216,1],[0.13333,0.16471,0.29804,1],[0.07843,0.10196,0.21961,1],[0.13333,0.14902,0.27451,1],[1.68627,1.66275,1.58431,1],[1.88235,1.87451,1.81176,1],[1.92157,1.89804,1.84314,1],[1.81176,1.80392,1.74118,1],[1.66275,1.67059,1.61569,1],[1.37255,1.32549,1.29412,1],[0.98039,0.7451,0.7451,1],[0.4,0.08627,0.12549,1],[0.18824,0,0,1],[0.56471,0.4,0.43922,1],[1.45882,1.46667,1.51373,1],[1.90588,2,2,1],[1.97647,2,2,1],[2,2,2,0],[0.62745,0.6902,0.81569,1],[0.07843,0.14902,0.32157,1],[0.14902,0.19608,0.36863,1],[0.21961,0.26667,0.43922,1]]];
 
+        const trumpMassQuantityEl = document.querySelector('trump-mass-quantity'),
+              orbitStatisticsQuantityEl = document.querySelector('orbit-statistics-quantity'),
+              catchUpQuantityEl = document.querySelector('catch-up-quantity'),
+              trumpTweetEl = document.querySelector('trump-tweet'),
+              absorbedEl = document.querySelector('absorbed'),
+              absorbedNameEl = document.querySelector('absorbed-name'),
+              absorbedByNameEl = document.querySelector('absorbed-by-name');
+
+        const tagEl = document.querySelector('tag'),
+              commandsEl = document.querySelector('commands'),
+              helpEl = document.querySelector('help'),
+              helpContentEl = document.querySelector('help-content');
+
         class Mass {
           constructor(mass, color, position = [0, 0, 0], velocity = [0, 0, 0], acceleration = [0, 0, 0], gravity = [0, 0, 0]) {
             this.mass = mass;
@@ -627,12 +673,7 @@
         };
 
         const universe = [
-          new Trump(10000, [ 255,   255,    0, 0]),
-          new Mass(1,     [   2,  0.33, 0.33, 1], [  1000,  0,   30], [  0,  0.5, -120]),
-          new Mass(1,     [0.33,  0.33,    2, 1], [ -1200,  0,    0], [  0,  0.5,  120]),
-          new Mass(0.015, [ 255,     0,    0, 1], [     0,  0, 1985], [ 120,   -5,   0]),
-          new Mass(0.25,  [ 255,   255,  255, 1], [     0,  0, 2015], [ 120,    5,   0]),
-          new Mass(10,    [   0,   255,  255, 1], [     0,  0, 2000], [ 120,   -1,   0])
+          new Trump(10000, [ 255,   255,    0, 0])
         ], tweets = [], media = [], events = [];
 
         const [
@@ -644,6 +685,11 @@
           sizes,
           colors
         ] = map(universe, ['position', 'velocity', 'acceleration', 'gravity', 'mass', 'size', 'color']);
+
+        addObserver();
+
+        let positionIndex = 1,
+            lookAtIndex = 0;
 
         function map(list, properties) {
           return properties.map(p => list.map(item => item[p]));
@@ -753,8 +799,6 @@
         }
 
         let trumpScaleFactor = 5;
-        let positionIndex = 5,
-            lookAtIndex = 0;
         <root>
           <camera proxy={false}
                   position={t => cameraPosition}
@@ -817,21 +861,40 @@
 
         window.requestAnimationFrame(animate);
 
-        function add (result, v1, v2) {
-          result[0] = v1[0] + v2[0];
-          result[1] = v1[1] + v2[1];
-          result[2] = v1[2] + v2[2];
-          return result;
+        function add (r, v1, v2) {
+          r[0] = v1[0] + v2[0];
+          r[1] = v1[1] + v2[1];
+          r[2] = v1[2] + v2[2];
+          return r;
+        }
+
+        function scale (r, v, s) {
+          r[0] = v[0] * s;
+          r[1] = v[1] * s;
+          r[2] = v[2] * s;
+          return v;
         }
 
         const cameraPosition = [0, 0, 0];
-        let cameraOffset = [0, 1000, 0];
+        let cameraOffset = [0, 100, 0];
         const collisionList = []; // where should this go?
 
         function animate() {
           run();
 
-          add(cameraPosition, universe[positionIndex].position, cameraOffset);
+          const p = universe[positionIndex].position,
+                tp = universe[lookAtIndex].position,
+                d = [p[0]-tp[0], p[1]-tp[1], p[2]-tp[2]],
+                m = magnitude(d);
+
+          if (m > 0) {
+            d[0] /= m;
+            d[1] /= m;
+            d[2] /= m;
+          }
+
+          add(cameraPosition, p, scale(d, d, 300));
+          add(cameraPosition, cameraPosition, cameraOffset);
 
           void trumpTweetEl.offsetWidth;
           for (let i = 0; i < events.length; i++) {
@@ -1029,25 +1092,12 @@
 
         if (window.location.search === '?nointro') document.querySelector('notice').classList.add('no-intro');
 
-        const trumpMassQuantityEl = document.querySelector('trump-mass-quantity'),
-              orbitStatisticsQuantityEl = document.querySelector('orbit-statistics-quantity'),
-              catchUpQuantityEl = document.querySelector('catch-up-quantity'),
-              trumpTweetEl = document.querySelector('trump-tweet'),
-              absorbedEl = document.querySelector('absorbed'),
-              absorbedNameEl = document.querySelector('absorbed-name'),
-              absorbedByNameEl = document.querySelector('absorbed-by-name');
-
         updateMassesGUI();
 
         function updateMassesGUI() {
           trumpMassQuantityEl.innerHTML = universe[0].mass;
           orbitStatisticsQuantityEl.innerHTML = Math.max(0, universe.length - 1);
         }
-
-        const tagEl = document.querySelector('tag'),
-              commandsEl = document.querySelector('commands'),
-              helpEl = document.querySelector('help'),
-              helpContentEl = document.querySelector('help-content');
 
         tagEl.addEventListener('click', () => commandsEl.classList.toggle('show'));
 
@@ -1179,13 +1229,13 @@
             },
             'prevPosition': () => {
               cameraOffset[0] = 0;
-              cameraOffset[1] = 1000;
+              cameraOffset[1] = 100;
               cameraOffset[2] = 0;
               return positionIndex === 0 ? positionIndex = universe.length - 1 : positionIndex--;
             },
             'nextPosition': () => {
               cameraOffset[0] = 0;
-              cameraOffset[1] = 1000;
+              cameraOffset[1] = 100;
               cameraOffset[2] = 0;
               return positionIndex = (positionIndex + 1) % universe.length;
             }
@@ -1228,7 +1278,7 @@
          <warning><trump>TRUMP</trump> has tweeted, watch out!</warning>
          <info>Don't worry, CNN is orbiting it!</info>
         </trump-tweet>
-        <absorbed><absorbed-name></absorbed-name> absorbed by <absorbed-by-name></absorbed-by-name>!</absorbed>
+        <absorbed><absorbed-name></absorbed-name> was absorbed by <absorbed-by-name></absorbed-by-name>!</absorbed>
         <commands></commands>
         <tag><trump>TRUMP</trump>orbit <brand>alpha preview</brand> <version>uncommitted</version></tag>
         <help>?</help>
@@ -1257,6 +1307,6 @@
         </help-content>
       </hud>
     </mathbox>
-    <notice class="fade-out"><screen></screen><message>entering <trump>TRUMP</trump> orbit<message></notice>
+    <notice class="fade-out"><screen></screen><message>entering <trump>TRUMP</trump> orbit<message><statement>You are a brave soul</statement></notice>
   </body>
 </html>
