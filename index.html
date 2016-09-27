@@ -578,7 +578,7 @@
 
     <mathbox tabindex="2">
       <script type="mathbox/jsx">
-        const trump = [[[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0]],
+        const trumpColors = [[[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0]],
         [[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[1.00392,0.83137,0.8,1],[1.24706,0.97255,0.76078,1],[1.40392,1.11373,0.78431,1],[1.4902,1.21569,0.87059,1],[1.52941,1.26275,0.94118,1],[1.41961,1.19216,0.91765,1],[1.40392,1.21569,0.98039,1],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0]],
         [[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[0.94118,0.75294,0.77647,1],[1.30196,0.94118,0.61961,1],[1.41961,1.01961,0.63529,1],[1.41961,1.08235,0.73725,1],[1.41961,1.1451,0.80784,1],[1.45098,1.20784,0.91765,1],[1.4902,1.28627,1.01961,1],[1.48235,1.26275,0.98824,1],[1.47451,1.21569,0.92549,1],[1.43529,1.19216,0.88627,1],[1.46667,1.26275,0.97255,1],[1.48235,1.30196,1.05098,1],[1.34118,1.2549,1.17647,1],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0]],
         [[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0],[1.22353,0.86275,0.57255,1],[1.35686,0.94902,0.58039,1],[1.36471,0.95686,0.61176,1],[1.40392,1.03529,0.69804,1],[1.38824,1.10588,0.79216,1],[1.41176,1.17647,0.87843,1],[1.44314,1.19216,0.92549,1],[1.41961,1.16863,0.90196,1],[1.41961,1.11373,0.80784,1],[1.40392,1.06667,0.75294,1],[1.35686,1.06667,0.75294,1],[1.32549,1.01176,0.6902,1],[1.35686,1.0902,0.80784,1],[1.44314,1.23137,1.01961,1],[1.23137,1.09804,1.05098,1],[2,2,2,0],[2,2,2,0],[2,2,2,0],[2,2,2,0]],
@@ -659,11 +659,13 @@
           get name() { return 'Tweet'; }
         }
 
-        class Like extends Mass {
+        class TweetSpawn extends Mass { }
+
+        class Like extends TweetSpawn {
           get name() { return 'Like'; }
         }
 
-        class ReTweet extends Mass {
+        class ReTweet extends TweetSpawn {
           get name() { return 'Re-Tweet'; }
         }
 
@@ -676,9 +678,12 @@
           get name() { return this.mediaName; }
         };
 
-        const universe = [
-          new Trump(10000, [ 255,   255,    0, 0])
-        ], tweets = [], media = [], events = [['observer+']];
+        const trump = new Trump(10000, [ 255,   255,    0, 0]),
+              universe = [trump],
+              tweets = [],
+              tweetSpawn = new Set(),
+              media = [],
+              events = [['observer+']];
 
         const [
           positions,
@@ -730,7 +735,7 @@
                                       [340, 5, 0]),
                 cnn = new Media('CNN', 5 ,[2, 2, 2, 1],
                                   [universe[0].position[0] + 200, universe[0].position[1] + 0, universe[0].position[2] + 250],
-                                  [340, 5, 0]);
+                                  [340, -1, 0]);
 
           addMass(tweet, view);
           addMass(cnn, view);
@@ -775,8 +780,10 @@
                      ,tp[1] - position[1]
                      ,tp[2] - position[2]];
 
-          addMass(new constructor(1, color, position,
-                          [tv[0] + d[0]/x, tv[1] + d[1]/x, tv[2] + d[2]/x]), view);
+          const spawn = new constructor(mass, color, position,
+                                      [tv[0] + d[0]/x, tv[1] + d[1]/x, tv[2] + d[2]/x]);
+          addMass(spawn, view);
+          tweetSpawn.add(spawn);
         }
 
         function addFollower() {
@@ -796,14 +803,14 @@
           <cartesian range={[[-1, 1], [-1, 1], [-1, 1]]}
                      scale={[1, 1, 1]}>
             <cartesian range={[[-1, 1], [-1, 1], [-1, 1]]}
-                       scale={[trump[0].length * trumpScaleFactor, trump.length * trumpScaleFactor, trump.length * trumpScaleFactor]}
-                       position={t => universe[0].position}
+                       scale={[trumpColors[0].length * trumpScaleFactor, trumpColors.length * trumpScaleFactor, trumpColors.length * trumpScaleFactor]}
+                       position={t => trump.position}
                        rotation={[Math.PI, 0, 0]}>
-              <area height={trump.length} width={trump[0].length} />
+              <area height={trumpColors.length} width={trumpColors[0].length} />
               <matrix id="trump"
-                      width={trump[0].length}
-                      height={trump.length}
-                      data={trump} />
+                      width={trumpColors[0].length}
+                      height={trumpColors.length}
+                      data={trumpColors} />
               <point points="<<" colors="<" size={1200 * trumpScaleFactor} shape="square" opacity={1}/>
             </cartesian>
 
@@ -851,6 +858,24 @@
         function tick() {
           currentTick++;
 
+          const {position: tp, velocity: tv} = trump;
+
+          tweetSpawn.forEach(spawn => {
+            const {position: p, velocity: v} = spawn;
+
+            const x = 2;
+
+            const d = [0, 0, 0];
+
+            d[0] = tp[0] - p[0];
+            d[1] = tp[1] - p[1];
+            d[2] = tp[2] - p[2];
+
+            v[0] = tv[0] + d[0]/x;
+            v[1] = tv[1] + d[1]/x;
+            v[2] = tv[2] + d[2]/x;
+          });
+
           for (let i = 0; i < universe.length; i++) {
             const mass = universe[i];
 
@@ -858,6 +883,8 @@
             mass.gravity[0] = 0;
             mass.gravity[1] = 0;
             mass.gravity[2] = 0;
+
+            mass.mass += 1 / ticksPerSecond;
           }
 
           for (let i = 0; i < universe.length; i++) {
@@ -973,6 +1000,9 @@
             if (smallerMass instanceof Tweet) {
               tweets.splice(tweets.indexOf(smallerMass), 1);
             }
+            else if (smallerMass instanceof TweetSpawn) {
+              tweetSpawn.delete(smallerMass);
+            }
 
             if (smallerMass instanceof Tweet ||
                 smallerMass instanceof Media ||
@@ -1017,7 +1047,7 @@
         updateMassesGUI();
 
         function updateMassesGUI() {
-          trumpMassQuantityEl.innerHTML = universe[0].mass;
+          trumpMassQuantityEl.innerHTML = universe[0].mass.toFixed(1);
           orbitStatisticsQuantityEl.innerHTML = Math.max(0, universe.length - 1);
         }
 
