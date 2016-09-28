@@ -632,6 +632,7 @@
             this.velocity = velocity;
             this.acceleration = acceleration;
             this.gravity = gravity;
+            this.created = currentTick; // !!!!!!!!!!!!!!!!!!!111
           }
 
           get name() { return 'Mass'; }
@@ -648,7 +649,7 @@
 
         class Trump extends Mass {
           get name() { return '<trump>TRUMP</trump>'; }
-          get size() { return this.mass; }
+          get size() { return 0; }
         }
 
         class Observer extends Mass {
@@ -879,19 +880,17 @@
             const {position: tp, velocity: tv} = trump;
 
             tweetSpawn.forEach(spawn => {
-              const {position: p, velocity: v} = spawn;
+              const {position: p, velocity: v, created} = spawn;
 
-              const x = 2;
+              const x = Math.max(1, ticksPerSecond / (currentTick - created) / 3);
 
-              const d = [0, 0, 0];
+              dd[0] = tp[0] - p[0];
+              dd[1] = tp[1] - p[1];
+              dd[2] = tp[2] - p[2];
 
-              d[0] = tp[0] - p[0];
-              d[1] = tp[1] - p[1];
-              d[2] = tp[2] - p[2];
-
-              v[0] = tv[0] + d[0]/x;
-              v[1] = tv[1] + d[1]/x;
-              v[2] = tv[2] + d[2]/x;
+              v[0] = tv[0] + dd[0]/x;
+              v[1] = tv[1] + dd[1]/x;
+              v[2] = tv[2] + dd[2]/x;
             });
           }
 
@@ -985,8 +984,8 @@
               g1[2] += pv2[2] * factor;
             }
 
-            const threshold = 4 * Math.log2(s1 + s2) / 3;
-            if (d1 < threshold || d2 < threshold) collisionList.push([s1 < s2, universe[i], universe[j], s1 < s2 ? i : j]);
+            const threshold = 4 * Math.log2(m1 + m2) / 3;
+            if (d1 < threshold || d2 < threshold) collisionList.push([m1 < m2, universe[i], universe[j], m1 < m2 ? i : j]);
           }
 
           function updateVelocities() {
@@ -1070,7 +1069,9 @@
 
         function updateMassesGUI() {
           trumpMassQuantityEl.innerHTML = universe[0].mass.toFixed(1);
-          orbitStatisticsQuantityEl.innerHTML = Math.max(0, universe.length - 1);
+
+          const masses = Math.max(0, universe.length - 1);
+          orbitStatisticsQuantityEl.innerHTML = masses + ' mass' + (masses > 1 ? 'es' : '');
         }
 
         tagEl.addEventListener('click', () => commandsEl.classList.toggle('show'));
@@ -1340,7 +1341,7 @@
       </script>
       <hud>
         <trump-mass><trump>TRUMP</trump>'s mass: <trump-mass-quantity></trump-mass-quantity></trump-mass>
-        <orbit-statistics><orbit-statistics-quantity></orbit-statistics-quantity> masses in orbit</orbit-statistics>
+        <orbit-statistics><orbit-statistics-quantity></orbit-statistics-quantity> in orbit</orbit-statistics>
         <catch-up><catch-up-quantity></catch-up-quantity> ticks behind</catch-up>
         <trump-tweet>
          <warning><trump>TRUMP</trump> has tweeted, watch out!</warning>
@@ -1362,12 +1363,12 @@
          K 'fakeLike
         ENTER 'newMass
         SPACE 'change movement target
-         A 'left
-         D 'right
-         W 'forward
-         S 'backward
-         Q 'up
-         Z 'down
+         A 'decrease target x velocity (x-)
+         D 'increase target x velocity (x+)
+         W 'decrease target z velocity (z-)
+         S 'increase target z velocity (z+)
+         Q 'increase target y velocity (y-)
+         Z 'decrease target y velocity (y+)
          . 'speed+
          , 'speed-
          0 'ticks+
