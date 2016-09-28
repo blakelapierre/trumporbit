@@ -683,7 +683,8 @@
               tweets = [],
               tweetSpawn = new Set(),
               media = [],
-              events = [['observer+']];
+              events = [['observer+']],
+              uievents = [];
 
         const [
           positions,
@@ -743,7 +744,7 @@
           tweets.push(tweet);
           media.push(cnn);
 
-          events.push(['new_tweet']);
+          uievents.push(['tweet']);
         }
 
         function addRetweet(event, view) {
@@ -790,8 +791,8 @@
 
         }
 
-        function absorbed() {
-
+        function absorbed(event) {
+          uievents.push(event);
         }
 
         let trumpScaleFactor = 5;
@@ -1221,14 +1222,19 @@
             // external
             'observer+': addObserver,
             'observer-': event => {},
-            'tweet': (event, view) => addTweet(event, view) & trumpTweetEl.classList.remove('show'),
+            'tweet': addTweet,
             'like': addLike,
             'retweet': addRetweet,
             'follower+': addFollower,
             'follower-': event => {}, //?
 
             // internal
-            'absorbed': event => absorbed(event) & absorbedEl.classList.remove('show')
+            'absorbed': absorbed
+          };
+
+          const uuievents = {
+            'tweet': event => trumpTweetEl.classList.remove('show'),
+            'absorbed': event => absorbedEl.classList.remove('show')
           };
 
           const run = runner(universe);
@@ -1244,7 +1250,16 @@
                     ticks = Math.min(maxTicksPerCall, t - currentTick);
 
               for (let i = 0; i < ticks ; i++) {
+                for (let i = 0; i < events.length; i++) {
+                  const event = events[i];
+
+                  (eevents[event[0]] || (() => {}))(event, view);
+                }
+
+                events.splice(0);
+
                 tick();
+
                 currentTick++;
               }
 
@@ -1261,10 +1276,10 @@
           function animate() {
             run();
 
-            for (let i = 0; i < events.length; i++) {
-              const event = events[i];
+            for (let i = 0; i < uievents.length; i++) {
+              const event = uievents[i];
 
-              (eevents[event[0]] || (() => {}))(event, view);
+              (uuievents[event[0]] || (() => {}))(event, view);
             }
 
             const p = universe[positionIndex].position,
@@ -1283,8 +1298,8 @@
 
             void trumpTweetEl.offsetWidth;
 
-            for (let i = 0; i < events.length; i++) {
-              const [name, ...args] = events[i];
+            for (let i = 0; i < uievents.length; i++) {
+              const [name, ...args] = uievents[i];
 
               if (name === 'tweet') trumpTweetEl.classList.add('show');
               else if (name === 'absorbed') {
@@ -1296,7 +1311,7 @@
               }
             }
 
-            events.splice(0);
+            uievents.splice(0);
 
             window.requestAnimationFrame(animate);
           }
