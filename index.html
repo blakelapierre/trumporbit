@@ -1225,7 +1225,7 @@
         };
 
         function createSocket() {
-          const socket = new WebSocket('ws://localhost:8080');
+          const socket = new WebSocket(`ws://${window.location.hostname}:8080`);
 
           socket.onopen = () => {
             socket.send('test');
@@ -1253,6 +1253,9 @@
                 likes[parts[1]] = parts[2];
 
                 for (let i = 0; i < newLikes; i++) events.push(['like', parts[1]]); //ewwww
+                break;
+              case 'o':
+                events.push(['observer+']);
                 break;
             }
           };
