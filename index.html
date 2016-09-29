@@ -680,8 +680,11 @@
         };
 
         const trump = new Trump(100000, [ 255,   255,    0, 0]),
-              universe = [trump],
-              tweets = [],
+              oldTweets = new Tweet(2000, [0, 1, 1.2, 0.2], [0, -2000, 0], [-420, 0, 0]),
+              universe = [trump, oldTweets],
+              tweets = [oldTweets],
+              tweetMap = {},
+              likes = {},
               tweetSpawn = new Set(),
               media = [],
               events = [['observer+']],
@@ -697,7 +700,7 @@
           colors
         ] = map(universe, ['position', 'velocity', 'acceleration', 'gravity', 'mass', 'size', 'color']);
 
-        let positionIndex = 1,
+        let positionIndex = 2,
             lookAtIndex = 0;
 
         function map(list, properties) {
@@ -739,26 +742,28 @@
                                   [universe[0].position[0] + 90, universe[0].position[1] + 0, universe[0].position[2] + 350],
                                   [960, 5, 0]);
 
+          tweet.tweetID = event[1];
+
           addMass(tweet, view);
           addMass(cnn, view);
 
           tweets.push(tweet);
           media.push(cnn);
 
+          tweetMap[event[1]] = tweet;
+
           uievents.push(['tweet']);
         }
 
         function addRetweet(event, view) {
-          addTweetSpawn(ReTweet, 1, [25 / 128, 207 / 128, 134 / 128, 1], view);
+          addTweetSpawn(tweetMap[event[1]] || oldTweets, ReTweet, 1, [25 / 128, 207 / 128, 134 / 128, 1], view);
         }
 
         function addLike(event, view) {
-          addTweetSpawn(Like, 1, [190 / 128, 25 / 128, 49 / 128, 1], view);
+          addTweetSpawn(tweetMap[event[1]] || oldTweets, Like, 1, [190 / 128, 25 / 128, 49 / 128, 1], view);
         }
 
-        function addTweetSpawn(constructor, mass, color, view) {
-          const tweet = tweets[tweets.length - 1];
-
+        function addTweetSpawn(tweet, constructor, mass, color, view) {
           if (!tweet) throw new Error('No tweet!!!!!!@!');
 
           const {position: p} = tweet,
@@ -1022,6 +1027,7 @@
 
               if (smallerMass instanceof Tweet) {
                 tweets.splice(tweets.indexOf(smallerMass), 1);
+                delete tweetMap[smallerMass.tweetID];
               }
               else if (smallerMass instanceof TweetSpawn) {
                 tweetSpawn.delete(smallerMass);
@@ -1218,7 +1224,49 @@
           }
         };
 
+        function createSocket() {
+          const socket = new WebSocket('ws://localhost:8080');
+
+          socket.onopen = () => {
+            socket.send('test');
+            console.log('open');
+          };
+
+          socket.onmessage = (data, flags) => {
+            const parts = (data.data || '').split(',');
+            let newLikes = 0;
+
+            switch (parts[0]) {
+              case 'r':
+                events.push(['retweet', parts[1], parts[2]]);
+
+                newLikes = parts[2] - (likes[parts[1]] || parts[2]);
+                likes[parts[1]] = parts[2];
+
+                for (let i = 0; i < newLikes; i++) events.push(['like', parts[1]]); //ewwww
+
+                break;
+              case 't':
+                events.push(['tweet', parts[1], parts[2]]);
+
+                newLikes = parts[2] - (likes[parts[1]] || parts[2]);
+                likes[parts[1]] = parts[2];
+
+                for (let i = 0; i < newLikes; i++) events.push(['like', parts[1]]); //ewwww
+                break;
+            }
+          };
+
+          socket.onclose = () => {
+            console.log('need to reconnect');
+          };
+
+          return socket;
+        }
+
         function start(view) {
+          const socket = createSocket();
+
           const eevents = {
             // external
             'observer+': addObserver,
@@ -1337,7 +1385,6 @@
           colors[selectedMassIndex][1] = 255;
           colors[selectedMassIndex][2] = 0;
         }
-
       </script>
       <hud>
         <trump-mass><trump>TRUMP</trump>'s mass: <trump-mass-quantity></trump-mass-quantity></trump-mass>
