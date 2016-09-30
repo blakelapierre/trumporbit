@@ -5,9 +5,21 @@ const server = new Server({port:8080});
 console.log('server created');
 server.on('connection', socket => {
   console.log('connected');
-  server.clients.forEach(client => client.send('o')); //dupe?
+
+  socket.on('close', () => broadcast('o-'));
+  broadcast('o'); //dupe?
 });
 
+function broadcast(msg) {
+  server.clients.forEach(client => {
+    try {
+      client.send(msg);
+    }
+    catch (e) {
+      console.error(e);
+    }
+  });
+}
 
 console.log('listeners established');
 
@@ -19,7 +31,7 @@ console.log('process listener');
 process.stdin.on('data', chunk => {
   const lines = chunk.split('\n');
 
-  lines.forEach(line => line !== '' && server.clients.forEach(client => client.send(line) & console.log(line)));
+  lines.forEach(line => line !== '' && server.clients.forEach(client => client.send(line)) & console.log(line));
 });
 
 console.log('listening');
