@@ -946,7 +946,7 @@
               const {position: p, velocity: v, created} = spawn;
 
               const age = currentTick - created;
-              const x = Math.max(1, 200 / age);
+              const x = Math.max(1, 250 / Math.min(250, age));
 
               dd[0] = tp[0] - p[0];
               dd[1] = tp[1] - p[1];
