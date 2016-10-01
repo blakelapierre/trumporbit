@@ -179,7 +179,7 @@
 
         text-align: center;
 
-        font-size: 2vw;
+        font-size: 1.5vw;
 
         color: #fff;
 
@@ -240,13 +240,131 @@
         }
       }
 
-      distance {
+      current-look-at {
+        position: fixed;
+
+        top: 0;
+        left: 0;
+        right: 0;
+
+        white-space: normal;
+
+        display: flex;
+
+        justify-content: center;
+        align-items: center;
+
+        &.is-trump {
+          table {
+            display: none;
+          }
+        }
+
+        previous-look-at, next-look-at {
+          margin: 0 1.5vw;
+
+          padding: 0 1vw;
+
+          font-size: 3em;
+          font-weight: bold;
+
+          color: rgba(255, 255, 255, 0.1);
+
+          cursor: pointer;
+
+          user-select: none;
+          -webkit-user-select: none;
+
+          &:hover {
+            color: rgba(255, 255, 255, 0.5);
+            text-shadow: 0px 0px 1rem rgba(255, 255, 255, 0.7);
+          }
+        }
+
+        display {
+          min-width: 20%;
+
+          display: flex;
+          flex-direction: column;
+
+          align-items: center;
+
+          font-size: 0.8em;
+
+          color: rgba(255, 255, 255, 0.7);
+
+          table {
+            font-size: 1em;
+
+            color: rgba(255, 255, 255, 0.5);
+
+            border-top: solid 1px rgba(255, 255, 255, 0.2);
+          }
+
+          mass-name {
+            // font-size: 1rem;
+            font-weight: bold;
+          }
+
+          distance {
+            display: block;
+          }
+        }
+      }
+
+      current-mass {
         position: fixed;
 
         bottom: 0;
         left: 0;
 
         margin: 1vw;
+
+        white-space: normal;
+
+        display: flex;
+
+        justify-content: center;
+        align-items: center;
+
+        previous-mass, next-mass {
+          margin: 0 1.5vw;
+
+          padding: 0 1vw;
+
+          font-size: 5em;
+          font-weight: bold;
+
+          color: rgba(255, 255, 255, 0.7);
+
+          cursor: pointer;
+
+          &:hover {
+            text-shadow: 0px 0px 1rem rgba(255, 255, 255, 0.7);
+          }
+        }
+
+        display {
+          min-width: 20%;
+
+          display: flex;
+          flex-direction: column;
+
+          align-items: center;
+
+          table {
+            color: inherit;
+          }
+
+          mass-name {
+            font-size: 1.2em;
+            font-weight: bold;
+          }
+
+          distance {
+            display: block;
+          }
+        }
       }
 
       tag {
@@ -254,8 +372,6 @@
 
         bottom: 0;
         left: 0;
-
-        // margin: 1vw;
 
         font-size: 0.4em;
 
@@ -344,7 +460,7 @@
         }
         100% {
           background-color: rgba(0, 0, 0, 0);
-          transform: scale(0);
+          transform: scale(1);
         }
       }
 
@@ -376,10 +492,6 @@
           right: 0;
           bottom: 0;
 
-          // z-index: 1;
-
-          border-radius: 1vw;
-
           background-color: rgba(0, 0, 0, 1);
 
           animation: fade-background-out 6s 3s ease-in-out forwards;
@@ -391,8 +503,6 @@
           left: 0;
           right: 0;
           bottom: 0;
-
-          // z-index: 2;
 
           display: flex;
 
@@ -424,7 +534,7 @@
 
           color: rgba(255, 255, 255, 0);
 
-          animation: fade-color-in-and-out 6s 5s ease-in-out;
+          animation: fade-color-in-and-out 6s 2s ease-in-out;
 
           align-items: center;
           justify-content: center;
@@ -622,6 +732,12 @@
 
         const trumpMassQuantityEl = document.querySelector('trump-mass-quantity'),
               orbitStatisticsQuantityEl = document.querySelector('orbit-statistics-quantity'),
+              massNameEls = document.getElementsByTagName('mass-name'),
+              lookAtMassNameEl = document.querySelector('look-at-mass-name'),
+              lookAtMassQuantityEl = document.querySelector('look-at-mass-quantity'),
+              lookAtDistanceQuantityEl = document.querySelector('look-at-distance-quantity'),
+              lookAtTrumpDistanceQuantityEl = document.querySelector('look-at-trump-distance-quantity'),
+              massQuantityEl = document.querySelector('mass-quantity'),
               distanceQuantityEl = document.querySelector('distance-quantity'),
               catchUpQuantityEl = document.querySelector('catch-up-quantity'),
               trumpTweetEl = document.querySelector('trump-tweet'),
@@ -630,9 +746,12 @@
               absorbedByNameEl = document.querySelector('absorbed-by-name');
 
         const tagEl = document.querySelector('tag'),
+              currentLookAtEl = document.querySelector('current-look-at'),
               commandsEl = document.querySelector('commands'),
               helpEl = document.querySelector('help'),
-              helpContentEl = document.querySelector('help-content');
+              helpContentEl = document.querySelector('help-content'),
+              previousLookAtEl = document.querySelector('previous-look-at'),
+              nextLookAtEl = document.querySelector('next-look-at');
 
         class Mass {
           constructor(mass, color, position = [0, 0, 0], velocity = [0, 0, 0], acceleration = [0, 0, 0], gravity = [0, 0, 0]) {
@@ -677,6 +796,10 @@
           get name() { return 'Tweet'; }
         }
 
+        class OldTweets extends Tweet {
+          get name() { return 'Tweet\'s of <trump>TRUMP</trump>\'s Past'; }
+        }
+
         class TweetSpawn extends Mass { }
 
         class Like extends TweetSpawn {
@@ -701,7 +824,7 @@
         };
 
         const trump = new Trump(100000, [ 255,   255,    0, 0]),
-              oldTweets = new Tweet(2000, [0, 1, 1.2, 0.5], [-2000, -2000, 0], [-420, 0, -420]),
+              oldTweets = new OldTweets(2000, [0, 1, 1.2, 0.5], [-2000, -2000, 0], [320, 0, -320]),
               universe = [trump, oldTweets],
               tweets = [oldTweets],
               tweetMap = {},
@@ -710,6 +833,8 @@
               media = [],
               events = [],
               uievents = [];
+
+        const MAX_TWEET_SPAWN = 50;
 
         const [
           positions,
@@ -750,7 +875,7 @@
 
         function addObserver(event, view) {
           positionIndex = universe.length;
-          addMass(new Observer(1, [255, 255, 255, 0.6], [universe[0].position[0], universe[0].position[1], universe[0].position[2] + 5000], [420, -1, 0]), view);
+          addMass(new Observer(1, [255, 255, 255, 1], [universe[0].position[0], universe[0].position[1], universe[0].position[2] + 5000], [420, -1, 0]), view);
         }
 
         function addTweet(event, view) {
@@ -831,6 +956,12 @@
           spawningTweets.add(tweet);
         }
 
+        function incrementRetweets([_, id, retweets], view) {
+          const tweet = tweetMap[id] || oldTweets;
+          tweet.retweets += retweets;
+          spawningTweets.add(tweet);
+        }
+
         function incrementFollowers([_, followers], view) {
           oldTweets.followers += followers;
         }
@@ -905,7 +1036,7 @@
         const collisionList = []; // where should this go?
 
         const cameraPosition = [0, 0, 0];
-        let cameraOffset = [0, 100, 0];
+        let cameraOffset = [0, 225, 0];
 
         let ticksPerSecond = 60,
             ticksPerStep = 10,
@@ -928,15 +1059,15 @@
             const {position: tp, velocity: tv} = trump;
 
             spawningTweets.forEach(tweet => {
-              if (tweet.likes > 0) {
+              if (tweet.likes > 0 && Math.random() > 0.1) {
                 tweet.likes--;
                 events.push(['like', tweet.tweetID]);
               }
-              if (tweet.retweets > 0) {
+              if (tweet.retweets > 0 && Math.random() > 0.1) {
                 tweet.retweets--;
                 events.push(['retweet', tweet.tweetID]);
               }
-              if (tweet.followers > 0) {
+              if (tweet.followers > 0 && Math.random() > 0.1) {
                 tweet.followers--;
                 events.push(['follower']);
               }
@@ -966,8 +1097,6 @@
               mass.gravity[0] = 0;
               mass.gravity[1] = 0;
               mass.gravity[2] = 0;
-
-              // mass.mass += 0.1 / ticksPerSecond;
             }
           }
 
@@ -1112,7 +1241,7 @@
                 if (positionIndex === smallerIndex) positionIndex = positions.length - 1;
                 else positionIndex--;
               }
-              if (lookAtIndex >= smallerIndex) lookAtIndex--;
+              if (lookAtIndex >= smallerIndex) previousLookAt();
             }
           }
         }
@@ -1136,14 +1265,61 @@
           const masses = Math.max(0, universe.length - 1);
           orbitStatisticsQuantityEl.innerHTML = masses + ' mass' + (masses > 1 ? 'es' : '');
 
-          const distance = magnitude(sub(dd, universe[positionIndex].position, trump.position))
+          const currentMass = universe[positionIndex];
 
+          const distance = magnitude(sub(dd, currentMass.position, trump.position));
+
+          massNameEls[0].innerHTML = currentMass.name;
+          massNameEls[1].innerHTML = currentMass.name;
+
+          massQuantityEl.innerHTML = currentMass.mass.toFixed(1);
           distanceQuantityEl.innerHTML = distance.toFixed(1);
+
+
+          const lookAtMass = universe[lookAtIndex];
+          lookAtMassNameEl.innerHTML = lookAtMass.name;
+
+          if (lookAtIndex > 0) {
+            const lookAtDistance = magnitude(sub(dd, lookAtMass.position, currentMass.position)),
+                  lookAtTrumpDistance = magnitude(sub(dd, lookAtMass.position, trump.position));
+
+            lookAtMassQuantityEl.innerHTML = lookAtMass.mass.toFixed(1);
+            lookAtDistanceQuantityEl.innerHTML = lookAtDistance.toFixed(1);
+            lookAtTrumpDistanceQuantityEl.innerHTML = lookAtTrumpDistance.toFixed(1);
+            currentLookAtEl.classList.remove('is-trump');
+          }
+          else {
+            currentLookAtEl.classList.add('is-trump');
+          }
         }
 
         tagEl.addEventListener('click', () => commandsEl.classList.toggle('show'));
 
         helpEl.addEventListener('click', () => helpContentEl.classList.toggle('show'));
+
+        previousLookAtEl.addEventListener('click', () => {
+          cameraOffset[0] = 0;
+          cameraOffset[1] = 100;
+          cameraOffset[2] = 0;
+          return previousLookAt();
+        });
+
+        nextLookAtEl.addEventListener('click', () => {
+          cameraOffset[0] = 0;
+          cameraOffset[1] = 100;
+          cameraOffset[2] = 0;
+          return nextLookAt();
+        });
+
+        function nextLookAt() {
+          lookAtIndex = (lookAtIndex + 1) % universe.length;
+          return lookAtIndex === positionIndex ? nextLookAt() : lookAtIndex;
+        }
+
+        function previousLookAt() {
+          lookAtIndex === 0 ? lookAtIndex = universe.length - 1 : lookAtIndex--;
+          return lookAtIndex === positionIndex ? previousLookAt() : lookAtIndex;
+        }
 
         module.exports = {
           editorPanel: false,
@@ -1164,15 +1340,15 @@
             [['L'], 'lookAtTrump'],
             [['O'], 'overview'],
             [['F'], 'frontview'],
-            [['S'], 'sideview'],
+            [['V'], 'sideview'],
             [[190], 'speed+'],
             [[188], 'speed-'],
             [['0'], 'ticks+'],
             [['9'], 'ticks-'],
             [[32], 'changePlayer'],
             [[13], 'newMass'],
-            [[221], 'nextPosition'],
-            [[219], 'prevPosition']
+            [[221], 'nextMass'],
+            [[219], 'prevMass']
           ],
           commands: {
             'left': () => velocities[selectedMassIndex][0]--,
@@ -1270,13 +1446,13 @@
                 'width'() { return universe.length; }
               }
             },
-            'prevPosition': () => {
+            'prevMass': () => {
               cameraOffset[0] = 0;
               cameraOffset[1] = 100;
               cameraOffset[2] = 0;
               return positionIndex === 0 ? positionIndex = universe.length - 1 : positionIndex--;
             },
-            'nextPosition': () => {
+            'nextMass': () => {
               cameraOffset[0] = 0;
               cameraOffset[1] = 100;
               cameraOffset[2] = 0;
@@ -1287,10 +1463,9 @@
 
         function createSocket() {
           const socket = new WebSocket(`ws://${window.location.hostname}:8080`);
-
+          let opened;
           socket.onopen = () => {
-            socket.send('test');
-            console.log('open');
+            opened = true;
           };
 
           socket.onmessage = (data, flags) => {
@@ -1313,7 +1488,7 @@
           };
 
           socket.onclose = () => {
-            console.log('need to reconnect');
+            if (opened) window.location.reload();
           };
 
           return socket;
@@ -1343,8 +1518,9 @@
             'follower-': event => {}, //?
             'follower': addFollower,
 
-            'like+': incrementLikes,
             'follower+': incrementFollowers,
+            'like+': incrementLikes,
+            'retweet+': incrementRetweets,
 
             // internal
             'absorbed': absorbed
@@ -1465,7 +1641,32 @@
         </trump-tweet>
         <absorbed><absorbed-name></absorbed-name> was absorbed by <absorbed-by-name></absorbed-by-name>!</absorbed>
         <commands></commands>
-        <distance>Distance to <trump>TRUMP</trump>: <distance-quantity></distance-quantity></distance>
+        <current-look-at>
+          <previous-look-at>&lt;</previous-look-at>
+          <display>
+            Looking At
+            <look-at-mass-name></look-at-mass-name>
+            <table>
+              <tbody>
+                <tr><td>Mass:</td><td><look-at-mass-quantity></look-at-mass-quantity></td></tr>
+                <tr><td>Distance to <mass-name></mass-name>:</td><td><look-at-distance-quantity></distance-quantity></td></tr>
+                <tr><td>Distance to <trump>TRUMP</trump>:</td><td><look-at-trump-distance-quantity></distance-quantity></td></tr>
+              </tbody>
+            </table>
+          </display>
+          <next-look-at>&gt;</next-look-at>
+        </current-look-at>
+        <current-mass>
+          <display>
+            <mass-name></mass-name>
+            <table>
+              <tbody>
+                <tr><td>Mass:</td><td><mass-quantity></mass-quantity></td></tr>
+                <tr><td>Distance to <trump>TRUMP</trump>:</td><td><distance-quantity></distance-quantity></td></tr>
+              </tbody>
+            </table>
+          </display>
+        </current-mass>
         <tag><trump>TRUMP</trump>orbit <brand>alpha preview</brand> <version>uncommitted</version></tag>
         <help>?</help>
         <help-content>
@@ -1473,8 +1674,8 @@
          F 'frontview
          S 'sideview
          L 'lookAtTrump
-         ] 'nextPosition
-         [ 'prevPosition
+         ] 'nextMass
+         [ 'prevMass
          T 'fakeTweet
          R 'fakeRetweet
          K 'fakeLike
@@ -1483,7 +1684,7 @@
          A 'decrease target x velocity (x-)
          D 'increase target x velocity (x+)
          W 'decrease target z velocity (z-)
-         S 'increase target z velocity (z+)
+         V 'increase target z velocity (z+)
          Q 'increase target y velocity (y-)
          Z 'decrease target y velocity (y+)
          . 'speed+
