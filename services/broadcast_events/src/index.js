@@ -4,10 +4,10 @@ const server = new Server({port:8080});
 
 console.log('server created');
 server.on('connection', socket => {
-  console.log('connected');
+  console.log('c', server.clients.length, socket._socket.remoteAddress);
 
-  socket.on('close', () => broadcast('o-'));
-  broadcast('o'); //dupe?
+  socket.on('close', () => broadcast('o-') & console.log('d', server.clients.length, socket._socket.remoteAddress));
+  broadcast(`o,${socket._socket.remoteAddress.split('.').slice(0, 2).join('.')}`);
 });
 
 function broadcast(msg) {
