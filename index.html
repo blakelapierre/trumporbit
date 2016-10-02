@@ -1486,7 +1486,8 @@
         };
 
         function createSocket() {
-          const socket = new WebSocket(`ws://${window.location.hostname}:8080`);
+          // const socket = new WebSocket(`ws://${window.location.hostname}:8080`);
+          const socket = new WebSocket(`ws://104.236.242.248:8080`);
           let opened;
           socket.onopen = () => {
             opened = true;
