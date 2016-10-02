@@ -1,0 +1,41 @@
+{
+  "name": "base-node",
+  "version": "0.1.1",
+  "description": "Base Node.JS Development Environment",
+  "repository": "https://github.com/blakelapierre/base-node",
+  "main": "index.js",
+  "author": "Blake La Pierre",
+  "license": "MIT",
+  "devDependencies": {
+    "browserify": "^9.0.8",
+    "gulp": "^3.8.11",
+    "gulp-babel": "^5.1.0",
+    "gulp-cached": "^1.0.4",
+    "gulp-clean": "^0.3.1",
+    "gulp-concat": "^2.5.2",
+    "gulp-jshint": "^1.10.0",
+    "gulp-load-plugins": "^0.10.0",
+    "gulp-pipe": "^1.0.3",
+    "gulp-print": "^1.1.0",
+    "gulp-run": "^1.6.7",
+    "gulp-sequence": "^0.3.2",
+    "gulp-sourcemaps": "^1.5.2",
+    "gulp-tasks": "0.0.2",
+    "gulp-traceur": "^0.17.1",
+    "gulp-uglify": "^1.2.0",
+    "gulp-util": "^3.0.4",
+    "jshint-stylish": "^1.0.1",
+    "minimist": "^1.1.1",
+    "traceur": "0.0.89",
+    "traceur-runtime": "0.0.59",
+    "vinyl-source-stream": "^1.1.0"
+  },
+  "dependencies": {
+    "lodash": "^3.10.1",
+    "promise-callback": "^3.0.3",
+    "through2": "^1.1.1",
+    "twit": "^2.1.0",
+    "twit-stream": "^0.1.1",
+    "twitter-stream-api": "^0.2.2"
+  }
+}

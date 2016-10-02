@@ -1,0 +1,5 @@
+#!/bin/bash
+
+cp ../target/ingest-twitter-1.0-SNAPSHOT-jar-with-dependencies.jar ingest.jar
+
+docker build -t 2016fantasy/ingest-twitter-java .
