@@ -31,7 +31,7 @@ console.log('process listener');
 process.stdin.on('data', chunk => {
   const lines = chunk.split('\n');
 
-  lines.forEach(line => line !== '' && server.clients.forEach(client => client.send(line)) & console.log(line));
+  lines.forEach(line => line !== '' && server.clients.forEach(client => {try {client.send(line); } catch (e) { console.error(e); }}) & console.log(line));
 });
 
 console.log('listening');
