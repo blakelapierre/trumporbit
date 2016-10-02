@@ -838,6 +838,7 @@
         let tweetSpawnCount = 0;
 
         const MAX_TWEET_SPAWN = 50,
+              MAX_TWEET_SPAWN_AGE = 60 * 5,
               MAX_OBSERVERS = 51;
 
         const [
@@ -1106,6 +1107,10 @@
               v[0] = tv[0] + dd[0]/x;
               v[1] = tv[1] + dd[1]/x;
               v[2] = tv[2] + dd[2]/x;
+
+              if (age > MAX_TWEET_SPAWN_AGE) {
+                collisionList.push([spawn.mass < trump.mass, spawn, trump, universe.indexOf(spawn)]);
+              }
             });
           }
 
