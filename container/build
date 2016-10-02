@@ -7,4 +7,4 @@ cp -R ../dist assets/
 cp -R ../images assets/
 cp -R ../lib assets/
 
-docker build -t blakelapierre/trumporbit .
+docker build -t trumporbit/www .
