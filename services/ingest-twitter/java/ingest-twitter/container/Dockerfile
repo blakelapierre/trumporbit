@@ -1,5 +1,6 @@
 FROM 2016fantasy/openjdk-8-jre
 
-ADD ingest.jar ingest.jar
+ADD listen /listen
+ADD ingest.jar /target/ingest-twitter-1.0-SNAPSHOT-jar-with-dependencies.jar
 
-CMD ["java", "-jar",  "/ingest.jar"]
+CMD ["./listen"]
