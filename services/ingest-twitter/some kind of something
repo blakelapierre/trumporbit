@@ -1,0 +1,21 @@
+twitter {
+  ingest
+    -> log
+    -> transform
+
+  transform
+    -> cache
+    -> inject
+}
+
+events {
+  inject
+    -> filters
+
+  [filters
+    -> leagues]
+}
+
+leagues {
+
+}

@@ -1,0 +1,8 @@
+#!/bin/sh
+
+source ./credentials
+CONSUMER_KEY=$CONSUMER_KEY \
+CONSUMER_SECRET=$CONSUMER_SECRET \
+TOKEN=$TOKEN \
+SECRET=$SECRET \
+java -jar target/ingest-twitter-1.0-SNAPSHOT-jar-with-dependencies.jar > tweets

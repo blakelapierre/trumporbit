@@ -1,0 +1,10 @@
+#!/bin/bash
+
+mkdir -p assets
+
+cp ../index.html assets/
+cp -R ../dist assets/
+cp -R ../images assets/
+cp -R ../lib assets/
+
+docker build -t blakelapierre/trumporbit .
