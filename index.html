@@ -828,14 +828,12 @@
               universe = [trump, oldTweets],
               tweets = [oldTweets],
               tweetMap = {},
-              tweetSpawn = new Set(),
+              tweetSpawn = [],
               spawningTweets = new Set(),
               media = [],
               observers = [],
               events = [],
               uievents = [];
-
-        let tweetSpawnCount = 0;
 
         const MAX_TWEET_SPAWN = 50,
               MAX_TWEET_SPAWN_AGE = 60 * 5,
@@ -961,8 +959,7 @@
           const spawn = new constructor(mass, color, position,
                                       [tv[0] + d[0]/x, tv[1] + d[1]/x, tv[2] + d[2]/x]);
           addMass(spawn, view);
-          tweetSpawn.add(spawn);
-          tweetSpawnCount++;
+          tweetSpawn.push(spawn);
         }
 
         function absorbed(event) {
@@ -1072,12 +1069,11 @@
           resolveCollisions();
 
           updateMassesGUI();
-          collisionList.splice(0);
 
           function updateTweetSpawn() {
             const {position: tp, velocity: tv} = trump;
 
-            if (tweetSpawnCount < MAX_TWEET_SPAWN) {
+            if (tweetSpawn.length < MAX_TWEET_SPAWN) {
               spawningTweets.forEach(tweet => {
                 if (tweet.likes > 0 && Math.random() > 0.1) {
                   tweet.likes--;
@@ -1094,8 +1090,9 @@
               });
             }
 
-            tweetSpawn.forEach(spawn => {
-              const {position: p, velocity: v, created} = spawn;
+            for (let i = 0; i < tweetSpawn.length; i++) {
+              const spawn = tweetSpawn[i],
+                    {mass, position: p, velocity: v, created} = spawn;
 
               const age = currentTick - created;
               const x = Math.max(1, 250 / Math.min(250, age));
@@ -1109,9 +1106,15 @@
               v[2] = tv[2] + dd[2]/x;
 
               if (age > MAX_TWEET_SPAWN_AGE) {
-                collisionList.push([spawn.mass < trump.mass, spawn, trump, universe.indexOf(spawn)]);
+                const index = universe.indexOf(spawn);
+                if (index === -1) {
+                  console.log('-1!', age, spawn, universe);
+                }
+                else collisionList.push([true, spawn, trump, index]);
               }
-            });
+            }
+
+            resolveCollisions();
           }
 
           function positionHalfTick() {
@@ -1237,8 +1240,7 @@
                     greaterMass = firstSmaller ? mass2 : mass1;
 
               if (smallerMass instanceof TweetSpawn) {
-                tweetSpawn.delete(smallerMass);
-                tweetSpawnCount--;
+                tweetSpawn.splice(tweetSpawn.indexOf(smallerMass), 1);
               }
               else if (smallerMass instanceof Tweet) {
                 tweets.splice(tweets.indexOf(smallerMass), 1);
@@ -1270,8 +1272,12 @@
                 if (positionIndex === smallerIndex) positionIndex = positions.length - 1;
                 else positionIndex--;
               }
-              if (lookAtIndex >= smallerIndex) previousLookAt();
+              if (lookAtIndex >= smallerIndex) {
+                previousLookAt();
+              }
             }
+
+            collisionList.splice(0);
           }
         }
 
