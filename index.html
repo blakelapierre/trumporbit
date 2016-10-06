@@ -769,10 +769,22 @@
           get size() { return 1000 * Math.log2(this.mass + 1); }
 
           positionHalfTick(ticksPerSecond) {
-            const {position, velocity} = this;
-            position[0] += velocity[0] / ticksPerSecond / 2;
-            position[1] += velocity[1] / ticksPerSecond / 2;
-            position[2] += velocity[2] / ticksPerSecond / 2;
+            const {position: p, velocity: v} = this;
+            p[0] += v[0] / ticksPerSecond / 2;
+            p[1] += v[1] / ticksPerSecond / 2;
+            p[2] += v[2] / ticksPerSecond / 2;
+          }
+
+          velocityTick(ticksPerSecond) {
+            const {
+              velocity: v,
+              acceleration: a,
+              gravity: g
+            } = this;
+
+            v[0] += (a[0] + g[0]) / ticksPerStep;
+            v[1] += (a[1] + g[1]) / ticksPerStep;
+            v[2] += (a[2] + g[2]) / ticksPerStep;
           }
         }
 
@@ -1050,6 +1062,7 @@
 
 
         const collisionList = []; // where should this go?
+        let collisionIIndex = 0;
 
         const cameraPosition = [0, 0, 0];
         let cameraOffset = [0, 225, 0];
@@ -1090,11 +1103,12 @@
 
               if (age > MAX_TWEET_SPAWN_AGE) {
                 const index = universe.indexOf(spawn);
-                console.log(index);
                 if (index === -1) {
-                  // console.log('-1!', age, spawn, universe);
+                  console.log('-1!', age, spawn, universe);
                 }
-                else collisionList.push([true, spawn, trump, index]);
+                else {
+                  collisionList.push([true, spawn, trump, index]);
+                }
               }
             }
 
@@ -1206,27 +1220,36 @@
               g1[2] += pv2[2] * factor;
             }
 
-            const threshold = 4 * Math.log2(m1 + m2) / 3;
-            if (d1 < threshold || d2 < threshold) collisionList.push([m1 < m2, universe[i], universe[j], m1 < m2 ? i : j]);
+            if (universe[i].futureCollision) {
+              collisionList.push(universe[i].futureCollision);
+              delete universe[i].futureCollision;
+            }
+            else { // I don't think there should be an else, but these both *can't* run, or the resolve will break;
+              const threshold = 4 * Math.log2(m1 + m2) / 3;
+              if (d1 < threshold || d2 < threshold) { // better ordering of checks?
+                if (m1 < m2) {
+                  //wtf is this
+                  // collisionList.splice(collisionIndex++, 0, [true, universe[i], universe[j], i])
+                  collisionList.push([true, universe[i], universe[j], i]);
+                  // collisionIIndex++;
+                }
+                else {
+                  universe[j].futureCollision = [false, universe[i], universe[j], j];
+                  // collisionList.push([false, universe[i], universe[j], j]);
+                }
+              }
+            }
           }
 
           function updateVelocities() {
             universe.forEach(mass => {
-              const {
-                velocity: v,
-                acceleration: a,
-                gravity: g
-              } = mass;
-
-              v[0] += (a[0] + g[0]) / ticksPerStep;
-              v[1] += (a[1] + g[1]) / ticksPerStep;
-              v[2] += (a[2] + g[2]) / ticksPerStep;
-
+              mass.velocityTick(ticksPerStep);
               mass.positionHalfTick(ticksPerStep);
             });
           }
 
           function resolveCollisions() {
+            console.log(collisionList, universe);
             for (let i = collisionList.length - 1; i >= 0; i--) {
               const [firstSmaller, mass1, mass2] = collisionList[i],
                     smallerMass = firstSmaller ? mass1 : mass2,
@@ -1280,6 +1303,8 @@
             }
 
             collisionList.splice(0);
+            collisionIIndex = 0;
+            console.log(collisionList, universe);
           }
         }
 
