@@ -2,6 +2,8 @@
   <head>
     <title>TRUMPorbit</title>
 
+    <meta name="theme-color" content="#000000" />
+
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:site" content="@TRUMPorbit" />
     <meta name="twitter:title" content="TRUMPorbit" />
@@ -835,6 +837,14 @@
           get name() { return this.mediaName; }
         };
 
+        const COLORS = {
+          observer: [255, 255, 255, 1],
+          tweet: [0, 1, 1.2, 2],
+          retweet: [25 / 128, 207 / 128, 134 / 128, 2],
+          like: [190 / 128, 25 / 128, 49 / 128, 2],
+          follower: [0 / 128, 25 / 128, 256 / 128, 2]
+        };
+
         const trump = new Trump(100000, [ 255,   255,    0, 0]),
               oldTweets = new OldTweets(2000, [0, 1, 1.2, 0.5], [-2000, -2000, 0], [320, 0, -320]),
               universe = [trump, oldTweets],
@@ -892,7 +902,7 @@
 
           if (observers.length < MAX_OBSERVERS) {
             const tp = trump.position;
-            const observer = addMass(new Observer(1, [255, 255, 255, 1], [tp[0], tp[1], tp[2] + 5000], [420, -1, 0]), view);
+            const observer = addMass(new Observer(1, COLORS.observer, [tp[0], tp[1], tp[2] + 5000], [420, -1, 0]), view);
 
             observers.push(observer);
           }
@@ -907,7 +917,7 @@
           // this should be calculated based on current trump mass (and, maybe, positions/velocities of orbiting masses?)
           const tp = trump.position; // ?
 
-          const tweet = new Tweet(800, [0, 1, 1.2, 2],
+          const tweet = new Tweet(800, COLORS.tweet,
                                        [tp[0], tp[1], tp[2] + 350],
                                        [1000, -1, 0]),
                 cnn = new Media('CNN', 5, [2, 2, 2, 1],
@@ -928,15 +938,15 @@
         }
 
         function addRetweet(event, view) {
-          addTweetSpawn(tweetMap[event[1]] || oldTweets, ReTweet, 1, [25 / 128, 207 / 128, 134 / 128, 2], view);
+          addTweetSpawn(tweetMap[event[1]] || oldTweets, ReTweet, 1, COLORS.retweet, view);
         }
 
         function addLike(event, view) {
-          addTweetSpawn(tweetMap[event[1]] || oldTweets, Like, 1, [190 / 128, 25 / 128, 49 / 128, 2], view);
+          addTweetSpawn(tweetMap[event[1]] || oldTweets, Like, 1, COLORS.like, view);
         }
 
         function addFollower(event, view) {
-          addTweetSpawn(oldTweets, Follower, 1, [0 / 128, 25 / 128, 256 / 128, 2], view);
+          addTweetSpawn(oldTweets, Follower, 1, COLORS.follower, view);
         }
 
         const spread = 700;
