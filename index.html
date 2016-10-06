@@ -768,7 +768,7 @@
 
           get name() { return 'Mass'; }
 
-          get size() { return 1000 * Math.log2(this.mass + 1); }
+          get size() { return 500 * Math.log2(this.mass + 1); }
 
           positionHalfTick(ticksPerSecond) {
             const {position: p, velocity: v} = this;
@@ -846,7 +846,7 @@
         };
 
         const trump = new Trump(100000, [ 255,   255,    0, 0]),
-              oldTweets = new OldTweets(2000, [0, 1, 1.2, 0.5], [-2000, -2000, 0], [320, 0, -320]),
+              oldTweets = new OldTweets(2000, [0, 1, 1.2, 0.5], [-800, -800, 0], [320, 0, -320]),
               universe = [trump, oldTweets],
               tweets = [oldTweets],
               tweetMap = {},
@@ -902,7 +902,7 @@
 
           if (observers.length < MAX_OBSERVERS) {
             const tp = trump.position;
-            const observer = addMass(new Observer(1, COLORS.observer, [tp[0], tp[1], tp[2] + 5000], [420, -1, 0]), view);
+            const observer = addMass(new Observer(1, COLORS.observer, [tp[0], tp[1], tp[2] + 1000], [420, -1, 0]), view);
 
             observers.push(observer);
           }
