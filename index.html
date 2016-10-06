@@ -846,7 +846,7 @@
         };
 
         const trump = new Trump(100000, [ 255,   255,    0, 0]),
-              oldTweets = new OldTweets(2000, [0, 1, 1.2, 0.5], [-800, -800, 0], [320, 0, -320]),
+              oldTweets = new OldTweets(200, [0, 1, 1.2, 1], [-500, -500, 0], [315, 0, -315]),
               universe = [trump, oldTweets],
               tweets = [oldTweets],
               tweetMap = {},
@@ -902,7 +902,7 @@
 
           if (observers.length < MAX_OBSERVERS) {
             const tp = trump.position;
-            const observer = addMass(new Observer(1, COLORS.observer, [tp[0], tp[1], tp[2] + 1000], [420, -1, 0]), view);
+            const observer = addMass(new Observer(1, COLORS.observer, [tp[0], tp[1], tp[2] + 1000], [420, 0, 0]), view);
 
             observers.push(observer);
           }
@@ -917,12 +917,12 @@
           // this should be calculated based on current trump mass (and, maybe, positions/velocities of orbiting masses?)
           const tp = trump.position; // ?
 
-          const tweet = new Tweet(800, COLORS.tweet,
+          const tweet = new Tweet(100, COLORS.tweet,
                                        [tp[0], tp[1], tp[2] + 350],
-                                       [1000, -1, 0]),
+                                       [650, -1, 0]),
                 cnn = new Media('CNN', 5, [2, 2, 2, 1],
-                                          [tp[0] + 90, tp[1] + 0, tp[2] + 350],
-                                          [1000, 5, 0]);
+                                          [tp[0] + 70, tp[1] + 0, tp[2] + 350],
+                                          [650, 1, 0]);
 
           tweet.tweetID = event[1] || 'fake';
 
@@ -1416,9 +1416,9 @@
             'up': () => velocities[selectedMassIndex][1]++,
             'down': () => velocities[selectedMassIndex][1]--,
             'lookAtTrump': () => lookAtIndex = 0,
-            'overview': () => {lookAtIndex = 0; positionIndex = 0; cameraOffset = [0, 5000, 0];},
-            'frontview': () => {lookAtIndex = 0; positionIndex = 0; cameraOffset = [0, 0, 5000];},
-            'sideview': () => {lookAtIndex = 0; positionIndex = 0; cameraOffset = [-5000, 0, 0];},
+            'overview': () => {lookAtIndex = 0; positionIndex = 0; cameraOffset = [0, 2500, 0];},
+            'frontview': () => {lookAtIndex = 0; positionIndex = 0; cameraOffset = [0, 0, 2500];},
+            'sideview': () => {lookAtIndex = 0; positionIndex = 0; cameraOffset = [-2500, 0, 0];},
             'speed+': () => ++stepsPerSecond,
             'speed-': () => stepsPerSecond = Math.max(1, stepsPerSecond - 1),
             'ticks+': () => ++ticksPerStep,
