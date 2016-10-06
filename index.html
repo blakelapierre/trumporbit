@@ -1229,13 +1229,10 @@
               if (d1 < threshold || d2 < threshold) { // better ordering of checks?
                 if (m1 < m2) {
                   //wtf is this
-                  // collisionList.splice(collisionIndex++, 0, [true, universe[i], universe[j], i])
                   collisionList.push([true, universe[i], universe[j], i]);
-                  // collisionIIndex++;
                 }
                 else {
                   universe[j].futureCollision = [false, universe[i], universe[j], j];
-                  // collisionList.push([false, universe[i], universe[j], j]);
                 }
               }
             }
@@ -1249,7 +1246,6 @@
           }
 
           function resolveCollisions() {
-            console.log(collisionList, universe);
             for (let i = collisionList.length - 1; i >= 0; i--) {
               const [firstSmaller, mass1, mass2] = collisionList[i],
                     smallerMass = firstSmaller ? mass1 : mass2,
@@ -1264,7 +1260,6 @@
                     greaterMass = firstSmaller ? mass2 : mass1;
 
               if (smallerMass instanceof TweetSpawn) {
-                console.log('removing tweetspawn', smallerIndex, smallerMass);
                 tweetSpawn.splice(tweetSpawn.indexOf(smallerMass), 1);
               }
               else if (smallerMass instanceof Tweet) {
@@ -1304,7 +1299,6 @@
 
             collisionList.splice(0);
             collisionIIndex = 0;
-            console.log(collisionList, universe);
           }
         }
 
