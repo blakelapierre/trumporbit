@@ -880,9 +880,6 @@
           sizes.push(size);
           colors.push(color);
 
-          // get this out of here asap!
-          orbitStatisticsQuantityEl.innerHTML = Math.max(0, universe.length - 1);
-
           view.select('#positions').set('width', positions.length);
           view.select('#colors').set('width', colors.length);
           view.select('#sizes').set('width', sizes.length);
@@ -1081,8 +1078,6 @@
           updateVelocities();
           resolveCollisions();
 
-          updateMassesGUI();
-
           function updateTweetSpawn() {
             const {position: tp, velocity: tv} = trump;
 
@@ -1155,10 +1150,15 @@
               acceleration: a1,
               gravity: g1,
               mass: m1,
-              size: s1
+              size: s1,
+              futureCollision
             } = universe[i];
 
-            for (let j = i + 1; j < universe.length; j++) updatePair(p1, v1, a1, g1, m1, s1, i, j);
+            if (futureCollision) {
+              collisionList.push(futureCollision);
+            }
+
+            for (let j = i + 1; j < universe.length; j++) updatePair(p1, v1, a1, g1, m1, s1, i, j, futureCollision);
 
             // F = ma ... a = F/m
             g1[0] = g1[0] / m1;
@@ -1166,7 +1166,7 @@
             g1[2] = g1[2] / m1;
           }
 
-          function updatePair(p1, v1, a1, g1, m1, s1, i, j) {
+          function updatePair(p1, v1, a1, g1, m1, s1, i, j, futureCollision) {
             const {
               position: p2,
               velocity: v2,
@@ -1220,14 +1220,10 @@
               g1[2] += pv2[2] * factor;
             }
 
-            if (universe[i].futureCollision) {
-              collisionList.push(universe[i].futureCollision);
-              delete universe[i].futureCollision;
-            }
-            else { // I don't think there should be an else, but these both *can't* run, or the resolve will break;
+            if (!futureCollision) {
               const threshold = 4 * Math.log2(m1 + m2) / 3;
               if (d1 < threshold || d2 < threshold) { // better ordering of checks?
-                if (m1 < m2) {
+                if (m1 <= m2) {
                   //wtf is this
                   collisionList.push([universe[i], universe[j], i]);
                 }
@@ -1589,7 +1585,8 @@
           window.requestAnimationFrame(animate);
 
           function runner(universe, startTime = new Date().getTime(), maxTicksPerCall = 50) {
-            let currentTick = 0;
+            let currentTick = 0,
+                lastGUIUpdate = 0;
 
             return (currentTime = new Date().getTime()) => {
               const dt = currentTime - startTime,
@@ -1608,6 +1605,11 @@
                 tick();
 
                 currentTick++;
+              }
+
+              if ((currentTime - lastGUIUpdate) > 1000) {
+                updateMassesGUI();
+                lastGUIUpdate = currentTime;
               }
 
               if (currentTick !== t) {
