@@ -902,7 +902,7 @@
 
           if (observers.length < MAX_OBSERVERS) {
             const tp = trump.position;
-            const observer = addMass(new Observer(1, COLORS.observer, [tp[0], tp[1], tp[2] + 1000], [420, 0, 0]), view);
+            const observer = addMass(new Observer(1, COLORS.observer, [tp[0], tp[1], tp[2] + 1025], [420, 0, 0]), view);
 
             observers.push(observer);
           }
@@ -1621,7 +1621,7 @@
                 currentTick++;
               }
 
-              if ((currentTime - lastGUIUpdate) > 500) {
+              if ((currentTime - lastGUIUpdate) > 100) {
                 updateMassesGUI();
                 lastGUIUpdate = currentTime;
               }
