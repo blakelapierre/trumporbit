@@ -34,6 +34,6 @@
     "vinyl-source-stream": "^1.1.0"
   },
   "dependencies": {
-    "ws": "^1.1.1"
+    "uws": "^0.10.5"
   }
 }

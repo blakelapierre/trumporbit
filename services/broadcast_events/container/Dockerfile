@@ -1,6 +1,6 @@
 FROM alpine
 
-RUN apk --no-cache add nodejs && rm -rf /tmp/*
+RUN apk --no-cache add nodejs libc6-compat wget && rm -rf /tmp/*
 
 ADD ./app /app
 
