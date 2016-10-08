@@ -146,6 +146,25 @@
       follower: [0 / 128, 25 / 128, 256 / 128, 2]
     };
 
+    const ORBIT_PARAMETERS = {
+      'observer': {
+        p: (tp, tv) => [tp[0], tp[1], tp[2] + 3000],
+        v: (tp, tv) => [420, 0, 0]
+      },
+      'oldTweets': {
+        p: (tp, tv) => [-1600, -1600, 0],
+        v: (tp, tv) => [315, 0, -315]
+      },
+      'tweet': {
+        p: (tp, tv) => [tp[0], tp[1], tp[2] + 500],
+        v: (tp, tv) => [850, -1, 0]
+      },
+      'media': {
+        p: (tp, tv) => [tp[0] + 50, tp[1] + 0, tp[2] + 500],
+        v: (tp, tv) => [850, 1, 0]
+      }
+    };
+
     const trump = new Trump(100000, [ 255,   255,    0, 0]),
           universe = [trump],
           tweets = [],
@@ -203,8 +222,8 @@
       if (observers.length === 0) positionIndex = universe.length;
 
       if (observers.length < MAX_OBSERVERS) {
-        const tp = trump.position;
-        const observer = addMass(new Observer(1, COLORS.observer, [tp[0], tp[1], tp[2] + 1025], [420, 0, 0]), view);
+        const {position: tp, velocity: tv} = trump;
+        const observer = addMass(new Observer(1, COLORS.observer, ORBIT_PARAMETERS.observer.p(tp, tv), ORBIT_PARAMETERS.observer.v(tp, tv)), view);
 
         observers.push(observer);
       }
@@ -215,7 +234,8 @@
     }
 
     function addOldTweets(event, view) {
-      oldTweets = new OldTweets(200, [0, 1, 1.2, 1], [-500, -500, 0], [315, 0, -315]);
+      const {position: tp, velocity: tv} = trump;
+      oldTweets = new OldTweets(200, [0, 1, 1.2, 1], ORBIT_PARAMETERS.oldTweets.p(tp, tv), ORBIT_PARAMETERS.oldTweets.v(tp, tv));
 
       addMass(oldTweets, view);
       tweets.push(oldTweets);
@@ -224,14 +244,14 @@
     function addTweet(event, view) {
       lookAtIndex = universe.length;
       // this should be calculated based on current trump mass (and, maybe, positions/velocities of orbiting masses?)
-      const tp = trump.position; // ?
+      const {position: tp, velocity: tv} = trump;
 
       const tweet = new Tweet(100, COLORS.tweet,
-                                   [tp[0], tp[1], tp[2] + 350],
-                                   [650, -1, 0]),
+                                   ORBIT_PARAMETERS.tweet.p(tp, tv),
+                                   ORBIT_PARAMETERS.tweet.v(tp, tv)),
             cnn = new Media('CNN', 5, [2, 2, 2, 1],
-                                      [tp[0] + 70, tp[1] + 0, tp[2] + 350],
-                                      [650, 1, 0]);
+                                      ORBIT_PARAMETERS.media.p(tp, tv),
+                                      ORBIT_PARAMETERS.media.v(tp, tv));
 
       tweet.tweetID = event[1] || 'fake';
 
@@ -310,7 +330,7 @@
       oldTweets.followers += followers;
     }
 
-    let trumpScaleFactor = 5;
+    let trumpScaleFactor = 8;
     <root>
       <camera proxy={false}
               position={t => cameraPosition}
@@ -347,6 +367,12 @@
       </cartesian>
     </root>
 
+
+    const views = {
+      'overview': [0, 3500, 0],
+      'frontview': [0, 0, 3500],
+      'sideview': [-3500, 0, 0]
+    };
 
     function add (r, v1, v2) {
       r[0] = v1[0] + v2[0];
@@ -730,9 +756,9 @@
         'up': () => velocities[selectedMassIndex][1]++,
         'down': () => velocities[selectedMassIndex][1]--,
         'lookAtTrump': () => lookAtIndex = 0,
-        'overview': () => {lookAtIndex = 0; positionIndex = 0; cameraOffset = [0, 2500, 0];},
-        'frontview': () => {lookAtIndex = 0; positionIndex = 0; cameraOffset = [0, 0, 2500];},
-        'sideview': () => {lookAtIndex = 0; positionIndex = 0; cameraOffset = [-2500, 0, 0];},
+        'overview': () => {lookAtIndex = 0; positionIndex = 0; cameraOffset = views.overview;},
+        'frontview': () => {lookAtIndex = 0; positionIndex = 0; cameraOffset = views.frontview;},
+        'sideview': () => {lookAtIndex = 0; positionIndex = 0; cameraOffset = views.sideview;},
         'speed+': () => ++stepsPerSecond,
         'speed-': () => stepsPerSecond = Math.max(1, stepsPerSecond - 1),
         'ticks+': () => ++ticksPerStep,
@@ -853,7 +879,7 @@
             handle('tweet', parts);
             break;
           case 'o':
-            events.push(['observer+']);
+            events.push(['observer+', parts[1]]);
             break;
           case 'o-':
             break;

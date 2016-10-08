@@ -48,6 +48,8 @@ hud {
 
   white-space: pre;
 
+  font-size: 0.9em;
+
   transition: color 2s ease-in-out;
 
   &:hover {
@@ -108,13 +110,9 @@ hud {
       opacity: 1;
       // display: block;
     }
-    20% {
-      text-shadow: 0px 0px 0px #fff;
-      opacity: 1;
-    }
     100% {
       opacity: 0;
-      text-shadow: none;
+      text-shadow: 0px 0px 0px #fff;
       // display: none;
     }
   }
@@ -182,7 +180,7 @@ hud {
     &.show {
       display: block;
 
-      animation: flash-fade-and-hide 4s ease-in-out forwards;
+      animation: flash-fade-and-hide 1s ease-in-out forwards;
     }
   }
 

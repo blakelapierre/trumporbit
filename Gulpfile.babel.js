@@ -3,6 +3,9 @@ import less from 'gulp-less';
 import pipe from 'gulp-pipe';
 import pug from 'gulp-pug';
 
+gulp.task('dev', ['index'],
+  () => gulp.watch('src/*', ['index']));
+
 gulp.task('index', ['style'],
   () =>
     pipe([
