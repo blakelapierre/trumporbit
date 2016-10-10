@@ -51,16 +51,16 @@
       hud.classList.add(state);
 
       if (state === 'moving') {
-        cameraOffset[0] = 0;
-        cameraOffset[1] = 0;
-        cameraOffset[2] = 0;
+        targetCameraOffset[0] = 0;
+        targetCameraOffset[1] = 0;
+        targetCameraOffset[2] = 0;
 
         controls = attachVelocityControls();
       }
       else if (state === 'looking') {
-        cameraOffset[0] = 0;
-        cameraOffset[1] = 225;
-        cameraOffset[2] = 0;
+        targetCameraOffset[0] = 0;
+        targetCameraOffset[1] = 225;
+        targetCameraOffset[2] = 0;
 
         detachVelocityControls(controls);
       }
@@ -469,7 +469,7 @@
 
       add(v, v, [r[1], r[2], r[3]]);
 
-      mass.mass *= 0.5;
+      mass.mass *= 0.95;
 
       if (mass.mass < 0.01) events.push(['poof', mass, i]);
 
@@ -645,6 +645,13 @@
       'sideview': [-3500, 0, 0]
     };
 
+    function copy (r, s) {
+      r[0] = s[0];
+      r[1] = s[1];
+      r[2] = s[2];
+      return r;
+    }
+
     function add (r, u, v) {
       r[0] = u[0] + v[0];
       r[1] = u[1] + v[1];
@@ -694,17 +701,13 @@
     const collisionList = []; // where should this go?
     let collisionIIndex = 0;
 
-    const cameraPosition = [0, 0, 0];
-    let cameraOffset = [0, 225, 0];
+    const cameraPosition = [0, 0, 0],
+          cameraOffset = [0, 225, 0],
+          targetCameraOffset = [0, 225, 0];
 
     let ticksPerSecond = 60,
         ticksPerStep = 10,
         stepsPerSecond = 1;
-
-
-
-
-
 
 
     let currentTick = 0;
@@ -1026,16 +1029,16 @@
     helpEl.addEventListener('click', () => helpContentEl.classList.toggle('show'));
 
     previousLookAtEl.addEventListener('click', () => {
-      cameraOffset[0] = 0;
-      cameraOffset[1] = 100;
-      cameraOffset[2] = 0;
+      targetCameraOffset[0] = 0;
+      targetCameraOffset[1] = 100;
+      targetCameraOffset[2] = 0;
       return previousLookAt();
     });
 
     nextLookAtEl.addEventListener('click', () => {
-      cameraOffset[0] = 0;
-      cameraOffset[1] = 100;
-      cameraOffset[2] = 0;
+      targetCameraOffset[0] = 0;
+      targetCameraOffset[1] = 100;
+      targetCameraOffset[2] = 0;
       return nextLookAt();
     });
 
@@ -1088,9 +1091,9 @@
         'up': () => velocities[selectedMassIndex][1]++,
         'down': () => velocities[selectedMassIndex][1]--,
         'lookAtTrump': () => lookAtIndex = 0,
-        'overview': () => {lookAtIndex = 0; positionIndex = 0; cameraOffset = views.overview;},
-        'frontview': () => {lookAtIndex = 0; positionIndex = 0; cameraOffset = views.frontview;},
-        'sideview': () => {lookAtIndex = 0; positionIndex = 0; cameraOffset = views.sideview;},
+        'overview': () => {lookAtIndex = 0; positionIndex = 0; copy(targetCameraOffset, views.overview);},
+        'frontview': () => {lookAtIndex = 0; positionIndex = 0; copy(targetCameraOffset, views.frontview);},
+        'sideview': () => {lookAtIndex = 0; positionIndex = 0; copy(targetCameraOffset, views.sideview);},
         'speed+': () => ++stepsPerSecond,
         'speed-': () => stepsPerSecond = Math.max(1, stepsPerSecond - 1),
         'ticks+': () => ++ticksPerStep,
@@ -1177,15 +1180,15 @@
           }
         },
         'prevMass': () => {
-          cameraOffset[0] = 0;
-          cameraOffset[1] = 100;
-          cameraOffset[2] = 0;
+          targetCameraOffset[0] = 0;
+          targetCameraOffset[1] = 100;
+          targetCameraOffset[2] = 0;
           return positionIndex === 0 ? positionIndex = universe.length - 1 : positionIndex--;
         },
         'nextMass': () => {
-          cameraOffset[0] = 0;
-          cameraOffset[1] = 100;
-          cameraOffset[2] = 0;
+          targetCameraOffset[0] = 0;
+          targetCameraOffset[1] = 100;
+          targetCameraOffset[2] = 0;
           return positionIndex = (positionIndex + 1) % universe.length;
         }
       }
@@ -1306,6 +1309,10 @@
           d[1] /= m;
           d[2] /= m;
         }
+
+        cameraOffset[0] = cameraOffset[0] + ((targetCameraOffset[0] - cameraOffset[0]) / 10);
+        cameraOffset[1] = cameraOffset[1] + ((targetCameraOffset[1] - cameraOffset[1]) / 10);
+        cameraOffset[2] = cameraOffset[2] + ((targetCameraOffset[2] - cameraOffset[2]) / 10);
 
         add(cameraPosition, p, scale(d, d, 300));
         add(cameraPosition, cameraPosition, cameraOffset);
