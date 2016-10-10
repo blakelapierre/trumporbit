@@ -208,6 +208,15 @@
       get name() { return this.mediaName; }
     };
 
+    class Emission extends Mass {
+      constructor(...args) {
+        super(...args);
+
+        this.age = 100;
+      }
+      get name() { return 'Emission'; }
+    }
+
     const COLORS = {
       observer: [255, 255, 255, 1],
       tweet: [0, 1, 1.2, 2],
@@ -243,6 +252,7 @@
           spawningTweets = new Set(),
           media = [],
           observers = [],
+          emissions = [],
           events = [['oldTweets']],
           uievents = [];
 
@@ -467,7 +477,9 @@
 
       mass.mass -= emission;
 
-      addMass(new Mass(emission, COLORS.observer, add([0, 0, 0], mass.position, [-r[1], -r[2], -r[3]]), add([0, 0, 0], mass.velocity, [-r[1], -r[2], -r[3]])), view);
+      const e = addMass(new Emission(emission, COLORS.observer, add([0, 0, 0], mass.position, [-r[1], -r[2], -r[3]]), add([0, 0, 0], mass.velocity, [-r[1], -r[2], -r[3]])), view);
+
+      emissions.add(e);
 
       if (mass.mass < 0.01) events.push(['poof', mass, i]);
     }
@@ -684,11 +696,23 @@
     function tick() {
       currentTick++;
 
+      updateEmissions();
       updateTweetSpawn();
       positionHalfTick();
       updateGravities();
       updateVelocities();
       resolveCollisions();
+
+      function updateEmissions() {
+        for (let i = 0; i < emissions.length; i++) {
+          const emission = emissions[i],
+                {created} = emission;
+
+          if (currentTick - created > MAX_EMISSION_AGE) {
+
+          }
+        }
+      }
 
       function updateTweetSpawn() {
         const {position: tp, velocity: tv} = trump;
