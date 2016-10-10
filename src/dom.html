@@ -1209,7 +1209,7 @@
             lastGUIUpdate = currentTime;
           }
 
-          if (currentTick !== t) {
+          if (currentTick - t > 10) {
             catchUpQuantityEl.parentElement.style.display = 'block';
             catchUpQuantityEl.innerHTML = currentTick - t;
           }
