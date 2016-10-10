@@ -439,7 +439,7 @@
     }
 
     // x,y,z from camera/observer pov
-    function emitMass(x = 0, y = 0, z = 0) {
+    function emitMass(view, x = 0, y = 0, z = 0) {
       const mass = universe[positionIndex],
             {position: p, velocity: v} = mass,
             tp = universe[lookAtIndex].position,
@@ -463,7 +463,11 @@
 
       add(v, v, [r[1], r[2], r[3]]);
 
-      mass.mass *= 0.95;
+      const emission = mass.mass * 0.05;
+
+      mass.mass -= emission;
+
+      addMass(new Mass(emission, COLORS.observer, add([0, 0, 0], mass.position, [-r[1], -r[2], -r[3]]), add([0, 0, 0], mass.velocity, [-r[1], -r[2], -r[3]])), view);
 
       if (mass.mass < 0.01) events.push(['poof', mass, i]);
     }
@@ -1150,12 +1154,12 @@
         'retweet+': incrementRetweets,
 
         // controls
-        'xn': event => emitMass(-vBoost),
-        'xp': event => emitMass(vBoost),
-        'yn': event => emitMass(0, -vBoost),
-        'yp': event => emitMass(0, vBoost),
-        'zn': event => emitMass(0, 0, -vBoost),
-        'zp': event => emitMass(0, 0, vBoost),
+        'xn': event => emitMass(view, -vBoost),
+        'xp': event => emitMass(view, vBoost),
+        'yn': event => emitMass(view, 0, -vBoost),
+        'yp': event => emitMass(view, 0, vBoost),
+        'zn': event => emitMass(view, 0, 0, -vBoost),
+        'zp': event => emitMass(view, 0, 0, vBoost),
 
         // internal
         'absorbed': absorbed,
