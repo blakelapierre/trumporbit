@@ -832,36 +832,16 @@
         const d1 = magnitude(pv1),
               d2 = magnitude(pv2);
 
-        // Doesn't take into account mass having changed over time...
         calculateAndSetGravity(g2, pv1, m1, m2, d1);
         calculateAndSetGravity(g1, pv2, m1, m2, d2);
-        // if (d1 > 0) {
-        //   const factor = (m1 * m2) / (d1 * d1);
-
-        //   g2[0] += pv1[0] * factor;
-        //   g2[1] += pv1[1] * factor;
-        //   g2[2] += pv1[2] * factor;
-        // }
-
-        // if (d2 > 0) {
-        //   const factor = (m1 * m2) / (d2 * d2);
-
-        //   g1[0] += pv2[0] * factor;
-        //   g1[1] += pv2[1] * factor;
-        //   g1[2] += pv2[2] * factor;
-        // }
 
         handleCollision(m1, m2, d1, d2, i, j, collisionList, collisions);
       }
 
+      // calculateAndSetGravity({gravity: g, pullVector: pv, mass1: m1, mass2: m2, distance: d})
       function calculateAndSetGravity(g, pv, m1, m2, d) {
-        if (d > 0) {
-          const factor = (m1 * m2) / (d * d);
-
-          g[0] += pv[0] * factor;
-          g[1] += pv[1] * factor;
-          g[2] += pv[2] * factor;
-        }
+        // Doesn't take into account mass having changed over time...
+        if (d > 0) add(g, g, scale(dd, pv, (m1 * m2) / (d * d)));
       }
 
       function handleCollision(m1, m2, d1, d2, i, j, collisionList, collisions) {
