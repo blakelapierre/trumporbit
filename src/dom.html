@@ -33,6 +33,45 @@
     [[0.15686,0.22745,0.41569,1],[0.18039,0.25098,0.41569,1],[0.20392,0.26667,0.40784,1],[0.15686,0.17255,0.29804,1],[0.09412,0.08627,0.21176,1],[0.49412,0.48627,0.52549,1],[1.92157,1.89804,1.81176,1],[1.9451,1.91373,1.85098,1],[1.82745,1.81176,1.75686,1],[1.50588,1.50588,1.45882,1],[1.00392,0.83922,0.82353,1],[0.82353,0.52549,0.4549,1],[0.64314,0.26667,0.22745,1],[0.43922,0.10196,0.09412,1],[0.26667,0.00784,0.01569,1],[0.3451,0.04706,0.04706,1],[0.59608,0.29804,0.29804,1],[1.12157,1.01176,1.00392,1],[1.78039,1.84314,1.87451,1],[0,0,0,0],[1.10588,1.16078,1.2549,1],[0.13333,0.18039,0.35294,1],[0.18824,0.23529,0.39216,1],[0.26667,0.30588,0.47843,1]],
     [[0.13333,0.18824,0.36078,1],[0.15686,0.22745,0.38431,1],[0.16471,0.22745,0.39216,1],[0.13333,0.16471,0.29804,1],[0.07843,0.10196,0.21961,1],[0.13333,0.14902,0.27451,1],[1.68627,1.66275,1.58431,1],[1.88235,1.87451,1.81176,1],[1.92157,1.89804,1.84314,1],[1.81176,1.80392,1.74118,1],[1.66275,1.67059,1.61569,1],[1.37255,1.32549,1.29412,1],[0.98039,0.7451,0.7451,1],[0.4,0.08627,0.12549,1],[0.18824,0,0,1],[0.56471,0.4,0.43922,1],[1.45882,1.46667,1.51373,1],[1.90588,2,2,1],[1.97647,2,2,1],[0,0,0,0],[0.62745,0.6902,0.81569,1],[0.07843,0.14902,0.32157,1],[0.14902,0.19608,0.36863,1],[0.21961,0.26667,0.43922,1]]];
 
+    const hud = document.querySelector('hud'),
+          enterLooking = document.querySelector('enter-looking'),
+          enterMoving = document.querySelector('enter-moving'),
+          looking = document.querySelector('looking'),
+          moving = document.querySelector('moving');
+
+    enterLooking.addEventListener('click', event => enterState('looking'));
+    enterMoving.addEventListener('click', event => enterState('moving'));
+
+    const states = {looking, moving};
+    let currentState;
+
+    function enterState(state) {
+      if (currentState) hud.classList.remove(currentState);
+
+      hud.classList.add(state);
+
+      if (state === 'moving') {
+        cameraOffset[0] = 0;
+        cameraOffset[1] = 0;
+        cameraOffset[2] = 0;
+
+        attachVelocityControls();
+      }
+
+      currentState = state;
+    }
+
+
+    function attachVelocityControls() {
+      const [xn, xp, yn, yp, zn, zp] = ['xn', 'xp', 'yn', 'yp', 'zn', 'zp'].map(n => {
+        const el = document.querySelector(n);
+
+        el.addEventListener('click', event => events.push([n]));
+
+        return el;
+      });
+    }
+
     const trumpMassQuantityEl = document.querySelector('trump-mass-quantity'),
           orbitStatisticsQuantityEl = document.querySelector('orbit-statistics-quantity'),
           massNameEls = document.getElementsByTagName('mass-name'),
@@ -41,6 +80,7 @@
           lookAtDistanceQuantityEl = document.querySelector('look-at-distance-quantity'),
           lookAtTrumpDistanceQuantityEl = document.querySelector('look-at-trump-distance-quantity'),
           massQuantityEl = document.querySelector('mass-quantity'),
+          massVelocityQuantityEl = document.querySelector('mass-velocity-quantity'),
           distanceQuantityEl = document.querySelector('distance-quantity'),
           catchUpQuantityEl = document.querySelector('catch-up-quantity'),
           trumpTweetEl = document.querySelector('trump-tweet'),
@@ -178,6 +218,8 @@
 
     let oldTweets;
 
+    let pendingTweetSpawn = 0;
+
     const MAX_TWEET_SPAWN = 50,
           MAX_TWEET_SPAWN_AGE = 60 * 5,
           MAX_OBSERVERS = 51;
@@ -199,6 +241,9 @@
       return properties.map(p => list.map(item => item[p]));
     }
 
+
+
+
     function addMass(newMass, view) { // don't want view here!
       const {position, velocity, acceleration, gravity, mass, size, color} = newMass;
 
@@ -217,6 +262,9 @@
 
       return newMass;
     }
+
+
+
 
     function addObserver(event, view) {
       if (observers.length === 0) positionIndex = universe.length;
@@ -308,6 +356,7 @@
                                   [tv[0] + d[0]/x, tv[1] + d[1]/x, tv[2] + d[2]/x]);
       addMass(spawn, view);
       tweetSpawn.push(spawn);
+      pendingTweetSpawn--;
     }
 
     function absorbed(event) {
@@ -329,6 +378,151 @@
     function incrementFollowers([_, followers], view) {
       oldTweets.followers += followers;
     }
+
+    // x,y,z from camera/observer pov
+    function emitMass(x = 0, y = 0, z = 0) {
+      const mass = universe[positionIndex],
+            {position: p, velocity: v} = mass,
+            tp = universe[lookAtIndex].position,
+            d = [p[0]-tp[0], p[1]-tp[1], p[2]-tp[2]];
+            // m = magnitude(d);
+            // m = magnitude(d) || 1;
+
+      const u = [0, 0, 1];
+
+      // http://lolengine.net/blog/2013/09/18/beautiful-maths-quaternion-from-vectors
+      const m = Math.sqrt(2 + 2 * Math.abs(dot(u, d)));
+      scale(dd, cross(dd, u, d), 1 / m);
+      const q = [m/2, dd[0], dd[1], dd[2]];
+
+      qunit(q, q);
+
+      const r = [0, 0, 0, 0],
+            i = qinv([0, 0, 0, 0], q);
+
+      qmult(r, qmult(r, q, [0, x, y, z]), i);
+
+      add(v, v, [r[1], r[2], r[3]]);
+
+      universe[positionIndex].mass *= 0.99;
+
+
+
+
+      // if (m > 0) {
+      //   d[0] /= m;
+      //   d[1] /= m;
+      //   d[2] /= m;
+      // }
+
+      // const a = sub([0, 0, 0], p, [x, y, z]),
+      //       am = magnitude(a);
+
+      // a[0] /= am;
+      // a[1] /= am;
+      // a[2] /= am;
+
+      // // const r = [
+      // //   scale(dd, cross(dd, d, [0, 1, 0]), x),
+      // //   scale(dd, cross(dd, d, [0, 1, 0]), y),
+      // //   scale(dd, cross(dd, d, [0, 1, 0]), z)
+      // // ];
+      // const r = [
+      //   dot(cross(dd, [0, 0, -1], d), a),
+      //   dot(cross([0, 0, 0], dd, [0, 1, 0]), a),
+      //   dot(d, a)
+      // ];
+
+      // // cross(dd, [0, 0, -1], d);
+
+
+
+      // console.log(d, a, v, r);
+
+      // add(v, v, scale(r, r, magnitude([x, y, z])));
+    }
+
+
+    //http://mathworld.wolfram.com/Quaternion.html
+    function qmult(r, q1, q2) {
+      // console.log('qmult', r, q1, q2);
+
+      const v1 = [q1[1], q1[2], q1[3]],
+            v2 = [q2[1], q2[2], q2[3]],
+            s1 = scale([0, 0, 0], v2, q1[0]),
+            s2 = scale([0, 0, 0], v1, q2[0]);
+
+      add(dd, s1, add(dd, s2, cross(dd, v1, v2)));
+
+      r[0] = q1[0] * q2[0] - dot(v1, v2);
+      r[1] = dd[0];
+      r[2] = dd[1];
+      r[3] = dd[2];
+
+      return r;
+    }
+
+    // function qmult(r, q1, q2) {
+    //   r[0] = q2[0] * q1[0] - q2[1] * q1[1] - q2[2] * q1[2] - q2[3] * q2[3];
+    //   r[1] = q2[0] * q1[1] - q2[1] * q1[0] - q2[2] * q1[3] - q2[3] * q2[2];
+    //   r[2] = q2[0] * q1[2] - q2[1] * q1[3] - q2[2] * q1[0] - q2[3] * q2[1];
+    //   r[3] = q2[0] * q1[3] - q2[1] * q1[2] - q2[2] * q1[1] - q2[3] * q2[0];
+
+    //   return r;
+    // }
+
+    function qconj(r, q) {
+      r[0] = q[0];
+      r[1] = -q[1];
+      r[2] = -q[2];
+      r[3] = -q[3];
+
+      return r;
+    }
+
+    // don't call with d = 0
+    function qdiv(r, q, d) {
+      r[0] = q[0] / d;
+      r[1] = q[1] / d;
+      r[2] = q[2] / d;
+      r[3] = q[3] / d;
+
+      return r;
+    }
+
+    function qnorm(q) {
+      return Math.sqrt(q[0] * q[0] +
+                       q[1] * q[1] +
+                       q[2] * q[2] +
+                       q[3] * q[3]);
+    }
+
+    // assumes unit q?
+    function qinv(r, q) {
+      const s = 1 / (q[0] * q[0] + q[1] * q[1] + q[2] * q[2] + q[3] * q[3]);
+
+      r[0] = q[0] * s
+      r[1] = -q[1] * s
+      r[2] = -q[2] * s
+      r[3] = -q[3] * s
+
+      return r;
+    }
+
+    // function qinv(r, q) {
+    //   const n = qnorm(q);
+    //   return qdiv(r, qconj(r, q), n * n);
+    // }
+
+    function qunit(r, q) {
+      const n = qnorm(q);
+      return qdiv(r, q, n);
+    }
+
+
+
+
+
 
     let trumpScaleFactor = 8;
     <root>
@@ -368,23 +562,34 @@
     </root>
 
 
+
+
+
+
+
+
+
+
+
+
+
     const views = {
-      'overview': [0, 3500, 0],
+      'overview': [0, 5000, 0],
       'frontview': [0, 0, 3500],
       'sideview': [-3500, 0, 0]
     };
 
-    function add (r, v1, v2) {
-      r[0] = v1[0] + v2[0];
-      r[1] = v1[1] + v2[1];
-      r[2] = v1[2] + v2[2];
+    function add (r, u, v) {
+      r[0] = u[0] + v[0];
+      r[1] = u[1] + v[1];
+      r[2] = u[2] + v[2];
       return r;
     }
 
-    function sub (r, v1, v2) {
-      r[0] = v1[0] - v2[0];
-      r[1] = v1[1] - v2[1];
-      r[2] = v1[2] - v2[2];
+    function sub (r, u, v) {
+      r[0] = u[0] - v[0];
+      r[1] = u[1] - v[1];
+      r[2] = u[2] - v[2];
       return r;
     }
 
@@ -393,6 +598,23 @@
       r[1] = v[1] * s;
       r[2] = v[2] * s;
       return r;
+    }
+
+    function cross (r, u, v) {
+      r[0] = u[1] * v[2] - u[2] * u[1];
+      r[1] = u[2] * v[0] - u[0] * u[2];
+      r[2] = u[0] * v[1] - u[1] * u[0];
+      return r;
+    }
+
+    function dot (u, v) {
+      return u[0] * v[0] + u[1] * v[1] + u[2] * v[2];
+    }
+
+    function magnitude(v) {
+      return Math.sqrt(v[0] * v[0] +
+                       v[1] * v[1] +
+                       v[2] * v[2]);
     }
 
     const speedlimit = 300000;
@@ -412,6 +634,12 @@
     let ticksPerSecond = 60,
         ticksPerStep = 10,
         stepsPerSecond = 1;
+
+
+
+
+
+
 
     let currentTick = 0;
     function tick() {
@@ -454,19 +682,22 @@
 
         resolveCollisions();
 
-        if (tweetSpawn.length < MAX_TWEET_SPAWN) {
+        if ((tweetSpawn.length + pendingTweetSpawn) < MAX_TWEET_SPAWN) {
           spawningTweets.forEach(tweet => {
             if (tweet.likes > 0 && Math.random() > 0.1) {
               tweet.likes--;
               events.push(['like', tweet.tweetID]);
+              pendingTweetSpawn++;
             }
             if (tweet.retweets > 0 && Math.random() > 0.1) {
               tweet.retweets--;
               events.push(['retweet', tweet.tweetID]);
+              pendingTweetSpawn++;
             }
             if (tweet.followers > 0 && Math.random() > 0.1) {
               tweet.followers--;
               events.push(['follower']);
+              pendingTweetSpawn++;
             }
           });
         }
@@ -574,6 +805,7 @@
           if (d1 < threshold || d2 < threshold) { // better ordering of checks?
             if (m1 <= m2) {
               //wtf is this
+              //the same universe[i] could be pushed multiple times!!!!!!!
               collisionList.push([universe[i], universe[j], i]);
             }
             else {
@@ -646,11 +878,14 @@
       }
     }
 
-    function magnitude(vector) {
-      return Math.sqrt(vector[0] * vector[0] +
-                       vector[1] * vector[1] +
-                       vector[2] * vector[2]);
-    }
+
+
+
+
+
+
+
+
 
     let selectedMassIndex = 0, savedColor = [0, 0, 0];
     selectMass(selectedMassIndex);
@@ -663,22 +898,24 @@
       const masses = Math.max(0, universe.length - 1);
       orbitStatisticsQuantityEl.innerHTML = masses + ' mass' + (masses > 1 ? 'es' : '');
 
-      const currentMass = universe[positionIndex];
+      const currentMass = universe[positionIndex],
+            {mass, name, position, velocity} = currentMass;
 
       const distance = magnitude(sub(dd, currentMass.position, trump.position));
 
-      massNameEls[0].innerHTML = currentMass.name;
-      massNameEls[1].innerHTML = currentMass.name;
+      massNameEls[0].innerHTML = name;
+      massNameEls[1].innerHTML = name;
 
-      massQuantityEl.innerHTML = currentMass.mass.toFixed(1);
+      massQuantityEl.innerHTML = mass.toFixed(2);
       distanceQuantityEl.innerHTML = distance.toFixed(1);
+      massVelocityQuantityEl.innerHTML = `[${velocity[0].toFixed(1)}, ${velocity[1].toFixed(1)}, ${velocity[2].toFixed(1)}] ${magnitude(velocity).toFixed(1)}`;
 
 
       const lookAtMass = universe[lookAtIndex];
       lookAtMassNameEl.innerHTML = lookAtMass.name;
 
       if (lookAtIndex > 0) {
-        const lookAtDistance = magnitude(sub(dd, lookAtMass.position, currentMass.position)),
+        const lookAtDistance = magnitude(sub(dd, lookAtMass.position, position)),
               lookAtTrumpDistance = magnitude(sub(dd, lookAtMass.position, trump.position));
 
         lookAtMassQuantityEl.innerHTML = lookAtMass.mass.toFixed(1);
@@ -718,6 +955,8 @@
       lookAtIndex === 0 ? lookAtIndex = universe.length - 1 : lookAtIndex--;
       return lookAtIndex === positionIndex ? previousLookAt() : lookAtIndex;
     }
+
+
 
     module.exports = {
       editorPanel: false,
@@ -859,51 +1098,16 @@
       }
     };
 
-    function createSocket() {
-      // const socket = new WebSocket(`ws://${window.location.hostname}:8080`);
-      const socket = new WebSocket(`ws://104.236.242.248:8080`);
-      let opened;
-      socket.onopen = () => {
-        opened = true;
-      };
 
-      socket.onmessage = (data, flags) => {
-        const parts = (data.data || '').split(',');
-        const name = parts[0];
 
-        switch (name) {
-          case 'r':
-            handle('retweet', parts);
-            break;
-          case 't':
-            handle('tweet', parts);
-            break;
-          case 'o':
-            events.push(['observer+', parts[1]]);
-            break;
-          case 'o-':
-            break;
-        }
-      };
 
-      socket.onclose = () => {
-        if (opened) window.location.reload();
-      };
 
-      return socket;
-    }
 
-    function handle(name, parts) {
-      const id = parts[1];
-      events.push([name, id]);
 
-      const likes = parseInt(parts[2], 10);
-      const followers = parseInt(parts[3], 10);
 
-      if (likes > 0) events.push(['like+', id, likes]);
-      events.push(['follower+', followers]);
-    }
 
+
+    const vBoost = 10;
     function start(view) {
       const socket = createSocket();
 
@@ -920,6 +1124,14 @@
         'follower+': incrementFollowers,
         'like+': incrementLikes,
         'retweet+': incrementRetweets,
+
+        // controls
+        'xn': event => emitMass(-vBoost),
+        'xp': event => emitMass(vBoost),
+        'yn': event => emitMass(0, -vBoost),
+        'yp': event => emitMass(0, vBoost),
+        'zn': event => emitMass(0, 0, -vBoost),
+        'zp': event => emitMass(0, 0, vBoost),
 
         // internal
         'absorbed': absorbed,
@@ -948,7 +1160,7 @@
             for (let i = 0; i < events.length; i++) {
               const event = events[i];
 
-              (eevents[event[0]] || (() => {}))(event, view);
+              (eevents[event[0]] || defaultHandler(event))(event, view);
             }
 
             events.splice(0);
@@ -971,6 +1183,13 @@
             catchUpQuantityEl.parentElement.style.display = 'none';
           }
         };
+
+        function defaultHandler(event) {
+          console.log(`No eevents ${event[0]}!`)
+          return emptyFn;
+        }
+
+        function emptyFn() {}
       }
 
       function animate() {
@@ -1017,6 +1236,67 @@
       }
     }
 
+    function createSocket() {
+      // const socket = new WebSocket(`ws://${window.location.hostname}:8080`);
+      const socket = new WebSocket(`ws://104.236.242.248:8080`);
+      let opened;
+      socket.onopen = () => {
+        opened = true;
+      };
+
+      socket.onmessage = (data, flags) => {
+        const parts = (data.data || '').split(',');
+        const name = parts[0];
+
+        switch (name) {
+          case 'r':
+            handle('retweet', parts);
+            break;
+          case 't':
+            handle('tweet', parts);
+            break;
+          case 'o':
+            events.push(['observer+', parts[1]]);
+            break;
+          case 'o-':
+            break;
+        }
+      };
+
+      socket.onclose = () => {
+        if (opened) window.location.reload();
+      };
+
+      return socket;
+    }
+
+    function handle(name, parts) {
+      const id = parts[1];
+      events.push([name, id]);
+
+      const likes = parseInt(parts[2], 10);
+      const followers = parseInt(parts[3], 10);
+
+      if (likes > 0) events.push(['like+', id, likes]);
+      events.push(['follower+', followers]);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     // might want in the future, saves typing
     function randomMass() {
       addMass(new Mass(1, [255, 255, 0, 1], [universe[0].position[0] + Math.random() * 5000 - 2500, universe[0].position[1] + Math.random() * 5000 - 2500, universe[0].position[2] + Math.random() * 5000 - 2500], [Math.random() * 600 - 300, Math.random() * 600 - 300, Math.random() * 600 - 300]));
@@ -1037,9 +1317,71 @@
       colors[selectedMassIndex][2] = 0;
     }
   </script>
+
   <hud>
-    <trump-mass><trump>TRUMP</trump>'s mass: <trump-mass-quantity></trump-mass-quantity></trump-mass>
-    <orbit-statistics><orbit-statistics-quantity></orbit-statistics-quantity> in orbit</orbit-statistics>
+    <start>
+      <enter-looking></enter-looking>
+      <enter-moving></enter-moving>
+    </start>
+
+    <looking>
+      <current-look-at>
+        <previous-look-at>&lt;</previous-look-at>
+        <display>
+          Looking At
+          <look-at-mass-name></look-at-mass-name>
+          <table>
+            <tbody>
+              <tr><td>Mass:</td><td><look-at-mass-quantity></look-at-mass-quantity></td></tr>
+              <tr><td>Distance to <mass-name></mass-name>:</td><td><look-at-distance-quantity></distance-quantity></td></tr>
+              <tr><td>Distance to <trump>TRUMP</trump>:</td><td><look-at-trump-distance-quantity></distance-quantity></td></tr>
+            </tbody>
+          </table>
+        </display>
+        <next-look-at>&gt;</next-look-at>
+      </current-look-at>
+      <trump-mass><trump>TRUMP</trump>'s mass: <trump-mass-quantity></trump-mass-quantity></trump-mass>
+      <orbit-statistics><orbit-statistics-quantity></orbit-statistics-quantity> in orbit</orbit-statistics>
+    </looking>
+
+    <moving>
+      <current-mass>
+        <display>
+          <mass-name></mass-name>
+          <table>
+            <tbody>
+              <tr><td>Mass:</td><td><mass-quantity></mass-quantity></td></tr>
+              <tr><td>Distance to <trump>TRUMP</trump>:</td><td><distance-quantity></distance-quantity></td></tr>
+              <tr><td>Absolute (!) velocity:</td><td><mass-velocity-quantity></mass-velocity-quantity></td></tr>
+            </tbody>
+          </table>
+        </display>
+      </current-mass>
+
+      <velocity-controls>
+        <z>
+          <zp>⇧</zp>
+          <zn>⇩</zn>
+        </z>
+        <others>
+          <up>
+            <yp>⇧</yp></up>
+          <x>
+            <xn>⇦</xn>
+            <xp>⇨</xp>
+          </x>
+          <down>
+            <yn>⇩</yn>
+          </down>
+        </others>
+        <dummy><z>
+          <zp>⇧</zp>
+          <zn>⇩</zn>
+        </z></dummy>
+      </velocity-controls>
+    </moving>
+
+
     <catch-up><catch-up-quantity></catch-up-quantity> ticks behind</catch-up>
     <trump-tweet>
      <warning><trump>TRUMP</trump> has tweeted, watch out!</warning>
@@ -1047,32 +1389,7 @@
     </trump-tweet>
     <absorbed><absorbed-name></absorbed-name> was absorbed by <absorbed-by-name></absorbed-by-name>!</absorbed>
     <commands></commands>
-    <current-look-at>
-      <previous-look-at>&lt;</previous-look-at>
-      <display>
-        Looking At
-        <look-at-mass-name></look-at-mass-name>
-        <table>
-          <tbody>
-            <tr><td>Mass:</td><td><look-at-mass-quantity></look-at-mass-quantity></td></tr>
-            <tr><td>Distance to <mass-name></mass-name>:</td><td><look-at-distance-quantity></distance-quantity></td></tr>
-            <tr><td>Distance to <trump>TRUMP</trump>:</td><td><look-at-trump-distance-quantity></distance-quantity></td></tr>
-          </tbody>
-        </table>
-      </display>
-      <next-look-at>&gt;</next-look-at>
-    </current-look-at>
-    <current-mass>
-      <display>
-        <mass-name></mass-name>
-        <table>
-          <tbody>
-            <tr><td>Mass:</td><td><mass-quantity></mass-quantity></td></tr>
-            <tr><td>Distance to <trump>TRUMP</trump>:</td><td><distance-quantity></distance-quantity></td></tr>
-          </tbody>
-        </table>
-      </display>
-    </current-mass>
+
     <tag><trump>TRUMP</trump>orbit <brand>alpha preview</brand> <version>uncommitted</version></tag>
     <help>?</help>
     <help-content>
@@ -1100,4 +1417,9 @@
     </help-content>
   </hud>
 </mathbox>
-<notice class="fade-out"><screen></screen><message>entering <trump>TRUMP</trump> orbit<message><statement>You are a brave soul</statement></notice>
+
+<notice class="fade-out">
+  <screen></screen>
+  <message>entering <trump>TRUMP</trump> orbit<message>
+  <statement>You are a brave soul</statement>
+</notice>

@@ -39,8 +39,8 @@ hud {
   position: fixed;
   top: 0;
   left: 0;
-  right: 100%;
-  bottom: 100%;
+  right: 0;
+  bottom: 0;
 
   z-index: 1;
 
@@ -54,6 +54,143 @@ hud {
 
   &:hover {
     color: rgba(255, 255, 255, 1);
+  }
+
+  &.looking {
+    start {display: none;}
+
+    looking {
+      display: block;
+
+      opacity: 1;
+    }
+  }
+
+  &.moving {
+    start {display: none;}
+
+    moving {
+      display: block;
+
+      velocity-controls {
+        opacity: 1;
+      }
+    }
+  }
+
+  start {
+    position: absolute;
+
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    enter-looking {
+      flex: 3 1 auto;
+    }
+
+    enter-moving {
+      flex: 2 1 auto;
+    }
+  }
+
+  looking {
+    display: none;
+
+    opacity: 0;
+
+    transition: opacity 1s ease-in-out;
+  }
+
+  moving {
+    display: none;
+
+    velocity-controls {
+      position: absolute;
+
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+
+      margin: 0 auto;
+
+      font-size: 7em;
+      font-weight: lighter;
+
+      color: rgba(255, 255, 255, 0.5);
+
+      display: flex;
+
+      justify-content: center;
+
+      cursor: pointer;
+
+      user-select: none;
+      -webkit-user-select: none;
+
+      opacity: 0;
+
+      transition: opacity 1s ease-in-out;
+
+      zp, zn, yp, yn, xp, xn {
+        margin: 0.25em;
+
+        transition: text-shadow 0.1s ease-in-out;
+
+        &:hover {
+          text-shadow: 0px 0px 1em #fff;
+        }
+      }
+
+      z {
+        flex: 0 1 auto;
+
+        display: flex;
+        flex-direction: column;
+
+        justify-content: center;
+
+        transform: rotateX(60deg);
+      }
+
+      others {
+        min-width: 20vw;
+
+        flex: 0 1 auto;
+
+        display: flex;
+        flex-direction: column;
+
+        justify-content: center;
+
+        up, down {
+          flex: 0 1 auto;
+
+          display: flex;
+          justify-content: center;
+        }
+
+        x {
+          flex: 0 1 auto;
+
+          display: flex;
+          justify-content: space-between;
+        }
+      }
+
+      dummy {
+        flex: 0 0 auto;
+
+        opacity: 0;
+
+        color: #000;
+      }
+    }
   }
 
   trump-mass {
