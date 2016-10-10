@@ -666,6 +666,7 @@
     let collisionIIndex = 0;
 
     const cameraPosition = [0, 0, 0],
+          targetCameraPosition = [0, 0, 0],
           cameraOffset = [0, 225, 0],
           targetCameraOffset = [0, 225, 0];
 
@@ -1256,10 +1257,16 @@
           d[2] /= m;
         }
 
-        add(cameraOffset, cameraOffset, div(dd, sub(dd, targetCameraOffset, cameraOffset), 10));
+        add(cameraOffset, cameraOffset, div(dd, sub(dd, targetCameraOffset, cameraOffset), 2));
 
-        add(cameraPosition, p, scale(d, d, 300));
-        add(cameraPosition, cameraPosition, cameraOffset);
+        add(targetCameraPosition, p, scale(d, d, 300));
+        add(targetCameraPosition, targetCameraPosition, cameraOffset);
+
+        // add(cameraPosition, p, scale(d, d, 300));
+        // add(cameraPosition, cameraPosition, cameraOffset);
+
+
+        add(cameraPosition, cameraPosition, div(dd, sub(dd, targetCameraPosition, cameraPosition), 2));
 
         void trumpTweetEl.offsetWidth;
 
