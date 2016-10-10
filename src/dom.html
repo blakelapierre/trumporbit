@@ -1131,7 +1131,13 @@
 
 
 
-
+    function centerOnTrump() {
+      const {position: tp} = trump;
+      for (let i = universe.length - 1; i >= 0; i--) {
+        const {position: p} = universe[i];
+        sub(p, p, tp);
+      }
+    }
 
 
 
@@ -1185,6 +1191,7 @@
           const dt = runTime - startTime,
                 t = Math.ceil((dt / 1000) * ticksPerSecond);
 
+          centerOnTrump();
           let currentTime;
           while (currentTick < t && ((currentTime = new Date().getTime()) - runTime) < maxRunTime) {
             handleEvents();
