@@ -43,7 +43,7 @@
     enterMoving.addEventListener('click', event => enterState('moving'));
 
     const states = {looking, moving};
-    let currentState;
+    let currentState, controls;
 
     function enterState(state) {
       if (currentState) hud.classList.remove(currentState);
@@ -55,22 +55,51 @@
         cameraOffset[1] = 0;
         cameraOffset[2] = 0;
 
-        attachVelocityControls();
+        controls = attachVelocityControls();
+      }
+      else if (state === 'looking') {
+        cameraOffset[0] = 0;
+        cameraOffset[1] = 225;
+        cameraOffset[2] = 0;
+
+        detachVelocityControls(controls);
       }
 
       currentState = state;
     }
 
-
     function attachVelocityControls() {
-      const [xn, xp, yn, yp, zn, zp] = ['xn', 'xp', 'yn', 'yp', 'zn', 'zp'].map(n => {
+      return ['xn', 'xp', 'yn', 'yp', 'zn', 'zp'].map(n => {
         const el = document.querySelector(n);
 
-        el.addEventListener('click', event => events.push([n]));
+        el.onclick = event => {
+          events.push([n]);
+          event.stopPropagation();
+        };
+
+        // el.addEventListener('click', event => {
+        //   events.push([n]);
+        //   event.stopPropagation();
+        // });
 
         return el;
       });
     }
+
+    function detachVelocityControls(controls) {
+      (controls || []).forEach(c => c.onclick = undefined);
+    }
+
+    const velocityControlsEl = document.querySelector('velocity-controls'),
+          movingTriggerEl = document.querySelector('moving-trigger');
+
+    velocityControlsEl.addEventListener('click', event => {
+      enterState('looking');
+    });
+
+    movingTriggerEl.addEventListener('click', event => {
+      enterState('moving');
+    });
 
     const trumpMassQuantityEl = document.querySelector('trump-mass-quantity'),
           orbitStatisticsQuantityEl = document.querySelector('orbit-statistics-quantity'),
@@ -86,7 +115,8 @@
           trumpTweetEl = document.querySelector('trump-tweet'),
           absorbedEl = document.querySelector('absorbed'),
           absorbedNameEl = document.querySelector('absorbed-name'),
-          absorbedByNameEl = document.querySelector('absorbed-by-name');
+          absorbedByNameEl = document.querySelector('absorbed-by-name'),
+          poofEl = document.querySelector('poof');
 
     const tagEl = document.querySelector('tag'),
           currentLookAtEl = document.querySelector('current-look-at'),
@@ -220,7 +250,7 @@
 
     let pendingTweetSpawn = 0;
 
-    const MAX_TWEET_SPAWN = 50,
+    const MAX_TWEET_SPAWN = 75,
           MAX_TWEET_SPAWN_AGE = 60 * 5,
           MAX_OBSERVERS = 51;
 
@@ -369,14 +399,49 @@
       spawningTweets.add(tweet);
     }
 
-    function incrementRetweets([_, id, retweets], view) {
+    function incrementRetweets([_, id], view) {
       const tweet = tweetMap[id] || oldTweets;
-      tweet.retweets += retweets;
+      tweet.retweets++;
       spawningTweets.add(tweet);
     }
 
     function incrementFollowers([_, followers], view) {
       oldTweets.followers += followers;
+    }
+
+    function poof([_, mass]) {
+      if (mass instanceof TweetSpawn) {
+        tweetSpawn.splice(tweetSpawn.indexOf(mass), 1);
+      }
+      else if (mass instanceof Tweet) {
+        tweets.splice(tweets.indexOf(mass), 1);
+        delete tweetMap[mass.tweetID];
+      }
+      else if (mass instanceof Observer) {
+        observers.splice(observers.indexOf(mass), 1);
+      }
+
+      const index = universe.indexOf(mass); // annoying lookup
+      universe.splice(index, 1);
+      positions.splice(index, 1);
+      velocities.splice(index, 1);
+      accelerations.splice(index, 1);
+      gravities.splice(index, 1);
+      masses.splice(index, 1);
+      sizes.splice(index, 1);
+      colors.splice(index, 1);
+
+      if (positionIndex >= index && positionIndex > 0) {
+        if (positionIndex === index) {
+          positionIndex = positions.length - 1;
+          uievents.push(['poof', mass])
+          enterState('looking'); // what?!
+        }
+        else positionIndex--;
+      }
+      if (lookAtIndex >= index) {
+        previousLookAt();
+      }
     }
 
     // x,y,z from camera/observer pov
@@ -404,9 +469,9 @@
 
       add(v, v, [r[1], r[2], r[3]]);
 
-      universe[positionIndex].mass *= 0.99;
+      mass.mass *= 0.5;
 
-
+      if (mass.mass < 0.01) events.push(['poof', mass, i]);
 
 
       // if (m > 0) {
@@ -441,6 +506,7 @@
 
       // add(v, v, scale(r, r, magnitude([x, y, z])));
     }
+
 
 
     //http://mathworld.wolfram.com/Quaternion.html
@@ -682,25 +748,52 @@
 
         resolveCollisions();
 
-        if ((tweetSpawn.length + pendingTweetSpawn) < MAX_TWEET_SPAWN) {
-          spawningTweets.forEach(tweet => {
-            if (tweet.likes > 0 && Math.random() > 0.1) {
-              tweet.likes--;
-              events.push(['like', tweet.tweetID]);
-              pendingTweetSpawn++;
-            }
-            if (tweet.retweets > 0 && Math.random() > 0.1) {
-              tweet.retweets--;
-              events.push(['retweet', tweet.tweetID]);
-              pendingTweetSpawn++;
-            }
-            if (tweet.followers > 0 && Math.random() > 0.1) {
-              tweet.followers--;
-              events.push(['follower']);
-              pendingTweetSpawn++;
-            }
-          });
-        }
+        //lots of unnecessary stuff going on here sometimes
+        spawningTweets.forEach(tweet => {
+          if ((tweetSpawn.length + pendingTweetSpawn) >= MAX_TWEET_SPAWN) return false;
+
+          if (tweet.likes > 0 && Math.random() > 0.5) {
+            tweet.likes--;
+            events.push(['like', tweet.tweetID]);
+            pendingTweetSpawn++;
+          }
+
+          if ((tweetSpawn.length + pendingTweetSpawn) >= MAX_TWEET_SPAWN) return false;
+
+          if (tweet.retweets > 0 && Math.random() > 0.5) {
+            tweet.retweets--;
+            events.push(['retweet', tweet.tweetID]);
+            pendingTweetSpawn++;
+          }
+
+          if ((tweetSpawn.length + pendingTweetSpawn) >= MAX_TWEET_SPAWN) return false;
+
+          if (tweet.followers > 0 && Math.random() > 0.5) {
+            tweet.followers--;
+            events.push(['follower']);
+            pendingTweetSpawn++;
+          }
+        });
+
+        // if ((tweetSpawn.length + pendingTweetSpawn) < MAX_TWEET_SPAWN) {
+        //   spawningTweets.forEach(tweet => {
+        //     if (tweet.likes > 0 && Math.random() > 0.1) {
+        //       tweet.likes--;
+        //       events.push(['like', tweet.tweetID]);
+        //       pendingTweetSpawn++;
+        //     }
+        //     if (tweet.retweets > 0 && Math.random() > 0.1) {
+        //       tweet.retweets--;
+        //       events.push(['retweet', tweet.tweetID]);
+        //       pendingTweetSpawn++;
+        //     }
+        //     if (tweet.followers > 0 && Math.random() > 0.1) {
+        //       tweet.followers--;
+        //       events.push(['follower']);
+        //       pendingTweetSpawn++;
+        //     }
+        //   });
+        // }
       }
 
       function positionHalfTick() {
@@ -1135,12 +1228,14 @@
 
         // internal
         'absorbed': absorbed,
-        'oldTweets': addOldTweets
+        'oldTweets': addOldTweets,
+        'poof': poof
       };
 
       const uuievents = {
         'tweet': event => trumpTweetEl.classList.remove('show'),
-        'absorbed': event => absorbedEl.classList.remove('show')
+        'absorbed': event => absorbedEl.classList.remove('show'),
+        'poof': event => poofEl.classList.remove('show')
       };
 
       const run = runner(universe);
@@ -1228,6 +1323,11 @@
             absorbedNameEl.innerHTML = absorbed;
             absorbedByNameEl.innerHTML = by;
           }
+          else if (name === 'poof') {
+            const [poof, mass] = args;
+
+            poofEl.classList.add('show');
+          }
         }
 
         uievents.splice(0);
@@ -1250,7 +1350,7 @@
 
         switch (name) {
           case 'r':
-            handle('retweet', parts);
+            handle('retweet+', parts);
             break;
           case 't':
             handle('tweet', parts);
@@ -1342,6 +1442,7 @@
       </current-look-at>
       <trump-mass><trump>TRUMP</trump>'s mass: <trump-mass-quantity></trump-mass-quantity></trump-mass>
       <orbit-statistics><orbit-statistics-quantity></orbit-statistics-quantity> in orbit</orbit-statistics>
+      <moving-trigger></moving-trigger>
     </looking>
 
     <moving>
@@ -1388,6 +1489,7 @@
      <info>Don't worry, CNN is orbiting it!</info>
     </trump-tweet>
     <absorbed><absorbed-name></absorbed-name> was absorbed by <absorbed-by-name></absorbed-by-name>!</absorbed>
+    <poof>You ran out of mass!</poof>
     <commands></commands>
 
     <tag><trump>TRUMP</trump>orbit <brand>alpha preview</brand> <version>uncommitted</version></tag>

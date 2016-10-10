@@ -101,9 +101,26 @@ hud {
   looking {
     display: none;
 
+    position: absolute;
+
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
     opacity: 0;
 
     transition: opacity 1s ease-in-out;
+
+    moving-trigger {
+      position: absolute;
+
+      left: 0;
+      right: 0;
+      bottom: 0;
+
+      height: 40%; // ?
+    }
   }
 
   moving {
@@ -132,13 +149,14 @@ hud {
 
       user-select: none;
       -webkit-user-select: none;
+      -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 
       opacity: 0;
 
       transition: opacity 1s ease-in-out;
 
       zp, zn, yp, yn, xp, xn {
-        margin: 0.25em;
+        padding: 0.25em;
 
         transition: text-shadow 0.1s ease-in-out;
 
@@ -318,6 +336,28 @@ hud {
       display: block;
 
       animation: flash-fade-and-hide 1s ease-in-out forwards;
+    }
+  }
+
+  poof {
+    display: none;
+
+    position: fixed;
+
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    font-size: 4vw;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    &.show {
+      display: flex;
     }
   }
 
