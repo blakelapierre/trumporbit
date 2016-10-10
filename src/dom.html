@@ -1236,51 +1236,6 @@
         function emptyFn() {}
       }
 
-      // function runner(universe, startTime = new Date().getTime(), maxTicksPerCall = 50) {
-      //   let currentTick = 0,
-      //       lastGUIUpdate = 0;
-
-      //   return (currentTime = new Date().getTime()) => {
-      //     const dt = currentTime - startTime,
-      //           t = Math.ceil((dt / 1000) * ticksPerSecond),
-      //           ticks = Math.min(maxTicksPerCall, t - currentTick);
-
-      //     for (let i = 0; i < ticks ; i++) {
-      //       for (let i = 0; i < events.length; i++) {
-      //         const event = events[i];
-
-      //         (eevents[event[0]] || defaultHandler(event))(event, view);
-      //       }
-
-      //       events.splice(0);
-
-      //       tick();
-
-      //       currentTick++;
-      //     }
-
-      //     if ((currentTime - lastGUIUpdate) > 100) {
-      //       updateMassesGUI();
-      //       lastGUIUpdate = currentTime;
-      //     }
-
-      //     if (currentTick !== t) {
-      //       catchUpQuantityEl.parentElement.style.display = 'block';
-      //       catchUpQuantityEl.innerHTML = currentTick - t;
-      //     }
-      //     else {
-      //       catchUpQuantityEl.parentElement.style.display = 'none';
-      //     }
-      //   };
-
-      //   function defaultHandler(event) {
-      //     console.log(`No eevents ${event[0]}!`)
-      //     return emptyFn;
-      //   }
-
-      //   function emptyFn() {}
-      // }
-
       function animate() {
         run();
 
