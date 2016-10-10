@@ -472,46 +472,12 @@
       mass.mass *= 0.95;
 
       if (mass.mass < 0.01) events.push(['poof', mass, i]);
-
-
-      // if (m > 0) {
-      //   d[0] /= m;
-      //   d[1] /= m;
-      //   d[2] /= m;
-      // }
-
-      // const a = sub([0, 0, 0], p, [x, y, z]),
-      //       am = magnitude(a);
-
-      // a[0] /= am;
-      // a[1] /= am;
-      // a[2] /= am;
-
-      // // const r = [
-      // //   scale(dd, cross(dd, d, [0, 1, 0]), x),
-      // //   scale(dd, cross(dd, d, [0, 1, 0]), y),
-      // //   scale(dd, cross(dd, d, [0, 1, 0]), z)
-      // // ];
-      // const r = [
-      //   dot(cross(dd, [0, 0, -1], d), a),
-      //   dot(cross([0, 0, 0], dd, [0, 1, 0]), a),
-      //   dot(d, a)
-      // ];
-
-      // // cross(dd, [0, 0, -1], d);
-
-
-
-      // console.log(d, a, v, r);
-
-      // add(v, v, scale(r, r, magnitude([x, y, z])));
     }
 
 
 
     //http://mathworld.wolfram.com/Quaternion.html
     function qmult(r, q1, q2) {
-      // console.log('qmult', r, q1, q2);
 
       const v1 = [q1[1], q1[2], q1[3]],
             v2 = [q2[1], q2[2], q2[3]],
@@ -527,15 +493,6 @@
 
       return r;
     }
-
-    // function qmult(r, q1, q2) {
-    //   r[0] = q2[0] * q1[0] - q2[1] * q1[1] - q2[2] * q1[2] - q2[3] * q2[3];
-    //   r[1] = q2[0] * q1[1] - q2[1] * q1[0] - q2[2] * q1[3] - q2[3] * q2[2];
-    //   r[2] = q2[0] * q1[2] - q2[1] * q1[3] - q2[2] * q1[0] - q2[3] * q2[1];
-    //   r[3] = q2[0] * q1[3] - q2[1] * q1[2] - q2[2] * q1[1] - q2[3] * q2[0];
-
-    //   return r;
-    // }
 
     function qconj(r, q) {
       r[0] = q[0];
@@ -876,23 +833,35 @@
               d2 = magnitude(pv2);
 
         // Doesn't take into account mass having changed over time...
-        if (d1 > 0) {
-          const factor = (m1 * m2) / (d1 * d1);
+        calculateAndSetGravity(g2, pv1, m1, m2, d1);
+        calculateAndSetGravity(g1, pv2, m1, m2, d2);
+        // if (d1 > 0) {
+        //   const factor = (m1 * m2) / (d1 * d1);
 
-          g2[0] += pv1[0] * factor;
-          g2[1] += pv1[1] * factor;
-          g2[2] += pv1[2] * factor;
-        }
+        //   g2[0] += pv1[0] * factor;
+        //   g2[1] += pv1[1] * factor;
+        //   g2[2] += pv1[2] * factor;
+        // }
 
-        if (d2 > 0) {
-          const factor = (m1 * m2) / (d2 * d2);
+        // if (d2 > 0) {
+        //   const factor = (m1 * m2) / (d2 * d2);
 
-          g1[0] += pv2[0] * factor;
-          g1[1] += pv2[1] * factor;
-          g1[2] += pv2[2] * factor;
-        }
+        //   g1[0] += pv2[0] * factor;
+        //   g1[1] += pv2[1] * factor;
+        //   g1[2] += pv2[2] * factor;
+        // }
 
         handleCollision(m1, m2, d1, d2, i, j, collisionList, collisions);
+      }
+
+      function calculateAndSetGravity(g, pv, m1, m2, d) {
+        if (d > 0) {
+          const factor = (m1 * m2) / (d * d);
+
+          g[0] += pv[0] * factor;
+          g[1] += pv[1] * factor;
+          g[2] += pv[2] * factor;
+        }
       }
 
       function handleCollision(m1, m2, d1, d2, i, j, collisionList, collisions) {
