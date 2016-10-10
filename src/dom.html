@@ -1256,9 +1256,7 @@
           d[2] /= m;
         }
 
-        cameraOffset[0] = cameraOffset[0] + ((targetCameraOffset[0] - cameraOffset[0]) / 10);
-        cameraOffset[1] = cameraOffset[1] + ((targetCameraOffset[1] - cameraOffset[1]) / 10);
-        cameraOffset[2] = cameraOffset[2] + ((targetCameraOffset[2] - cameraOffset[2]) / 10);
+        add(cameraOffset, cameraOffset, div(dd, sub(dd, targetCameraOffset, cameraOffset), 10));
 
         add(cameraPosition, p, scale(d, d, 300));
         add(cameraPosition, cameraPosition, cameraOffset);
