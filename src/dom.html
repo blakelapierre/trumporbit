@@ -543,71 +543,6 @@
 
 
 
-    //http://mathworld.wolfram.com/Quaternion.html
-    function qmult(r, q1, q2) {
-
-      const v1 = [q1[1], q1[2], q1[3]],
-            v2 = [q2[1], q2[2], q2[3]],
-            s1 = scale([0, 0, 0], v2, q1[0]),
-            s2 = scale([0, 0, 0], v1, q2[0]);
-
-      add(dd, s1, add(dd, s2, cross(dd, v1, v2)));
-
-      r[0] = q1[0] * q2[0] - dot(v1, v2);
-      r[1] = dd[0];
-      r[2] = dd[1];
-      r[3] = dd[2];
-
-      return r;
-    }
-
-    function qconj(r, q) {
-      r[0] = q[0];
-      r[1] = -q[1];
-      r[2] = -q[2];
-      r[3] = -q[3];
-
-      return r;
-    }
-
-    // don't call with d = 0
-    function qdiv(r, q, d) {
-      r[0] = q[0] / d;
-      r[1] = q[1] / d;
-      r[2] = q[2] / d;
-      r[3] = q[3] / d;
-
-      return r;
-    }
-
-    function qnorm(q) {
-      return Math.sqrt(q[0] * q[0] +
-                       q[1] * q[1] +
-                       q[2] * q[2] +
-                       q[3] * q[3]);
-    }
-
-    // assumes unit q?
-    function qinv(r, q) {
-      const s = 1 / (q[0] * q[0] + q[1] * q[1] + q[2] * q[2] + q[3] * q[3]);
-
-      r[0] = q[0] * s
-      r[1] = -q[1] * s
-      r[2] = -q[2] * s
-      r[3] = -q[3] * s
-
-      return r;
-    }
-
-    // function qinv(r, q) {
-    //   const n = qnorm(q);
-    //   return qdiv(r, qconj(r, q), n * n);
-    // }
-
-    function qunit(r, q) {
-      const n = qnorm(q);
-      return qdiv(r, q, n);
-    }
 
 
 
@@ -668,65 +603,6 @@
       'frontview': [0, 0, 3500],
       'sideview': [-3500, 0, 0]
     };
-
-    function set (r, x, y, z) {
-      r[0] = x;
-      r[1] = y;
-      r[2] = z;
-      return r;
-    }
-
-    function copy (r, s) {
-      r[0] = s[0];
-      r[1] = s[1];
-      r[2] = s[2];
-      return r;
-    }
-
-    function add (r, u, v) {
-      r[0] = u[0] + v[0];
-      r[1] = u[1] + v[1];
-      r[2] = u[2] + v[2];
-      return r;
-    }
-
-    function sub (r, u, v) {
-      r[0] = u[0] - v[0];
-      r[1] = u[1] - v[1];
-      r[2] = u[2] - v[2];
-      return r;
-    }
-
-    function scale (r, v, s) {
-      r[0] = v[0] * s;
-      r[1] = v[1] * s;
-      r[2] = v[2] * s;
-      return r;
-    }
-
-    function div (r, v, d) {
-      r[0] = v[0] / d;
-      r[1] = v[1] / d;
-      r[2] = v[2] / d;
-      return r;
-    }
-
-    function cross (r, u, v) {
-      r[0] = u[1] * v[2] - u[2] * u[1];
-      r[1] = u[2] * v[0] - u[0] * u[2];
-      r[2] = u[0] * v[1] - u[1] * u[0];
-      return r;
-    }
-
-    function dot (u, v) {
-      return u[0] * v[0] + u[1] * v[1] + u[2] * v[2];
-    }
-
-    function magnitude(v) {
-      return Math.sqrt(v[0] * v[0] +
-                       v[1] * v[1] +
-                       v[2] * v[2]);
-    }
 
     const speedlimit = 300000;
     const pv1 = [0, 0, 0],
@@ -839,26 +715,6 @@
             pendingTweetSpawn++;
           }
         });
-
-        // if ((tweetSpawn.length + pendingTweetSpawn) < MAX_TWEET_SPAWN) {
-        //   spawningTweets.forEach(tweet => {
-        //     if (tweet.likes > 0 && Math.random() > 0.1) {
-        //       tweet.likes--;
-        //       events.push(['like', tweet.tweetID]);
-        //       pendingTweetSpawn++;
-        //     }
-        //     if (tweet.retweets > 0 && Math.random() > 0.1) {
-        //       tweet.retweets--;
-        //       events.push(['retweet', tweet.tweetID]);
-        //       pendingTweetSpawn++;
-        //     }
-        //     if (tweet.followers > 0 && Math.random() > 0.1) {
-        //       tweet.followers--;
-        //       events.push(['follower']);
-        //       pendingTweetSpawn++;
-        //     }
-        //   });
-        // }
       }
 
       function positionHalfTick() {
@@ -1431,10 +1287,131 @@
     }
 
 
+    function set (r, x, y, z) {
+      r[0] = x;
+      r[1] = y;
+      r[2] = z;
+      return r;
+    }
+
+    function copy (r, s) {
+      r[0] = s[0];
+      r[1] = s[1];
+      r[2] = s[2];
+      return r;
+    }
+
+    function add (r, u, v) {
+      r[0] = u[0] + v[0];
+      r[1] = u[1] + v[1];
+      r[2] = u[2] + v[2];
+      return r;
+    }
+
+    function sub (r, u, v) {
+      r[0] = u[0] - v[0];
+      r[1] = u[1] - v[1];
+      r[2] = u[2] - v[2];
+      return r;
+    }
+
+    function scale (r, v, s) {
+      r[0] = v[0] * s;
+      r[1] = v[1] * s;
+      r[2] = v[2] * s;
+      return r;
+    }
+
+    function div (r, v, d) {
+      r[0] = v[0] / d;
+      r[1] = v[1] / d;
+      r[2] = v[2] / d;
+      return r;
+    }
+
+    function cross (r, u, v) {
+      r[0] = u[1] * v[2] - u[2] * u[1];
+      r[1] = u[2] * v[0] - u[0] * u[2];
+      r[2] = u[0] * v[1] - u[1] * u[0];
+      return r;
+    }
+
+    function dot (u, v) {
+      return u[0] * v[0] + u[1] * v[1] + u[2] * v[2];
+    }
+
+    function magnitude(v) {
+      return Math.sqrt(v[0] * v[0] +
+                       v[1] * v[1] +
+                       v[2] * v[2]);
+    }
 
 
+    //http://mathworld.wolfram.com/Quaternion.html
+    function qmult(r, q1, q2) {
 
+      const v1 = [q1[1], q1[2], q1[3]],
+            v2 = [q2[1], q2[2], q2[3]],
+            s1 = scale([0, 0, 0], v2, q1[0]),
+            s2 = scale([0, 0, 0], v1, q2[0]);
 
+      add(dd, s1, add(dd, s2, cross(dd, v1, v2)));
+
+      r[0] = q1[0] * q2[0] - dot(v1, v2);
+      r[1] = dd[0];
+      r[2] = dd[1];
+      r[3] = dd[2];
+
+      return r;
+    }
+
+    function qconj(r, q) {
+      r[0] = q[0];
+      r[1] = -q[1];
+      r[2] = -q[2];
+      r[3] = -q[3];
+
+      return r;
+    }
+
+    // don't call with d = 0
+    function qdiv(r, q, d) {
+      r[0] = q[0] / d;
+      r[1] = q[1] / d;
+      r[2] = q[2] / d;
+      r[3] = q[3] / d;
+
+      return r;
+    }
+
+    function qnorm(q) {
+      return Math.sqrt(q[0] * q[0] +
+                       q[1] * q[1] +
+                       q[2] * q[2] +
+                       q[3] * q[3]);
+    }
+
+    // assumes unit q?
+    function qinv(r, q) {
+      const s = 1 / (q[0] * q[0] + q[1] * q[1] + q[2] * q[2] + q[3] * q[3]);
+
+      r[0] = q[0] * s
+      r[1] = -q[1] * s
+      r[2] = -q[2] * s
+      r[3] = -q[3] * s
+
+      return r;
+    }
+
+    // function qinv(r, q) {
+    //   const n = qnorm(q);
+    //   return qdiv(r, qconj(r, q), n * n);
+    // }
+
+    function qunit(r, q) {
+      const n = qnorm(q);
+      return qdiv(r, q, n);
+    }
 
 
 
