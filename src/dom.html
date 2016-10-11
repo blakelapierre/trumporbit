@@ -301,6 +301,12 @@
       }
     };
 
+    const views = {
+      'overview': [0, 5000, 0],
+      'frontview': [0, 0, 3500],
+      'sideview': [-3500, 0, 0]
+    };
+
     const camera = new Camera();
 
     const trump = new Trump(100000, [ 255,   255,    0, 0]),
@@ -585,24 +591,6 @@
         <point points="<<<" colors="<<" sizes="<" shape="circle" opacity={0.9}/>
       </cartesian>
     </root>
-
-
-
-
-
-
-
-
-
-
-
-
-
-    const views = {
-      'overview': [0, 5000, 0],
-      'frontview': [0, 0, 3500],
-      'sideview': [-3500, 0, 0]
-    };
 
     const speedlimit = 300000;
     const pv1 = [0, 0, 0],
