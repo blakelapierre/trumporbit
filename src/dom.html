@@ -51,16 +51,12 @@
       hud.classList.add(state);
 
       if (state === 'moving') {
-        targetCameraOffset[0] = 0;
-        targetCameraOffset[1] = 0;
-        targetCameraOffset[2] = 0;
+        camera.targetOffset = [0, 0, 0];
 
         controls = attachVelocityControls();
       }
       else if (state === 'looking') {
-        targetCameraOffset[0] = 0;
-        targetCameraOffset[1] = 225;
-        targetCameraOffset[2] = 0;
+        camera.targetOffset = [0, 225, 0];
 
         detachVelocityControls(controls);
       }
@@ -125,6 +121,60 @@
           helpContentEl = document.querySelector('help-content'),
           previousLookAtEl = document.querySelector('previous-look-at'),
           nextLookAtEl = document.querySelector('next-look-at');
+
+    class Camera {
+      constructor() {
+        this._targetPosition = [0, 0, 0];
+        this._targetLookAt = [0, 0, 0];
+        this._targetOffset = [0, 225, 0];
+
+        this._li = 0;
+        this._pi = 0;
+        this._oi = 0;
+
+        this.position = copy([0, 0, 0], this._targetPosition);
+        this.lookAt = copy([0, 0, 0], this._targetLookAt);
+        this.offset = copy([0, 0, 0], this._targetOffset);
+      }
+
+      update() {
+        const p = universe[this.positionIndex].position,
+              tp = universe[this.lookAtIndex].position,
+              d = [p[0]-tp[0], p[1]-tp[1], p[2]-tp[2]],
+              m = magnitude(d);
+
+        if (m > 0) div (d, d, m);
+
+        add(this.offset, this.offset, scale(dd, sub(dd, this._targetOffset, this.offset), Math.min(this._oi++, 60) / 60));
+
+        add(this._targetPosition, p, scale(d, d, 300));
+        add(this._targetPosition, this._targetPosition, this.offset);
+
+        add(this.position, this.position, scale(dd, sub(dd, this._targetPosition, this.position), Math.min(this._pi++, 60) / 60));
+      }
+
+      set lookAtIndex (index) {
+        this._li = 0;
+        this._lookAtIndex = index;
+      }
+
+      set positionIndex (index) {
+        this._pi = 0;
+        this._positionIndex = index;
+      }
+
+      get lookAtIndex() { return this._lookAtIndex || 0; }
+      get positionIndex() { return this._positionIndex || 0; }
+
+      get targetPosition() {
+        return universe[this._positionIndex];
+      }
+
+      set targetOffset([x, y, z]) {
+        this._oi = 0;
+        set(this._targetOffset, x, y, z);
+      }
+    }
 
     class Mass {
       constructor(mass, color, position = [0, 0, 0], velocity = [0, 0, 0], acceleration = [0, 0, 0], gravity = [0, 0, 0]) {
@@ -244,6 +294,8 @@
       }
     };
 
+    const camera = new Camera();
+
     const trump = new Trump(100000, [ 255,   255,    0, 0]),
           universe = [trump],
           tweets = [],
@@ -261,8 +313,9 @@
     let pendingTweetSpawn = 0;
 
     const MAX_TWEET_SPAWN = 75,
+          MAX_OBSERVERS = 51,
           MAX_TWEET_SPAWN_AGE = 60 * 5,
-          MAX_OBSERVERS = 51;
+          MAX_EMISSION_AGE = 60 * 5;
 
     const [
       positions,
@@ -273,9 +326,6 @@
       sizes,
       colors
     ] = map(universe, ['position', 'velocity', 'acceleration', 'gravity', 'mass', 'size', 'color']);
-
-    let positionIndex = 1,
-        lookAtIndex = 0;
 
     function map(list, properties) {
       return properties.map(p => list.map(item => item[p]));
@@ -307,7 +357,7 @@
 
 
     function addObserver(event, view) {
-      if (observers.length === 0) positionIndex = universe.length;
+      if (observers.length === 0) camera.positionIndex = universe.length;
 
       if (observers.length < MAX_OBSERVERS) {
         const {position: tp, velocity: tv} = trump;
@@ -330,7 +380,7 @@
     }
 
     function addTweet(event, view) {
-      lookAtIndex = universe.length;
+      camera.lookAtIndex = universe.length;
       // this should be calculated based on current trump mass (and, maybe, positions/velocities of orbiting masses?)
       const {position: tp, velocity: tv} = trump;
 
@@ -435,24 +485,24 @@
       sizes.splice(index, 1);
       colors.splice(index, 1);
 
-      if (positionIndex >= index && positionIndex > 0) {
-        if (positionIndex === index) {
-          positionIndex = positions.length - 1;
+      if (camera.positionIndex >= index && camera.positionIndex > 0) {
+        if (camera.positionIndex === index) {
+          camera.positionIndex = positions.length - 1;
           uievents.push(['poof', mass])
           enterState('looking'); // what?!
         }
-        else positionIndex--;
+        else camera.positionIndex--;
       }
-      if (lookAtIndex >= index) {
+      if (camera.lookAtIndex >= index) {
         previousLookAt();
       }
     }
 
     // x,y,z from camera/observer pov
     function emitMass(view, x = 0, y = 0, z = 0) {
-      const mass = universe[positionIndex],
+      const mass = universe[camera.positionIndex],
             {position: p, velocity: v} = mass,
-            tp = universe[lookAtIndex].position,
+            tp = universe[camera.lookAtIndex].position,
             d = [p[0]-tp[0], p[1]-tp[1], p[2]-tp[2]];
             // m = magnitude(d);
             // m = magnitude(d) || 1;
@@ -479,7 +529,7 @@
 
       const e = addMass(new Emission(emission, COLORS.observer, add([0, 0, 0], mass.position, [-r[1], -r[2], -r[3]]), add([0, 0, 0], mass.velocity, [-r[1], -r[2], -r[3]])), view);
 
-      emissions.add(e);
+      emissions.push(e);
 
       if (mass.mass < 0.01) events.push(['poof', mass, i]);
     }
@@ -560,8 +610,8 @@
     let trumpScaleFactor = 8;
     <root>
       <camera proxy={false}
-              position={t => cameraPosition}
-              lookAt={t => universe[lookAtIndex].position}
+              position={t => camera.position}
+              lookAt={t => camera.lookAt}
               fov={90} />
       <cartesian range={[[-1, 1], [-1, 1], [-1, 1]]}
                  scale={[1, 1, 1]}>
@@ -681,11 +731,6 @@
 
     const collisionList = []; // where should this go?
     let collisionIIndex = 0;
-
-    const cameraPosition = [0, 0, 0],
-          targetCameraPosition = [0, 0, 0],
-          cameraOffset = [0, 225, 0],
-          targetCameraOffset = [0, 225, 0];
 
     let ticksPerSecond = 60,
         ticksPerStep = 10,
@@ -924,11 +969,11 @@
           sizes.splice(smallerIndex, 1);
           colors.splice(smallerIndex, 1);
 
-          if (positionIndex >= smallerIndex && positionIndex > 0) {
-            if (positionIndex === smallerIndex) positionIndex = positions.length - 1;
-            else positionIndex--;
+          if (camera.positionIndex >= smallerIndex && camera.positionIndex > 0) {
+            if (camera.positionIndex === smallerIndex) camera.positionIndex = positions.length - 1;
+            else camera.positionIndex--;
           }
-          if (lookAtIndex >= smallerIndex) {
+          if (camera.lookAtIndex >= smallerIndex) {
             previousLookAt();
           }
         }
@@ -958,7 +1003,7 @@
       const masses = Math.max(0, universe.length - 1);
       orbitStatisticsQuantityEl.innerHTML = masses + ' mass' + (masses > 1 ? 'es' : '');
 
-      const currentMass = universe[positionIndex],
+      const currentMass = universe[camera.positionIndex],
             {mass, name, position, velocity} = currentMass;
 
       const distance = magnitude(sub(dd, currentMass.position, trump.position));
@@ -971,10 +1016,10 @@
       massVelocityQuantityEl.innerHTML = `[${velocity[0].toFixed(1)}, ${velocity[1].toFixed(1)}, ${velocity[2].toFixed(1)}] ${magnitude(velocity).toFixed(1)}`;
 
 
-      const lookAtMass = universe[lookAtIndex];
+      const lookAtMass = universe[camera.lookAtIndex];
       lookAtMassNameEl.innerHTML = lookAtMass.name;
 
-      if (lookAtIndex > 0) {
+      if (camera.lookAtIndex > 0) {
         const lookAtDistance = magnitude(sub(dd, lookAtMass.position, position)),
               lookAtTrumpDistance = magnitude(sub(dd, lookAtMass.position, trump.position));
 
@@ -993,23 +1038,23 @@
     helpEl.addEventListener('click', () => helpContentEl.classList.toggle('show'));
 
     previousLookAtEl.addEventListener('click', () => {
-      set(targetCameraOffset, 0, 100, 0);
+      camera.targetOffset = [0, 100, 0]
       return previousLookAt();
     });
 
     nextLookAtEl.addEventListener('click', () => {
-      set(targetCameraOffset, 0, 100, 0);
+      camera.targetOffset = [0, 100, 0]
       return nextLookAt();
     });
 
     function nextLookAt() {
-      lookAtIndex = (lookAtIndex + 1) % universe.length;
-      return lookAtIndex === positionIndex ? nextLookAt() : lookAtIndex;
+      camera.lookAtIndex = (camera.lookAtIndex + 1) % universe.length;
+      return camera.lookAtIndex === camera.positionIndex ? nextLookAt() : camera.lookAtIndex;
     }
 
     function previousLookAt() {
-      lookAtIndex === 0 ? lookAtIndex = universe.length - 1 : lookAtIndex--;
-      return lookAtIndex === positionIndex ? previousLookAt() : lookAtIndex;
+      camera.lookAtIndex === 0 ? camera.lookAtIndex = universe.length - 1 : camera.lookAtIndex--;
+      return camera.lookAtIndex === camera.positionIndex ? previousLookAt() : camera.lookAtIndex;
     }
 
 
@@ -1050,10 +1095,10 @@
         'backward': () => velocities[selectedMassIndex][2]++,
         'up': () => velocities[selectedMassIndex][1]++,
         'down': () => velocities[selectedMassIndex][1]--,
-        'lookAtTrump': () => lookAtIndex = 0,
-        'overview': () => {lookAtIndex = 0; positionIndex = 0; copy(targetCameraOffset, views.overview);},
-        'frontview': () => {lookAtIndex = 0; positionIndex = 0; copy(targetCameraOffset, views.frontview);},
-        'sideview': () => {lookAtIndex = 0; positionIndex = 0; copy(targetCameraOffset, views.sideview);},
+        'lookAtTrump': () => camera.lookAtIndex = 0,
+        'overview': () => {camera.lookAtIndex = 0; camera.positionIndex = 0; camera.targetOffset =  views.overview;},
+        'frontview': () => {camera.lookAtIndex = 0; camera.positionIndex = 0; camera.targetOffset =  views.frontview;},
+        'sideview': () => {camera.lookAtIndex = 0; camera.positionIndex = 0; camera.targetOffset =  views.sideview;},
         'speed+': () => ++stepsPerSecond,
         'speed-': () => stepsPerSecond = Math.max(1, stepsPerSecond - 1),
         'ticks+': () => ++ticksPerStep,
@@ -1140,12 +1185,12 @@
           }
         },
         'prevMass': () => {
-          set(targetCameraOffset, 0, 100, 0);
-          return positionIndex === 0 ? positionIndex = universe.length - 1 : positionIndex--;
+          camera.targetOffset = [0, 100, 0];
+          return camera.positionIndex === 0 ? camera.positionIndex = universe.length - 1 : camera.positionIndex--;
         },
         'nextMass': () => {
-          set(targetCameraOffset, 0, 100, 0);
-          return positionIndex = (positionIndex + 1) % universe.length;
+          camera.targetOffset = [0, 100, 0];
+          return camera.positionIndex = (camera.positionIndex + 1) % universe.length;
         }
       }
     };
@@ -1264,23 +1309,26 @@
           (uuievents[event[0]] || (() => {}))(event, view);
         }
 
-        const p = universe[positionIndex].position,
-              tp = universe[lookAtIndex].position,
-              d = [p[0]-tp[0], p[1]-tp[1], p[2]-tp[2]],
-              m = magnitude(d);
+        // const p = universe[positionIndex].position,
+        //       tp = universe[lookAtIndex].position,
+        //       d = [p[0]-tp[0], p[1]-tp[1], p[2]-tp[2]],
+        //       m = magnitude(d);
 
-        if (m > 0) div (d, d, m);
+        // if (m > 0) div (d, d, m);
 
-        add(cameraOffset, cameraOffset, div(dd, sub(dd, targetCameraOffset, cameraOffset), 2));
+        camera.update();
+        // copy(cameraPosition, camera.position);
 
-        add(targetCameraPosition, p, scale(d, d, 300));
-        add(targetCameraPosition, targetCameraPosition, cameraOffset);
+        // add(cameraOffset, cameraOffset, div(dd, sub(dd, targetCameraOffset, cameraOffset), 2));
+
+        // add(targetCameraPosition, p, scale(d, d, 300));
+        // add(targetCameraPosition, targetCameraPosition, cameraOffset);
 
         // add(cameraPosition, p, scale(d, d, 300));
         // add(cameraPosition, cameraPosition, cameraOffset);
 
 
-        add(cameraPosition, cameraPosition, div(dd, sub(dd, targetCameraPosition, cameraPosition), 2));
+        // add(cameraPosition, cameraPosition, div(dd, sub(dd, targetCameraPosition, cameraPosition), 2));
 
         void trumpTweetEl.offsetWidth;
 
