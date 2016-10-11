@@ -369,7 +369,7 @@
 
 
 
-    function addMass(newMass, view) { // don't want view here!
+    function addMass(newMass) {
       const {position, velocity, acceleration, gravity, mass, size, color} = newMass;
 
       universe.push(newMass);
@@ -389,12 +389,12 @@
 
 
 
-    function addObserver(event, view) {
+    function addObserver(event) {
       if (observers.length === 0) camera.positionIndex = universe.length;
 
       if (observers.length < MAX_OBSERVERS) {
         const {position: tp, velocity: tv} = trump;
-        const observer = addMass(new Observer(1, COLORS.observer, ORBIT_PARAMETERS.observer.p(tp, tv), ORBIT_PARAMETERS.observer.v(tp, tv)), view);
+        const observer = addMass(new Observer(1, COLORS.observer, ORBIT_PARAMETERS.observer.p(tp, tv), ORBIT_PARAMETERS.observer.v(tp, tv)));
 
         observers.push(observer);
       }
@@ -404,15 +404,15 @@
       }
     }
 
-    function addOldTweets(event, view) {
+    function addOldTweets(event) {
       const {position: tp, velocity: tv} = trump;
       oldTweets = new OldTweets(1000, [0, 1, 1.2, 1], ORBIT_PARAMETERS.oldTweets.p(tp, tv), ORBIT_PARAMETERS.oldTweets.v(tp, tv));
 
-      addMass(oldTweets, view);
+      addMass(oldTweets);
       tweets.push(oldTweets);
     }
 
-    function addTweet(event, view) {
+    function addTweet(event) {
       camera.lookAtIndex = universe.length;
       // this should be calculated based on current trump mass (and, maybe, positions/velocities of orbiting masses?)
       const {position: tp, velocity: tv} = trump;
@@ -426,8 +426,8 @@
 
       tweet.tweetID = event[1] || 'fake';
 
-      addMass(tweet, view);
-      addMass(cnn, view);
+      addMass(tweet);
+      addMass(cnn);
 
       tweets.push(tweet);
       media.push(cnn);
@@ -437,21 +437,21 @@
       uievents.push(['tweet']);
     }
 
-    function addRetweet(event, view) {
-      addTweetSpawn(tweetMap[event[1]] || oldTweets, ReTweet, 1, COLORS.retweet, view);
+    function addRetweet(event) {
+      addTweetSpawn(tweetMap[event[1]] || oldTweets, ReTweet, 1, COLORS.retweet);
     }
 
-    function addLike(event, view) {
-      addTweetSpawn(tweetMap[event[1]] || oldTweets, Like, 1, COLORS.like, view);
+    function addLike(event) {
+      addTweetSpawn(tweetMap[event[1]] || oldTweets, Like, 1, COLORS.like);
     }
 
-    function addFollower(event, view) {
-      addTweetSpawn(oldTweets, Follower, 1, COLORS.follower, view);
+    function addFollower(event) {
+      addTweetSpawn(oldTweets, Follower, 1, COLORS.follower);
     }
 
     const spread = 700;
 
-    function addTweetSpawn(tweet, constructor, mass, color, view) {
+    function addTweetSpawn(tweet, constructor, mass, color) {
       if (!tweet) throw new Error('No tweet!!!!!!@!');
 
       const {position: p} = tweet,
@@ -471,7 +471,7 @@
 
       const spawn = new constructor(mass, color, position,
                                   [tv[0] + d[0]/x, tv[1] + d[1]/x, tv[2] + d[2]/x]);
-      addMass(spawn, view);
+      addMass(spawn);
       tweetSpawn.push(spawn);
       pendingTweetSpawn--;
     }
@@ -480,19 +480,19 @@
       uievents.push(event);
     }
 
-    function incrementLikes([_, id, likes], view) {
+    function incrementLikes([_, id, likes]) {
       const tweet = tweetMap[id] || oldTweets;
       tweet.likes += likes;
       spawningTweets.add(tweet);
     }
 
-    function incrementRetweets([_, id], view) {
+    function incrementRetweets([_, id]) {
       const tweet = tweetMap[id] || oldTweets;
       tweet.retweets++;
       spawningTweets.add(tweet);
     }
 
-    function incrementFollowers([_, followers], view) {
+    function incrementFollowers([_, followers]) {
       oldTweets.followers += followers;
     }
 
@@ -532,7 +532,7 @@
     }
 
     // x,y,z from camera/observer pov
-    function emitMass(view, x = 0, y = 0, z = 0) {
+    function emitMass(x = 0, y = 0, z = 0) {
       const mass = universe[camera.positionIndex],
             {position: p, velocity: v} = mass,
             tp = universe[camera.lookAtIndex].position,
@@ -560,7 +560,7 @@
 
       mass.mass -= emission;
 
-      const e = addMass(new Emission(emission, COLORS.observer, add([0, 0, 0], mass.position, [-r[1], -r[2], -r[3]]), add([0, 0, 0], mass.velocity, [-r[1], -r[2], -r[3]])), view);
+      const e = addMass(new Emission(emission, COLORS.observer, add([0, 0, 0], mass.position, [-r[1], -r[2], -r[3]]), add([0, 0, 0], mass.velocity, [-r[1], -r[2], -r[3]])));
 
       emissions.push(e);
 
@@ -1122,12 +1122,12 @@
         'retweet+': incrementRetweets,
 
         // controls
-        'xn': event => emitMass(view, -vBoost),
-        'xp': event => emitMass(view, vBoost),
-        'yn': event => emitMass(view, 0, -vBoost),
-        'yp': event => emitMass(view, 0, vBoost),
-        'zn': event => emitMass(view, 0, 0, -vBoost),
-        'zp': event => emitMass(view, 0, 0, vBoost),
+        'xn': event => emitMass(-vBoost),
+        'xp': event => emitMass(vBoost),
+        'yn': event => emitMass(0, -vBoost),
+        'yp': event => emitMass(0, vBoost),
+        'zn': event => emitMass(0, 0, -vBoost),
+        'zp': event => emitMass(0, 0, vBoost),
 
         // internal
         'absorbed': absorbed,
