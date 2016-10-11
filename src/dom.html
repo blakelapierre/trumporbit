@@ -34,15 +34,15 @@
     [[0.13333,0.18824,0.36078,1],[0.15686,0.22745,0.38431,1],[0.16471,0.22745,0.39216,1],[0.13333,0.16471,0.29804,1],[0.07843,0.10196,0.21961,1],[0.13333,0.14902,0.27451,1],[1.68627,1.66275,1.58431,1],[1.88235,1.87451,1.81176,1],[1.92157,1.89804,1.84314,1],[1.81176,1.80392,1.74118,1],[1.66275,1.67059,1.61569,1],[1.37255,1.32549,1.29412,1],[0.98039,0.7451,0.7451,1],[0.4,0.08627,0.12549,1],[0.18824,0,0,1],[0.56471,0.4,0.43922,1],[1.45882,1.46667,1.51373,1],[1.90588,2,2,1],[1.97647,2,2,1],[0,0,0,0],[0.62745,0.6902,0.81569,1],[0.07843,0.14902,0.32157,1],[0.14902,0.19608,0.36863,1],[0.21961,0.26667,0.43922,1]]];
 
     const hud = document.querySelector('hud'),
-          enterLooking = document.querySelector('enter-looking'),
-          enterMoving = document.querySelector('enter-moving'),
-          looking = document.querySelector('looking'),
-          moving = document.querySelector('moving');
+          enterLookingEl = document.querySelector('enter-looking'),
+          enterMovingEl = document.querySelector('enter-moving'),
+          lookingEl = document.querySelector('looking'),
+          movingEl = document.querySelector('moving');
 
-    enterLooking.addEventListener('click', event => enterState('looking'));
-    enterMoving.addEventListener('click', event => enterState('moving'));
+    enterLookingEl.addEventListener('click', event => enterState('looking'));
+    enterMovingEl.addEventListener('click', event => enterState('moving'));
 
-    const states = {looking, moving};
+    // const states = {looking, moving};
     let currentState, controls;
 
     function enterState(state) {
@@ -52,11 +52,19 @@
 
       if (state === 'moving') {
         camera.targetOffset = [0, 0, 0];
+        camera.targetFov = 100;
 
         controls = attachVelocityControls();
       }
       else if (state === 'looking') {
+        camera.targetOffset = [0, 100, 0];
+        camera.targetFov = 60;
+
+        detachVelocityControls(controls);
+      }
+      else if (state === 'start') {
         camera.targetOffset = [0, 225, 0];
+        camera.targetFov = 90;
 
         detachVelocityControls(controls);
       }
@@ -89,11 +97,16 @@
     const velocityControlsEl = document.querySelector('velocity-controls'),
           movingTriggerEl = document.querySelector('moving-trigger');
 
-    velocityControlsEl.addEventListener('click', event => {
+    movingEl.addEventListener('click', event => {
       enterState('looking');
     });
 
+    lookingEl.addEventListener('click', event => {
+      enterState('start');
+    });
+
     movingTriggerEl.addEventListener('click', event => {
+      event.stopPropagation();
       enterState('moving');
     });
 
@@ -128,14 +141,17 @@
         this._targetPosition = [0, 0, 0];
         this._targetLookAt = [0, 0, 0];
         this._targetOffset = [0, 225, 0];
+        this._targetFov = 90;
 
         this._li = 0;
         this._pi = 0;
         this._oi = 0;
+        this._fi = 0;
 
         this.position = copy([0, 0, 0], this._targetPosition);
         this.lookAt = copy([0, 0, 0], this._targetLookAt);
         this.offset = copy([0, 0, 0], this._targetOffset);
+        this.fov = 90;
       }
 
       update() {
@@ -154,16 +170,24 @@
         add(this.position, this.position, scale(dd, sub(dd, this._targetPosition, this.position), Math.min(this._pi++, 60) / 60));
 
         add(this.lookAt, this.lookAt, scale(dd, sub(dd, this.targetLookAt, this.lookAt), Math.min(this._li++, 60) / 60));
+
+        this.fov = this.fov + (this._targetFov - this.fov) * Math.min(this._fi++, 60) / 60;
+
       }
 
       set lookAtIndex (index) {
-        this._li = 0;
+        if (index !== this._lookAtIndex) this._li = 0;
         this._lookAtIndex = index;
       }
 
       set positionIndex (index) {
-        this._pi = 0;
+        if (index !== this._positionIndex) this._pi = 0;
         this._positionIndex = index;
+      }
+
+      set targetFov (fov) {
+        if (fov !== this.targetFov) this._fi = 0;
+        this._targetFov = fov;
       }
 
       get lookAtIndex() { return this._lookAtIndex || 0; }
@@ -178,7 +202,7 @@
       }
 
       set targetOffset([x, y, z]) {
-        this._oi = 0;
+        if (this._targetOffset[0] !== x || this._targetOffset[1] !== y || this._targetOffset[2] !== z) this._oi = 0;
         set(this._targetOffset, x, y, z);
       }
     }
@@ -560,7 +584,7 @@
       <camera proxy={false}
               position={t => camera.position}
               lookAt={t => camera.lookAt}
-              fov={90} />
+              fov={t => camera.fov} />
       <cartesian range={[[-1, 1], [-1, 1], [-1, 1]]}
                  scale={[1, 1, 1]}>
         <cartesian range={[[-1, 1], [-1, 1], [-1, 1]]}
@@ -909,13 +933,15 @@
 
     helpEl.addEventListener('click', () => helpContentEl.classList.toggle('show'));
 
-    previousLookAtEl.addEventListener('click', () => {
-      camera.targetOffset = [0, 100, 0]
+    previousLookAtEl.addEventListener('click', event => {
+      event.stopPropagation();
+
       return previousLookAt();
     });
 
-    nextLookAtEl.addEventListener('click', () => {
-      camera.targetOffset = [0, 100, 0]
+    nextLookAtEl.addEventListener('click', event => {
+      event.stopPropagation();
+
       return nextLookAt();
     });
 
@@ -1474,10 +1500,6 @@
       </current-mass>
 
       <velocity-controls>
-        <z>
-          <zp>⇧</zp>
-          <zn>⇩</zn>
-        </z>
         <others>
           <up>
             <yp>⇧</yp></up>
@@ -1486,13 +1508,11 @@
             <xp>⇨</xp>
           </x>
           <down>
+            <zn>⇧</zn>
             <yn>⇩</yn>
+            <zp>⇩</zp>
           </down>
         </others>
-        <dummy><z>
-          <zp>⇧</zp>
-          <zn>⇩</zn>
-        </z></dummy>
       </velocity-controls>
     </moving>
 
