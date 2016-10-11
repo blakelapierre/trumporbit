@@ -893,8 +893,6 @@
     if (window.location.search === '?nointro') document.querySelector('notice').classList.add('no-intro');
 
     function updateMassesGUI() {
-      // trumpMassQuantityEl.innerHTML = universe[0].mass.toFixed(1);
-
       const masses = Math.max(0, universe.length - 1);
       orbitStatisticsQuantityEl.innerHTML = masses + ' mass' + (masses > 1 ? 'es' : '');
 
