@@ -98,7 +98,7 @@
           movingTriggerEl = document.querySelector('moving-trigger');
 
     movingEl.addEventListener('click', event => {
-      enterState('looking');
+      enterState('start');
     });
 
     lookingEl.addEventListener('click', event => {
@@ -223,9 +223,7 @@
 
       positionHalfTick(ticksPerSecond) {
         const {position: p, velocity: v} = this;
-        p[0] += v[0] / ticksPerSecond / 2;
-        p[1] += v[1] / ticksPerSecond / 2;
-        p[2] += v[2] / ticksPerSecond / 2;
+        add(p, p, div(dd, div(dd, v, ticksPerSecond), 2));
       }
 
       velocityTick(ticksPerSecond) {
@@ -235,9 +233,10 @@
           gravity: g
         } = this;
 
-        v[0] += (a[0] + g[0]) / ticksPerStep;
-        v[1] += (a[1] + g[1]) / ticksPerStep;
-        v[2] += (a[2] + g[2]) / ticksPerStep;
+        add(v, v, div(dd, add(dd, a, g), ticksPerStep));
+        // v[0] += (a[0] + g[0]) / ticksPerStep;
+        // v[1] += (a[1] + g[1]) / ticksPerStep;
+        // v[2] += (a[2] + g[2]) / ticksPerStep;
       }
     }
 
@@ -825,6 +824,10 @@
       function resolveCollisions() {
         for (let i = collisionList.length - 1; i >= 0; i--) {
           const [smallerMass, greaterMass] = collisionList[i];
+
+          const ratio = smallerMass.mass / greaterMass.mass; // 0?
+
+          add(greaterMass.velocity, greaterMass.velocity, scale(dd, smallerMass.velocity, ratio));
 
           greaterMass.mass += smallerMass.mass;
         }
