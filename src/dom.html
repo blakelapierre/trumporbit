@@ -161,16 +161,16 @@
 
         if (m > 0) div (d, d, m);
 
-        add(this.offset, this.offset, scale(dd, sub(dd, this._targetOffset, this.offset), Math.min(this._oi++, 60) / 60));
+        add(this.offset, this.offset, scale(dd, sub(dd, this._targetOffset, this.offset), Math.min(this._oi++, 10) / 10));
 
         add(this._targetPosition, p, scale(d, d, 300));
         add(this._targetPosition, this._targetPosition, this.offset);
 
-        add(this.position, this.position, scale(dd, sub(dd, this._targetPosition, this.position), Math.min(this._pi++, 60) / 60));
+        add(this.position, this.position, scale(dd, sub(dd, this._targetPosition, this.position), Math.min(this._pi++, 10) / 10));
 
-        add(this.lookAt, this.lookAt, scale(dd, sub(dd, this.targetLookAt, this.lookAt), Math.min(this._li++, 60) / 60));
+        add(this.lookAt, this.lookAt, scale(dd, sub(dd, this.targetLookAt, this.lookAt), Math.min(this._li++, 10) / 10));
 
-        this.fov = this.fov + (this._targetFov - this.fov) * Math.min(this._fi++, 60) / 60;
+        this.fov = this.fov + (this._targetFov - this.fov) * Math.min(this._fi++, 10) / 10;
 
       }
 
@@ -219,14 +219,14 @@
 
       get name() { return 'Mass'; }
 
-      get size() { return 500 * Math.log2(this.mass + 1); }
+      get size() { return 800 * Math.log2(this.mass + 1); }
 
-      positionHalfTick(ticksPerSecond) {
+      positionHalfTick(ticksPerStep) {
         const {position: p, velocity: v} = this;
-        add(p, p, div(dd, div(dd, v, ticksPerSecond), 2));
+        add(p, p, div(dd, div(dd, v, ticksPerStep), 2));
       }
 
-      velocityTick(ticksPerSecond) {
+      velocityTick(ticksPerStep) {
         const {
           velocity: v,
           acceleration: a,
@@ -306,20 +306,20 @@
 
     const ORBIT_PARAMETERS = {
       'observer': {
-        p: (tp, tv) => [tp[0], tp[1], tp[2] + 3000],
-        v: (tp, tv) => [420, 0, 0]
+        p: (tp, tv) => [tp[0], tp[1], tp[2] + 1000],
+        v: (tp, tv) => [320, 0, 0]
       },
       'oldTweets': {
-        p: (tp, tv) => [-1600, -1600, 0],
+        p: (tp, tv) => [-600, -600, 0],
         v: (tp, tv) => [315, 0, -315]
       },
       'tweet': {
-        p: (tp, tv) => [tp[0], tp[1], tp[2] + 500],
-        v: (tp, tv) => [850, -1, 0]
+        p: (tp, tv) => [tp[0], tp[1], tp[2] + 400],
+        v: (tp, tv) => [600, -1, 0]
       },
       'media': {
-        p: (tp, tv) => [tp[0] + 50, tp[1] + 0, tp[2] + 500],
-        v: (tp, tv) => [850, 1, 0]
+        p: (tp, tv) => [tp[0] + 120, tp[1] + 0, tp[2] + 400],
+        v: (tp, tv) => [600, 1, 0]
       }
     };
 
@@ -381,9 +381,7 @@
       sizes.push(size);
       colors.push(color);
 
-      view.select('#positions').set('width', positions.length);
-      view.select('#colors').set('width', colors.length);
-      view.select('#sizes').set('width', sizes.length);
+      uievents.push(['newmass']);
 
       return newMass;
     }
@@ -408,7 +406,7 @@
 
     function addOldTweets(event, view) {
       const {position: tp, velocity: tv} = trump;
-      oldTweets = new OldTweets(200, [0, 1, 1.2, 1], ORBIT_PARAMETERS.oldTweets.p(tp, tv), ORBIT_PARAMETERS.oldTweets.v(tp, tv));
+      oldTweets = new OldTweets(1000, [0, 1, 1.2, 1], ORBIT_PARAMETERS.oldTweets.p(tp, tv), ORBIT_PARAMETERS.oldTweets.v(tp, tv));
 
       addMass(oldTweets, view);
       tweets.push(oldTweets);
@@ -419,7 +417,7 @@
       // this should be calculated based on current trump mass (and, maybe, positions/velocities of orbiting masses?)
       const {position: tp, velocity: tv} = trump;
 
-      const tweet = new Tweet(100, COLORS.tweet,
+      const tweet = new Tweet(500, COLORS.tweet,
                                    ORBIT_PARAMETERS.tweet.p(tp, tv),
                                    ORBIT_PARAMETERS.tweet.v(tp, tv)),
             cnn = new Media('CNN', 5, [2, 2, 2, 1],
@@ -594,7 +592,7 @@
                   width={trumpColors[0].length}
                   height={trumpColors.length}
                   data={trumpColors} />
-          <point points="<<" colors="<" size={1200 * trumpScaleFactor} shape="square" opacity={1}/>
+          <point points="<<" colors="<" size={1200 * trumpScaleFactor} shape="square" opacity={0.95}/>
         </cartesian>
 
         <array id="positions"
@@ -610,7 +608,7 @@
                width={universe.length}
                channels={1}
                data={sizes} />
-        <point points="<<<" colors="<<" sizes="<" shape="circle" opacity={0.9}/>
+        <point points="<<<" colors="<<" sizes="<" shape="circle" blending="mult" opacity={0.9}/>
       </cartesian>
     </root>
 
@@ -625,8 +623,8 @@
     const collisionList = []; // where should this go?
     let collisionIIndex = 0;
 
-    let ticksPerSecond = 60,
-        ticksPerStep = 10,
+    let /*ticksPerSecond = 60,*/
+        ticksPerStep = 30,
         stepsPerSecond = 1;
 
 
@@ -689,10 +687,10 @@
           if (age > MAX_TWEET_SPAWN_AGE) {
             const index = universe.indexOf(spawn);
             if (index === -1) {
-              console.log('-1!', age, spawn, universe);
+              uievents.push(['log', '-1!', age, spawn, universe]);
             }
             else {
-              collisionList.push([true, spawn, trump, index]);
+              collisionList.push([spawn, trump, index]);
             }
           }
         }
@@ -731,7 +729,7 @@
         for (let i = 0; i < universe.length; i++) {
           const mass = universe[i];
 
-          mass.positionHalfTick(ticksPerSecond);
+          mass.positionHalfTick(ticksPerStep);
           set(mass.gravity, 0, 0, 0);
         }
       }
@@ -783,24 +781,19 @@
         sub(pv1, oldp1, p2);
         sub(pv2, oldp2, p1);
 
-        const d1 = magnitude(pv1),
-              d2 = magnitude(pv2);
+        const d1 = dot(pv1, pv1),
+              d2 = dot(pv2, pv2),
+              m = m1 * m2;
 
-        calculateAndSetGravity(g2, pv1, m1, m2, d1);
-        calculateAndSetGravity(g1, pv2, m1, m2, d2);
+        if (d1 > 0) add(g2, g2, scale(dd, pv1, m / d1));
+        if (d2 > 0) add(g1, g1, scale(dd, pv2, m / d2));
 
         handleCollision(m1, m2, d1, d2, i, j, collisionList, collisions);
       }
 
-      // calculateAndSetGravity({gravity: g, pullVector: pv, mass1: m1, mass2: m2, distance: d})
-      function calculateAndSetGravity(g, pv, m1, m2, d) {
-        // Doesn't take into account mass having changed over time...
-        if (d > 0) add(g, g, scale(dd, pv, (m1 * m2) / (d * d)));
-      }
-
       function handleCollision(m1, m2, d1, d2, i, j, collisionList, collisions) {
         if (!collisions.futureCollision) {
-          const threshold = 4 * Math.log2(m1 + m2) / 3;
+          const threshold = (m1 + m2) / 2;
           if (d1 < threshold || d2 < threshold) { // better ordering of checks?
             if (m1 <= m2) {
               //wtf is this
@@ -827,7 +820,7 @@
 
           const ratio = smallerMass.mass / greaterMass.mass; // 0?
 
-          add(greaterMass.velocity, greaterMass.velocity, scale(dd, smallerMass.velocity, ratio));
+          div(greaterMass.velocity, add(greaterMass.velocity, greaterMass.velocity, scale(dd, smallerMass.velocity, ratio)), 2);
 
           greaterMass.mass += smallerMass.mass;
         }
@@ -1145,20 +1138,26 @@
       const uuievents = {
         'tweet': event => trumpTweetEl.classList.remove('show'),
         'absorbed': event => absorbedEl.classList.remove('show'),
-        'poof': event => poofEl.classList.remove('show')
+        'poof': event => poofEl.classList.remove('show'),
+        'newmass': event => {
+          view.select('#positions').set('width', positions.length);
+          view.select('#colors').set('width', colors.length);
+          view.select('#sizes').set('width', sizes.length);
+        },
+        'log': ([log, ...args]) => console.log('log', ...args)
       };
 
       const run = runner(universe);
 
       window.requestAnimationFrame(animate);
 
-      function runner(universe, startTime = new Date().getTime(), maxRunTime = 1000 / 30, GUIUpdateRate = 100) {
+      function runner(universe, startTime = new Date().getTime(), maxRunTime = 1000 / 10, GUIUpdateRate = 100) {
         let currentTick = 0,
             lastGUIUpdate = 0;
 
         return (runTime = new Date().getTime()) => {
           const dt = runTime - startTime,
-                t = Math.ceil((dt / 1000) * ticksPerSecond);
+                t = Math.floor((dt / 1000) * ticksPerStep);
 
           centerOnTrump();
           let currentTime;
