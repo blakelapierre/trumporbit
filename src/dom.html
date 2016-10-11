@@ -110,8 +110,7 @@
       enterState('moving');
     });
 
-    const trumpMassQuantityEl = document.querySelector('trump-mass-quantity'),
-          orbitStatisticsQuantityEl = document.querySelector('orbit-statistics-quantity'),
+    const orbitStatisticsQuantityEl = document.querySelector('orbit-statistics-quantity'),
           massNameEls = document.getElementsByTagName('mass-name'),
           lookAtMassNameEl = document.querySelector('look-at-mass-name'),
           lookAtMassQuantityEl = document.querySelector('look-at-mass-quantity'),
@@ -894,7 +893,7 @@
     if (window.location.search === '?nointro') document.querySelector('notice').classList.add('no-intro');
 
     function updateMassesGUI() {
-      trumpMassQuantityEl.innerHTML = universe[0].mass.toFixed(1);
+      // trumpMassQuantityEl.innerHTML = universe[0].mass.toFixed(1);
 
       const masses = Math.max(0, universe.length - 1);
       orbitStatisticsQuantityEl.innerHTML = masses + ' mass' + (masses > 1 ? 'es' : '');
@@ -915,13 +914,15 @@
       const lookAtMass = universe[camera.lookAtIndex];
       lookAtMassNameEl.innerHTML = lookAtMass.name;
 
-      if (camera.lookAtIndex > 0) {
-        const lookAtDistance = magnitude(sub(dd, lookAtMass.position, position)),
-              lookAtTrumpDistance = magnitude(sub(dd, lookAtMass.position, trump.position));
+      lookAtMassQuantityEl.innerHTML = lookAtMass.mass.toFixed(1);
 
-        lookAtMassQuantityEl.innerHTML = lookAtMass.mass.toFixed(1);
-        lookAtDistanceQuantityEl.innerHTML = lookAtDistance.toFixed(1);
+      const lookAtDistance = magnitude(sub(dd, lookAtMass.position, position));
+      lookAtDistanceQuantityEl.innerHTML = lookAtDistance.toFixed(1);
+
+      if (camera.lookAtIndex > 0) {
+        const lookAtTrumpDistance = magnitude(sub(dd, lookAtMass.position, trump.position));
         lookAtTrumpDistanceQuantityEl.innerHTML = lookAtTrumpDistance.toFixed(1);
+
         currentLookAtEl.classList.remove('is-trump');
       }
       else {
@@ -1207,26 +1208,7 @@
           (uuievents[event[0]] || (() => {}))(event, view);
         }
 
-        // const p = universe[positionIndex].position,
-        //       tp = universe[lookAtIndex].position,
-        //       d = [p[0]-tp[0], p[1]-tp[1], p[2]-tp[2]],
-        //       m = magnitude(d);
-
-        // if (m > 0) div (d, d, m);
-
         camera.update();
-        // copy(cameraPosition, camera.position);
-
-        // add(cameraOffset, cameraOffset, div(dd, sub(dd, targetCameraOffset, cameraOffset), 2));
-
-        // add(targetCameraPosition, p, scale(d, d, 300));
-        // add(targetCameraPosition, targetCameraPosition, cameraOffset);
-
-        // add(cameraPosition, p, scale(d, d, 300));
-        // add(cameraPosition, cameraPosition, cameraOffset);
-
-
-        // add(cameraPosition, cameraPosition, div(dd, sub(dd, targetCameraPosition, cameraPosition), 2));
 
         void trumpTweetEl.offsetWidth;
 
@@ -1474,13 +1456,12 @@
             <tbody>
               <tr><td>Mass:</td><td><look-at-mass-quantity></look-at-mass-quantity></td></tr>
               <tr><td>Distance to <mass-name></mass-name>:</td><td><look-at-distance-quantity></distance-quantity></td></tr>
-              <tr><td>Distance to <trump>TRUMP</trump>:</td><td><look-at-trump-distance-quantity></distance-quantity></td></tr>
+              <tr class="distance"><td>Distance to <trump>TRUMP</trump>:</td><td><look-at-trump-distance-quantity></distance-quantity></td></tr>
             </tbody>
           </table>
         </display>
         <next-look-at>&gt;</next-look-at>
       </current-look-at>
-      <trump-mass><trump>TRUMP</trump>'s mass: <trump-mass-quantity></trump-mass-quantity></trump-mass>
       <orbit-statistics><orbit-statistics-quantity></orbit-statistics-quantity> in orbit</orbit-statistics>
       <moving-trigger></moving-trigger>
     </looking>
