@@ -647,14 +647,34 @@ trump {
 
     z-index: 2;
 
-    transform: scale(0);
-
-    animation: fade-color-out 11s ease-in-out;
+    transform: scale(1);
 
     user-select: none;
 
     &.no-intro {
       display: none;
+    }
+
+    &.connected {
+      transform: scale(0);
+
+      animation: fade-color-out 11s ease-in-out;
+
+      screen {
+        animation: fade-background-out 6s 3s ease-in-out forwards;
+      }
+
+      message {
+        animation: fade-color-out 6s 1s ease-in-out forwards;
+        trump {
+          animation: fade-color-out 6s 3s ease-in-out forwards;
+
+        }
+      }
+
+      statement {
+        animation: fade-color-in-and-out 6s 2s ease-in-out;
+      }
     }
 
     screen {
@@ -665,8 +685,6 @@ trump {
       bottom: 0;
 
       background-color: rgba(0, 0, 0, 1);
-
-      animation: fade-background-out 6s 3s ease-in-out forwards;
     }
 
     message {
@@ -680,16 +698,12 @@ trump {
 
       color: rgba(255, 255, 255, 1);
 
-      animation: fade-color-out 6s 1s ease-in-out forwards;
-
       align-items: center;
       justify-content: center;
 
       trump {
         margin: 0 1vw;
         font-size: 7vw;
-
-        animation: fade-color-out 6s 3s ease-in-out forwards;
       }
     }
 
@@ -705,8 +719,6 @@ trump {
       font-size: 2vw;
 
       color: rgba(255, 255, 255, 0);
-
-      animation: fade-color-in-and-out 6s 2s ease-in-out;
 
       align-items: center;
       justify-content: center;

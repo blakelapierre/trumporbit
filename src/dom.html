@@ -112,7 +112,8 @@
           absorbedEl = document.querySelector('absorbed'),
           absorbedNameEl = document.querySelector('absorbed-name'),
           absorbedByNameEl = document.querySelector('absorbed-by-name'),
-          poofEl = document.querySelector('poof');
+          poofEl = document.querySelector('poof'),
+          noticeEl = document.querySelector('notice');
 
     const tagEl = document.querySelector('tag'),
           currentLookAtEl = document.querySelector('current-look-at'),
@@ -774,7 +775,7 @@
             if (camera.positionIndex >= index && camera.positionIndex > 0) {
               if (camera.positionIndex === index) {
                 camera.positionIndex = positions.length - 1;
-                uievents.push(['poof', mass]);
+                uievents.push(['poof', emission]);
                 enterState('looking'); // what?!
               }
               else camera.positionIndex--;
@@ -1239,7 +1240,7 @@
 
     const vBoost = 10;
     function start(view) {
-      const socket = createSocket();
+      const socket = createSocket(() => noticeEl.classList.add('connected'));
 
       const eevents = {
         // external
@@ -1383,12 +1384,13 @@
       }
     }
 
-    function createSocket() {
+    function createSocket(onopen = () => {}) {
       // const socket = new WebSocket(`ws://${window.location.hostname}:8080`);
       const socket = new WebSocket(`ws://104.236.242.248:8080`);
       let opened;
       socket.onopen = () => {
         opened = true;
+        onopen();
       };
 
       socket.onmessage = (data, flags) => {
@@ -1567,7 +1569,7 @@
   </hud>
 </mathbox>
 
-<notice class="fade-out">
+<notice>
   <screen></screen>
   <message>entering <trump>TRUMP</trump> orbit<message>
   <statement>You are a brave soul</statement>
