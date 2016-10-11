@@ -749,12 +749,33 @@
       resolveCollisions();
 
       function updateEmissions() {
-        for (let i = 0; i < emissions.length; i++) {
+        for (let i = emissions.length - 1; i >= 0; i--) {
           const emission = emissions[i],
                 {created} = emission;
 
           if (currentTick - created > MAX_EMISSION_AGE) {
+            emissions.splice(i, 1);
+            const index = universe.indexOf(emission); // annoying lookup
+            universe.splice(index, 1);
+            positions.splice(index, 1);
+            velocities.splice(index, 1);
+            accelerations.splice(index, 1);
+            gravities.splice(index, 1);
+            masses.splice(index, 1);
+            sizes.splice(index, 1);
+            colors.splice(index, 1);
 
+            if (camera.positionIndex >= index && camera.positionIndex > 0) {
+              if (camera.positionIndex === index) {
+                camera.positionIndex = positions.length - 1;
+                uievents.push(['poof', mass]);
+                enterState('looking'); // what?!
+              }
+              else camera.positionIndex--;
+            }
+            if (camera.lookAtIndex >= index) {
+              previousLookAt();
+            }
           }
         }
       }
