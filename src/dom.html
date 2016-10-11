@@ -138,7 +138,7 @@
       }
 
       update() {
-        const p = universe[this.positionIndex].position,
+        const p = this.targetPosition,
               tp = universe[this.lookAtIndex].position,
               d = [p[0]-tp[0], p[1]-tp[1], p[2]-tp[2]],
               m = magnitude(d);
@@ -151,6 +151,8 @@
         add(this._targetPosition, this._targetPosition, this.offset);
 
         add(this.position, this.position, scale(dd, sub(dd, this._targetPosition, this.position), Math.min(this._pi++, 60) / 60));
+
+        add(this.lookAt, this.lookAt, scale(dd, sub(dd, this.targetLookAt, this.lookAt), Math.min(this._li++, 60) / 60));
       }
 
       set lookAtIndex (index) {
@@ -167,7 +169,11 @@
       get positionIndex() { return this._positionIndex || 0; }
 
       get targetPosition() {
-        return universe[this._positionIndex];
+        return universe[this.positionIndex].position;
+      }
+
+      get targetLookAt() {
+        return universe[this.lookAtIndex].position;
       }
 
       set targetOffset([x, y, z]) {
