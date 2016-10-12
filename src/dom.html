@@ -214,7 +214,6 @@
         this.velocity = velocity;
         this.acceleration = acceleration;
         this.gravity = gravity;
-        this.created = currentTick; // !!!!!!!!!!!!!!!!!!!111
       }
 
       get name() { return 'Mass'; }
@@ -371,6 +370,8 @@
 
     function addMass(newMass) {
       const {position, velocity, acceleration, gravity, mass, size, color} = newMass;
+
+      newMass.created = currentTick;
 
       universe.push(newMass);
       positions.push(position);
