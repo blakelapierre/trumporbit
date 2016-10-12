@@ -287,20 +287,16 @@
     };
 
     class Emission extends Mass {
-      constructor(...args) {
-        super(...args);
-
-        this.age = 100;
-      }
       get name() { return 'Emission'; }
     }
 
     const COLORS = {
-      observer: [255, 255, 255, 1],
+      observer: [2, 2, 2, 1],
       tweet: [0, 1, 1.2, 2],
       retweet: [25 / 128, 207 / 128, 134 / 128, 2],
       like: [190 / 128, 25 / 128, 49 / 128, 2],
-      follower: [0 / 128, 25 / 128, 256 / 128, 2]
+      follower: [0 / 128, 25 / 128, 256 / 128, 2],
+      cnn: [2, 2, 2, 1]
     };
 
     const ORBIT_PARAMETERS = {
@@ -313,12 +309,12 @@
         v: (tp, tv) => [315, 0, -315]
       },
       'tweet': {
-        p: (tp, tv) => [tp[0], tp[1], tp[2] + 400],
-        v: (tp, tv) => [600, -1, 0]
+        p: (tp, tv) => [tp[0], tp[1], tp[2] + 250],
+        v: (tp, tv) => [575, -100, 0]
       },
       'media': {
-        p: (tp, tv) => [tp[0] + 120, tp[1] + 0, tp[2] + 400],
-        v: (tp, tv) => [600, 1, 0]
+        p: (tp, tv) => [tp[0] + 50, tp[1] + 40, tp[2] + 250],
+        v: (tp, tv) => [575, -98, 0]
       }
     };
 
@@ -421,7 +417,7 @@
       const tweet = new Tweet(500, COLORS.tweet,
                                    ORBIT_PARAMETERS.tweet.p(tp, tv),
                                    ORBIT_PARAMETERS.tweet.v(tp, tv)),
-            cnn = new Media('CNN', 5, [2, 2, 2, 1],
+            cnn = new Media('CNN', 5, COLORS.cnn,
                                       ORBIT_PARAMETERS.media.p(tp, tv),
                                       ORBIT_PARAMETERS.media.v(tp, tv));
 
