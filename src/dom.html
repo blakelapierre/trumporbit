@@ -134,7 +134,9 @@
           helpContentEl = document.querySelector('help-content'),
           previousLookAtEl = document.querySelector('previous-look-at'),
           nextLookAtEl = document.querySelector('next-look-at');
-const speed = 10;
+
+
+    const speed = 10;
     class Camera {
       constructor() {
         this._targetPosition = [0, 0, 0];
@@ -368,6 +370,46 @@ const speed = 10;
       }
     };
 
+    const eevents = {
+      // external
+      'observer+': addObserver,
+      'observer-': event => {},
+      'tweet': addTweet,
+      'like': addLike,
+      'retweet': addRetweet,
+      'follower-': event => {}, //?
+      'follower': addFollower,
+
+      'follower+': incrementFollowers,
+      'like+': incrementLikes,
+      'retweet+': incrementRetweets,
+
+      // controls
+      'xn': event => emitMass(-vBoost),
+      'xp': event => emitMass(vBoost),
+      'yn': event => emitMass(0, -vBoost),
+      'yp': event => emitMass(0, vBoost),
+      'zn': event => emitMass(0, 0, -vBoost),
+      'zp': event => emitMass(0, 0, vBoost),
+
+      // internal
+      'absorbed': absorbed,
+      'oldTweets': addOldTweets,
+      'poof': poof
+    };
+
+    const uuievents = {
+      'tweet': event => trumpTweetEl.classList.remove('show'),
+      'absorbed': event => absorbedEl.classList.remove('show'),
+      'poof': event => poofEl.classList.remove('show'),
+      'newmass': (event, view) => {
+        view.select('#positions').set('width', positions.length);
+        view.select('#colors').set('width', colors.length);
+        view.select('#sizes').set('width', sizes.length);
+      },
+      'log': ([log, ...args]) => console.log('log', ...args)
+    };
+
     const views = {
       'overview': [0, 2500, 0],
       'frontview': [0, 0, 3500],
@@ -502,7 +544,7 @@ const speed = 10;
     function addTweetSpawn(tweet, constructor, mass, color) {
       if (!tweet) throw new Error('No tweet!!!!!!@!');
 
-      const {position: p} = tweet,
+      const {position: p, size: s} = tweet,
             {position: tp, velocity: tv} = universe[0];
 
       const x = 20;
@@ -728,7 +770,7 @@ const speed = 10;
                 {mass, position: p, velocity: v, created} = spawn;
 
           const age = currentTick - created;
-          const x = Math.max(1, 250 / Math.min(250, age));
+          const x = Math.max(1, ticksPerStep * 1 / Math.min(ticksPerStep * 1, age));
 
           sub(dd, tp, p);
           add(v, tv, (div(dd, dd, x)));
@@ -1162,62 +1204,36 @@ const speed = 10;
     }
 
 
+    class Clock {
+      constructor(ticksPerStep) {
+        this.ticksPerStep = ticksPerStep;
+        this.startTime = this.currentTime;
+      }
+
+      get currentTime() { return new Date().getTime(); }
+
+      ticksTo(time) {
+        const dt = time - this.startTime;
+        return Math.floor((dt / 1000) * ticksPerStep);
+      }
+    }
 
     const vBoost = 10;
     function start(view) {
       const socket = createSocket(() => noticeEl.classList.add('connected'));
 
-      const eevents = {
-        // external
-        'observer+': addObserver,
-        'observer-': event => {},
-        'tweet': addTweet,
-        'like': addLike,
-        'retweet': addRetweet,
-        'follower-': event => {}, //?
-        'follower': addFollower,
-
-        'follower+': incrementFollowers,
-        'like+': incrementLikes,
-        'retweet+': incrementRetweets,
-
-        // controls
-        'xn': event => emitMass(-vBoost),
-        'xp': event => emitMass(vBoost),
-        'yn': event => emitMass(0, -vBoost),
-        'yp': event => emitMass(0, vBoost),
-        'zn': event => emitMass(0, 0, -vBoost),
-        'zp': event => emitMass(0, 0, vBoost),
-
-        // internal
-        'absorbed': absorbed,
-        'oldTweets': addOldTweets,
-        'poof': poof
-      };
-
-      const uuievents = {
-        'tweet': event => trumpTweetEl.classList.remove('show'),
-        'absorbed': event => absorbedEl.classList.remove('show'),
-        'poof': event => poofEl.classList.remove('show'),
-        'newmass': event => {
-          view.select('#positions').set('width', positions.length);
-          view.select('#colors').set('width', colors.length);
-          view.select('#sizes').set('width', sizes.length);
-        },
-        'log': ([log, ...args]) => console.log('log', ...args)
-      };
-
-      const run = runner(universe);
+      const run = runner(universe, new Clock());
 
       window.requestAnimationFrame(animate);
 
-      function runner(universe, startTime = new Date().getTime(), maxRunTime = 1000 / 10, GUIUpdateRate = 100) {
+      function runner(universe, clock, maxRunTime = 1000 / 10, GUIUpdateRate = 100) {
+        const {startTime} = clock;
+
         let currentTick = 0,
             lastGUIUpdate = 0;
 
-        return (runTime = new Date().getTime()) => {
-          const dt = runTime - startTime,
-                t = Math.floor((dt / 1000) * ticksPerStep);
+        return (runTime = clock.currentTime) => {
+          const t = clock.ticksTo(runTime);
 
           centerOnTrump();
           let currentTime;
@@ -1258,6 +1274,55 @@ const speed = 10;
 
         function emptyFn() {}
       }
+
+
+      // function runner(universe, startTime = new Date().getTime(), maxRunTime = 1000 / 10, GUIUpdateRate = 100) {
+      //   let currentTick = 0,
+      //       lastGUIUpdate = 0;
+
+      //   return (runTime = new Date().getTime()) => {
+      //     const dt = runTime - startTime,
+      //           t = Math.floor((dt / 1000) * ticksPerStep);
+
+      //     centerOnTrump();
+      //     let currentTime;
+      //     while (currentTick < t && ((currentTime = new Date().getTime()) - runTime) < maxRunTime) {
+      //       handleEvents();
+      //       tick();
+      //       currentTick++;
+      //     }
+
+      //     if ((currentTime - lastGUIUpdate) > 100) {
+      //       updateMassesGUI();
+      //       lastGUIUpdate = currentTime;
+      //     }
+
+      //     if (t - currentTick > 10) {
+      //       catchUpQuantityEl.parentElement.style.display = 'block';
+      //       catchUpQuantityEl.innerHTML = currentTick - t;
+      //     }
+      //     else {
+      //       catchUpQuantityEl.parentElement.style.display = 'none';
+      //     }
+      //   };
+
+      //   function handleEvents() {
+      //     for (let i = 0; i < events.length; i++) {
+      //       const event = events[i];
+
+      //       (eevents[event[0]] || defaultHandler(event))(event, view);
+      //     }
+
+      //     events.splice(0);
+      //   }
+
+      //   function defaultHandler(event) {
+      //     console.log(`No eevents ${event[0]}!`)
+      //     return emptyFn;
+      //   }
+
+      //   function emptyFn() {}
+      // }
 
       function animate() {
         run();
