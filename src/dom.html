@@ -37,7 +37,6 @@
 
     //bad name
     function goFullScreen() {
-      console.log('touched');
       if (document.body.requestFullscreen) document.body.requestFullscreen();
       else if (document.body.webkitRequestFullscreen) document.body.webkitRequestFullscreen();
       else if (document.body.mozRequestFullscreen) document.body.mozRequestFullscreen();
@@ -264,6 +263,7 @@
 
     class Mass {
       constructor(mass, color, position = [0, 0, 0], velocity = [0, 0, 0], acceleration = [0, 0, 0], gravity = [0, 0, 0]) {
+        this._sizeContainer = [];
         this.mass = mass;
         this.color = color;
         this.position = position;
@@ -273,12 +273,13 @@
         this.collisions = [];
       }
 
-      set mass(value) { this._mass = value; this._size = 700 * Math.pow(3 / (4 * Math.PI) * Math.sqrt(value), 1); }
+      set mass(value) { this._mass = value; this._sizeContainer[0] = 700 * Math.pow(3 / (4 * Math.PI) * value, 1 / 3); }
       get mass() { return this._mass; }
 
       get name() { return 'Mass'; }
 
-      get size() { return this._size; }
+      get size() { return this._sizeContainer; }
+      get collisionSize() { return this.size; }
       // get size() { return this.mass; }
       // get size() { return 800 * Math.log2(this.mass + 1); }
 
@@ -308,6 +309,7 @@
       }
       get name() { return '<trump>TRUMP</trump>'; }
       get size() { return 0; }
+      get collisionSize() { return super.size; }
     }
 
     class Observer extends Mass {
@@ -854,7 +856,7 @@
           acceleration: a1,
           gravity: g1,
           mass: m1,
-          size: s1,
+          collisionSize: s1,
           collisions
         } = universe[i];
 
@@ -881,7 +883,7 @@
           velocity: v2,
           acceleration: a2,
           mass: m2,
-          size: s2,
+          collisionSize: s2,
           gravity: g2
         } = universe[j];
 
@@ -909,7 +911,7 @@
       function handleCollision(s1, s2, m1, m2, d1, d2, i, j, collisionList, collisions) {
         if (collisions.length === 0) {
         // if (!collisions.futureCollision) {
-          const threshold = (m1 + m2) / 2;
+          const threshold = (s1[0] + s2[0]) / 2;
           if (d1 < threshold || d2 < threshold) { // better ordering of checks?
             if (m1 <= m2) {
               //wtf is this
