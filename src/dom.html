@@ -1230,13 +1230,13 @@
         const {startTime} = clock;
 
         let currentTick = 0,
-            lastGUIUpdate = 0;
+            lastGUIUpdate = 0,
+            currentTime;
 
         return (runTime = clock.currentTime) => {
           const t = clock.ticksTo(runTime);
 
           centerOnTrump();
-          let currentTime;
           while (currentTick < t && ((currentTime = clock.currentTime) - runTime) < maxRunTime) {
             handleEvents();
             tick();
