@@ -362,11 +362,11 @@
       },
       'tweet': {
         p: (tp, tv) => [tp[0], tp[1], tp[2] + 450],
-        v: (tp, tv) => [575, -10, 0]
+        v: (tp, tv) => [525, 0, 0]
       },
       'media': {
         p: (tp, tv) => [tp[0] + 70, tp[1] + 40, tp[2] + 450],
-        v: (tp, tv) => [575, -5, 0]
+        v: (tp, tv) => [525, 0, 0]
       }
     };
 
@@ -895,7 +895,7 @@
       function handleCollision(s1, s2, m1, m2, d1, d2, i, j, collisionList, collisions) {
         if (collisions.length === 0) {
         // if (!collisions.futureCollision) {
-          const threshold = (s1 + s2) / 2;
+          const threshold = (m1 + m2) / 2;
           if (d1 < threshold || d2 < threshold) { // better ordering of checks?
             if (m1 <= m2) {
               //wtf is this
