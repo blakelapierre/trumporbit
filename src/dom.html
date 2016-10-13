@@ -196,7 +196,7 @@
         add(this._targetPosition, p, scale(d, d, 100));
         add(this._targetPosition, this._targetPosition, this.offset);
 
-        add(this.position, this.position, scale(dd, sub(dd, this._targetPosition, this.position), Math.min(this._pi++, speed) / speed));
+        add(this.position, this.position, scale(dd, sub(dd, this.position, this._targetPosition), -Math.min(this._pi++, speed) / speed));
 
         add(this.lookAt, this.lookAt, scale(dd, sub(dd, this.targetLookAt, this.lookAt), Math.min(this._li++, speed) / speed));
 
@@ -669,7 +669,7 @@
 
       mass.mass -= emission;
 
-      const e = addMass(new Emission(emission, COLORS.observer, add([0, 0, 0], mass.position, [-r[1], -r[2], -r[3]]), add([0, 0, 0], mass.velocity, [-r[1], -r[2], -r[3]])));
+      const e = addMass(new Emission(emission, COLORS.observer, add([0, 0, 0], mass.position, scale(dd, [-r[1], -r[2], -r[3]], mass.mass + 1)), add([0, 0, 0], mass.velocity, [-r[1], -r[2], -r[3]])));
 
       emissions.push(e);
 
@@ -955,16 +955,17 @@
           else if (smallerMass instanceof Tweet) {
             tweets.splice(tweets.indexOf(smallerMass), 1);
             delete tweetMap[smallerMass.tweetID];
+
+            if (smallerMass instanceof OldTweets) events.push(['oldTweets']);
           }
           else if (smallerMass instanceof Observer) {
             observers.splice(observers.indexOf(smallerMass), 1);
           }
-          else if (smallerMass instanceof OldTweets) {
-            events.push(['oldTweets']);
-          }
           else if (smallerMass instanceof Emission) {
             emissions.splice(emissions.indexOf(smallerMass), 1);
           }
+
+          incrementStat(typeof smallerMass, 'absorbedBy', typeof greaterMass);
 
           if (smallerMass instanceof Tweet ||
               smallerMass instanceof Media ||
@@ -999,8 +1000,15 @@
     }
 
 
+    const stats = {};
+    function incrementStat(target, relation, object) {
+      stats[target] = stats[target] || {};
+      stats[target][relation] = stats[target][relation] || {};
+      return (stats[target][relation][object] = (stats[target][relation][object] || 0) + 1);
+      // return (stats[target][relation][object] = ((stats[target][relation] = (stats[target] = stats[target] || {})[relation] || {})[object] || 0) + 1);
 
-
+      // stats[target][relation][object] = (stats[target][relation][object] || 0) + 1;
+    }
 
 
 
