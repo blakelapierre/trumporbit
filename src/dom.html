@@ -1237,7 +1237,7 @@
 
           centerOnTrump();
           let currentTime;
-          while (currentTick < t && ((currentTime = new Date().getTime()) - runTime) < maxRunTime) {
+          while (currentTick < t && ((currentTime = clock.currentTime) - runTime) < maxRunTime) {
             handleEvents();
             tick();
             currentTick++;
