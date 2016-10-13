@@ -143,6 +143,7 @@
     const tagEl = document.querySelector('tag'),
           currentLookAtEl = document.querySelector('current-look-at'),
           commandsEl = document.querySelector('commands'),
+          statsEl = document.querySelector('stats'),
           helpEl = document.querySelector('help'),
           helpContentEl = document.querySelector('help-content'),
           previousLookAtEl = document.querySelector('previous-look-at'),
@@ -647,6 +648,7 @@
             tp = universe[camera.lookAtIndex].position,
             d = normalize([0, 0, 0], sub(dd, p, tp));
             // d = [p[0]-tp[0], p[1]-tp[1], p[2]-tp[2]];
+      const emission = mass.mass * 0.05;
 
       // sub(d, p, tp);
             // m = magnitude(d);
@@ -665,11 +667,16 @@
 
       add(v, v, [r[1], r[2], r[3]]);
 
-      const emission = mass.mass * 0.05;
+      const emissionVelocity = [-r[1], -r[2], -r[3]];
+
+      qunit(r, r);
+      // scale(dd, [-r[1], -r[2], -r[3]], (mass.mass + emission + 1) / 2);
+      scale(dd, emissionVelocity, mass.collisionSize[0] / 200); // why does this need ~200 here?
 
       mass.mass -= emission;
 
-      const e = addMass(new Emission(emission, COLORS.observer, add([0, 0, 0], mass.position, scale(dd, [-r[1], -r[2], -r[3]], mass.mass + 1)), add([0, 0, 0], mass.velocity, [-r[1], -r[2], -r[3]])));
+      // const e = addMass(new Emission(emission, COLORS.observer, add([0, 0, 0], mass.position, dd), add([0, 0, 0], mass.velocity, emissionVelocity)));
+      const e = addMass(new Emission(emission, COLORS.observer, add([0, 0, 0], mass.position, dd), [0, 0, 0]));
 
       emissions.push(e);
 
@@ -746,7 +753,8 @@
       updateTweetSpawn();
       positionHalfTick();
       updateGravities();
-      updateVelocities();
+      universe.forEach(updateMassVelocityAndPartialPosition);
+      // updateVelocities();
       resolveCollisions();
 
       function updateEmissions() {
@@ -927,11 +935,9 @@
         }
       }
 
-      function updateVelocities() {
-        universe.forEach(mass => {
-          mass.velocityTick(ticksPerStep);
-          mass.positionHalfTick(ticksPerStep);
-        });
+      function updateMassVelocityAndPartialPosition(mass) {
+        mass.velocityTick(ticksPerStep);
+        mass.positionHalfTick(ticksPerStep);
       }
 
       function resolveCollisions() {
@@ -965,7 +971,7 @@
             emissions.splice(emissions.indexOf(smallerMass), 1);
           }
 
-          incrementStat(typeof smallerMass, 'absorbedBy', typeof greaterMass);
+          incrementStat(smallerMass.constructor.name, 'absorbedBy', greaterMass.constructor.name);
 
           if (smallerMass instanceof Tweet ||
               smallerMass instanceof Media ||
@@ -1054,10 +1060,32 @@
       else {
         currentLookAtEl.classList.add('is-trump');
       }
+
+      guiUpdates.forEach(update => update());
+    }
+
+    statsEl.addEventListener('click', toggleStats);
+
+    const guiUpdates = [];
+
+    function toggleStats() {
+      if (statsEl.classList.contains('show')) {
+        statsEl.classList.remove('show');
+        statsEl.innerHTML = 'S';
+        guiUpdates.splice(0); // !
+      }
+      else {
+        statsEl.classList.add('show');
+        guiUpdates.push(() => statsEl.innerHTML = getStats());
+      }
+
+      function getStats() {
+        return JSON.stringify(stats, undefined, 2);
+        // return stats.map(target => target.map(relation => relation.map(object => )))
+      }
     }
 
     tagEl.addEventListener('click', () => commandsEl.classList.toggle('show'));
-
     helpEl.addEventListener('click', () => helpContentEl.classList.toggle('show'));
 
     previousLookAtEl.addEventListener('click', event => {
@@ -1672,6 +1700,7 @@
     <commands></commands>
 
     <tag><trump>TRUMP</trump>orbit <brand>alpha preview</brand> <version>uncommitted</version></tag>
+    <stats>S</stats>
     <help>?</help>
     <help-content>
      O 'overview
