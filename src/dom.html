@@ -136,7 +136,7 @@
           nextLookAtEl = document.querySelector('next-look-at');
 
 
-    const speed = 10;
+    const speed = 60;
     class Camera {
       constructor() {
         this._targetPosition = [0, 0, 0];
@@ -361,11 +361,11 @@
         v: (tp, tv) => [315, 0, -315]
       },
       'tweet': {
-        p: (tp, tv) => [tp[0], tp[1], tp[2] + 250],
+        p: (tp, tv) => [tp[0], tp[1], tp[2] + 450],
         v: (tp, tv) => [575, -10, 0]
       },
       'media': {
-        p: (tp, tv) => [tp[0] + 50, tp[1] + 40, tp[2] + 250],
+        p: (tp, tv) => [tp[0] + 70, tp[1] + 40, tp[2] + 450],
         v: (tp, tv) => [575, -5, 0]
       }
     };
@@ -922,11 +922,12 @@
         for (let i = collisionList.length - 1; i >= 0; i--) {
           const [smallerMass, greaterMass] = collisionList[i];
 
+          greaterMass.mass += smallerMass.mass;
+
           const ratio = smallerMass.mass / greaterMass.mass; // 0?
 
-          div(greaterMass.velocity, add(greaterMass.velocity, greaterMass.velocity, scale(dd, smallerMass.velocity, ratio)), 2);
+          div(greaterMass.velocity, add(greaterMass.velocity, scale(greaterMass.velocity, greaterMass.velocity, greaterMass.mass), scale(dd, smallerMass.velocity, smallerMass.mass)), greaterMass.mass + smallerMass.mass);
 
-          greaterMass.mass += smallerMass.mass;
         }
 
         for (let i = collisionList.length - 1; i >= 0; i--) {
