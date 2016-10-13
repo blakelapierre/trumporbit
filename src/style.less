@@ -587,6 +587,27 @@ hud {
     }
   }
 
+  overview {
+    position: fixed;
+
+    right: 0;
+    bottom: 0;
+
+    padding: 1vw;
+
+    cursor: pointer;
+
+    font-size: 2em;
+
+    animation: glow 20s 30s ease-in-out infinite;
+    transition: right, bottom, color 0.5s ease-in-out;
+
+    &.show {
+      color: rgba(255, 255, 255, 1);
+      animation: none;
+    }
+  }
+
   stats {
     position: fixed;
 

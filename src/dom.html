@@ -143,6 +143,7 @@
     const tagEl = document.querySelector('tag'),
           currentLookAtEl = document.querySelector('current-look-at'),
           commandsEl = document.querySelector('commands'),
+          overviewEl = document.querySelector('overview'),
           statsEl = document.querySelector('stats'),
           helpEl = document.querySelector('help'),
           helpContentEl = document.querySelector('help-content'),
@@ -260,6 +261,8 @@
         if (this._targetOffset[0] !== x || this._targetOffset[1] !== y || this._targetOffset[2] !== z) this._oi = 0;
         set(this._targetOffset, x, y, z);
       }
+
+      get targetOffset() { return this._targetOffset; }
     }
 
     class Mass {
@@ -1065,6 +1068,7 @@
     }
 
     statsEl.addEventListener('click', toggleStats);
+    overviewEl.addEventListener('click', toggleOverview);
 
     const guiUpdates = [];
 
@@ -1077,6 +1081,10 @@
       else {
         statsEl.classList.add('show');
         guiUpdates.push(() => statsEl.innerHTML = getStats());
+
+        camera.lookAtIndex = 0;
+        // camera.positionIndex = 0;
+        camera.targetOffset =  views.overview;
       }
 
       function getStats() {
@@ -1085,8 +1093,31 @@
       }
     }
 
+    const last = [];
+    function toggleOverview() {
+      if (overviewEl.classList.contains('show')) {
+        overviewEl.classList.remove('show');
+
+        const [lookAtIndex, positionIndex, targetOffset] = last.pop();
+
+        camera.lookAtIndex = lookAtIndex;
+        camera.positionIndex = positionIndex;
+        copy(camera.targetOffset, targetOffset);
+      }
+      else {
+        overviewEl.classList.add('show');
+
+        last.push([camera.lookAtIndex, camera.positionIndex, copy([0, 0, 0], camera.targetOffset)]);
+
+        camera.lookAtIndex = 0;
+        camera.positionIndex = 0;
+        camera.targetOffset = views.overview;
+      }
+    }
+
     tagEl.addEventListener('click', () => commandsEl.classList.toggle('show'));
     helpEl.addEventListener('click', () => helpContentEl.classList.toggle('show'));
+
 
     previousLookAtEl.addEventListener('click', event => {
       event.stopPropagation();
@@ -1700,6 +1731,7 @@
     <commands></commands>
 
     <tag><trump>TRUMP</trump>orbit <brand>alpha preview</brand> <version>uncommitted</version></tag>
+    <overview>O</overview>
     <stats>S</stats>
     <help>?</help>
     <help-content>
