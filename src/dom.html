@@ -399,6 +399,7 @@
     };
 
     const uuievents = {
+      'connected': () => noticeEl.classList.add('connected'),
       'tweet': event => trumpTweetEl.classList.remove('show'),
       'absorbed': event => absorbedEl.classList.remove('show'),
       'poof': event => poofEl.classList.remove('show'),
@@ -438,6 +439,8 @@
           MAX_OBSERVERS = 51,
           MAX_TWEET_SPAWN_AGE = 60 * 5,
           MAX_EMISSION_AGE = 60 * 5;
+
+    const vBoost = 10;
 
     const [
       positions,
@@ -1218,9 +1221,8 @@
       }
     }
 
-    const vBoost = 10;
     function start(view) {
-      const socket = createSocket(() => noticeEl.classList.add('connected'));
+      const socket = createSocket(() => uievents.push(['connected']));
 
       const run = runner(universe, new Clock());
 
@@ -1248,7 +1250,7 @@
             lastGUIUpdate = currentTime;
           }
 
-          if (t - currentTick > 10) {
+          if (t - currentTick > 0) {
             catchUpQuantityEl.parentElement.style.display = 'block';
             catchUpQuantityEl.innerHTML = currentTick - t;
           }
