@@ -218,7 +218,7 @@ hud {
       right: 0;
       bottom: 0;
 
-      margin: 0 auto;
+      margin: 0.5vw;
 
       font-size: 7em;
       font-weight: lighter;
@@ -227,7 +227,8 @@ hud {
 
       display: flex;
 
-      justify-content: center;
+      justify-content: stretch;
+      align-items:
 
       cursor: pointer;
 
@@ -261,31 +262,31 @@ hud {
       }
 
       others {
-        min-width: 30vw;
-
-        flex: 0 1 auto;
+        flex: 1 1 auto;
 
         display: flex;
         flex-direction: column;
 
-        justify-content: center;
+        justify-content: space-between;
 
         up, down {
-          flex: 0 1 auto;
+          flex: 1 1 auto;
 
           display: flex;
           justify-content: space-around;
+          align-items: flex-start;
         }
 
-        up {
-          justify-content: center;
+        down {
+          align-items: flex-end;
         }
 
         x {
-          flex: 0 1 auto;
+          flex: 1 1 auto;
 
           display: flex;
           justify-content: space-between;
+          align-items: center;
         }
       }
 
@@ -316,7 +317,7 @@ hud {
     display: inline-block;
 
     bottom: 0;
-    right: 0;
+    left: 0;
 
     margin: 1vw;
   }
@@ -327,11 +328,13 @@ hud {
     top: 0;
     width: 100%;
 
-    font-size: 2vw;
+    font-size: 1vw;
+    line-height: 1vw;
 
     text-align: center;
 
     color: #ddd;
+    background-color: rgba(255, 0, 0, 0.1);
 
     text-shadow: 0px 0px 1em #000;
   }
@@ -503,10 +506,9 @@ hud {
   current-mass {
     position: fixed;
 
-    bottom: 0;
+    top: 1vw;
     left: 0;
-
-    margin: 1vw;
+    right: 0;
 
     white-space: normal;
 
@@ -540,9 +542,21 @@ hud {
 
       align-items: center;
 
-      table {
-        color: inherit;
+      data {
+        display: flex;
+
+        justify-content: center;
+
+        table {
+          width: 50%;
+          padding: 1em;
+
+          flex: 0 1 auto;
+
+          color: inherit;
+        }
       }
+
 
       mass-name {
         font-size: 1.2em;

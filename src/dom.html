@@ -584,6 +584,8 @@
 
       const spawn = new constructor(mass, color, position,
                                   [tv[0] + d[0]/x, tv[1] + d[1]/x, tv[2] + d[2]/x]);
+      tweet.mass += spawn.mass;
+
       addMass(spawn);
       tweetSpawn.push(spawn);
       pendingTweetSpawn--;
@@ -1075,13 +1077,14 @@
     function toggleStats() {
       if (statsEl.classList.contains('show')) {
         statsEl.classList.remove('show');
-        statsEl.innerHTML = 'S';
+        statsEl.innerHTML = 'Stats';
         guiUpdates.splice(0); // !
       }
       else {
         statsEl.classList.add('show');
         guiUpdates.push(() => statsEl.innerHTML = getStats());
 
+        enterState('start');
         camera.lookAtIndex = 0;
         // camera.positionIndex = 0;
         camera.targetOffset =  views.overview;
@@ -1098,6 +1101,8 @@
       if (overviewEl.classList.contains('show')) {
         overviewEl.classList.remove('show');
 
+        overviewEl.innerHTML = 'Overview';
+
         const [lookAtIndex, positionIndex, targetOffset] = last.pop();
 
         camera.lookAtIndex = lookAtIndex;
@@ -1107,8 +1112,11 @@
       else {
         overviewEl.classList.add('show');
 
+        overviewEl.innerHTML = 'Orbit';
+
         last.push([camera.lookAtIndex, camera.positionIndex, copy([0, 0, 0], camera.targetOffset)]);
 
+        enterState('start');
         camera.lookAtIndex = 0;
         camera.positionIndex = 0;
         camera.targetOffset = views.overview;
@@ -1693,13 +1701,19 @@
       <current-mass>
         <display>
           <mass-name></mass-name>
-          <table>
-            <tbody>
-              <tr><td>Mass:</td><td><mass-quantity></mass-quantity></td></tr>
-              <tr><td>Distance to <trump>TRUMP</trump>:</td><td><distance-quantity></distance-quantity></td></tr>
-              <tr><td>Absolute (!) velocity:</td><td><mass-velocity-quantity></mass-velocity-quantity></td></tr>
-            </tbody>
-          </table>
+          <data>
+            <table>
+              <tbody>
+                <tr><td>Mass:</td><td><mass-quantity></mass-quantity></td></tr>
+                <tr><td>Distance to <trump>TRUMP</trump>:</td><td><distance-quantity></distance-quantity></td></tr>
+              </tbody>
+            </table>
+            <table>
+              <tbody>
+                <tr><td>Absolute (!) velocity:</td><td><mass-velocity-quantity></mass-velocity-quantity></td></tr>
+              </tbody>
+            </table>
+          </data>
         </display>
       </current-mass>
 
@@ -1731,8 +1745,8 @@
     <commands></commands>
 
     <tag><trump>TRUMP</trump>orbit <brand>alpha preview</brand> <version>uncommitted</version></tag>
-    <overview>O</overview>
-    <stats>S</stats>
+    <overview>Overview</overview>
+    <stats>Stats</stats>
     <help>?</help>
     <help-content>
      O 'overview
