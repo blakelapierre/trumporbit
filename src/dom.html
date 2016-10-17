@@ -67,6 +67,8 @@
         camera.targetOffset = [0, 0, 0];
         camera.targetFov = 100;
 
+        // universe[camera.positionIndex].color[3] = 0.25;
+
         controls = attachVelocityControls();
       }
       else if (state === 'looking') {
@@ -89,8 +91,18 @@
       return ['xn', 'xp', 'yn', 'yp', 'zn', 'zp'].map(n => {
         const el = document.querySelector(n);
 
-        el.onclick = event => {
-          events.push([n]);
+        // el.onclick = event => {
+        //   events.push([n]);
+        //   event.stopPropagation();
+        // };
+
+        el.onmousedown = event => {
+          events.push([`+${n}`]);
+          event.stopPropagation();
+        };
+
+        el.onmouseup = event => {
+          events.push([`-${n}`]);
           event.stopPropagation();
         };
 
@@ -133,10 +145,13 @@
           massVelocityQuantityEl = document.querySelector('mass-velocity-quantity'),
           distanceQuantityEl = document.querySelector('distance-quantity'),
           catchUpQuantityEl = document.querySelector('catch-up-quantity'),
+          soulsQuantityEl = document.querySelector('souls-quantity'),
           trumpTweetEl = document.querySelector('trump-tweet'),
           absorbedEl = document.querySelector('absorbed'),
           absorbedNameEl = document.querySelector('absorbed-name'),
           absorbedByNameEl = document.querySelector('absorbed-by-name'),
+          absorbedByEl = document.querySelector('absorbed-by'),
+          absorbedByByNameEl = document.querySelector('absorbed-by-by-name'),
           poofEl = document.querySelector('poof'),
           noticeEl = document.querySelector('notice');
 
@@ -150,13 +165,20 @@
           previousLookAtEl = document.querySelector('previous-look-at'),
           nextLookAtEl = document.querySelector('next-look-at');
 
+    function vnew(v) {
+      return copy([0, 0, 0], v);
+    }
 
     const speed = 60;
     class Camera {
-      constructor() {
+      constructor({follow, lookAt}) {
+        this.follow = follow;
+        this.lookAt = lookAt;
+
         this._targetPosition = [0, 0, 0];
         this._targetLookAt = [0, 0, 0];
         this._targetOffset = [0, 70, 0];
+        this._targetUp = [0, 0, 0];
         this._targetFov = 90;
 
         this._li = 0;
@@ -164,19 +186,27 @@
         this._oi = 0;
         this._fi = 0;
 
-        this.position = copy([0, 0, 0], this._targetPosition);
-        this.lookAt = copy([0, 0, 0], this._targetLookAt);
-        this.offset = copy([0, 0, 0], this._targetOffset);
-        this.up = [0, 0, 0];
-        this.fov = 90;
+        this.observed = {
+          position: vnew(this._targetPosition),
+          lookAt: vnew(this._targetLookAt),
+          up: vnew(this._targetUp),
+          fov: this._targetFov
+        }
+
+        this.offset = vnew(this._targetOffset);
+        // this.position = copy([0, 0, 0], this._targetPosition);
+        // this.lookAt = copy([0, 0, 0], this._targetLookAt);
+        // this.up = [0, 0, 0];
+        // this.fov = 90;
       }
 
       get iOffset() { return add(dd, this.offset, scale(dd, sub(dd, this._targetOffset, this.offset), Math.min(this._oi, speed) / speed)); }
       get iPosition() { return ;}
 
       update() {
-        const p = this.targetPosition,
-              tp = universe[this.lookAtIndex].position,
+        const p = this.follow.position,
+              // tp = universe[this.lookAtIndex].position,
+              tp = this.lookAt.position,
               d = sub([0, 0, 0], p, tp),
               // d = [p[0]-tp[0], p[1]-tp[1], p[2]-tp[2]],
               m = magnitude(d);
@@ -198,17 +228,17 @@
         add(this._targetPosition, p, scale(d, d, 100));
         add(this._targetPosition, this._targetPosition, this.offset);
 
-        add(this.position, this.position, scale(dd, sub(dd, this.position, this._targetPosition), -Math.min(this._pi++, speed) / speed));
+        add(this.observed.position, this.observed.position, scale(dd, sub(dd, this.observed.position, this._targetPosition), -Math.min(this._pi++, speed) / speed));
 
-        add(this.lookAt, this.lookAt, scale(dd, sub(dd, this.targetLookAt, this.lookAt), Math.min(this._li++, speed) / speed));
+        add(this.observed.lookAt, this.observed.lookAt, scale(dd, sub(dd, this.lookAt.position, this.observed.lookAt), Math.min(this._li++, speed) / speed));
 
-        this.fov = this.fov + (this._targetFov - this.fov) * Math.min(this._fi++, speed) / speed;
+        this.observed.fov = this.observed.fov + (this._targetFov - this.observed.fov) * Math.min(this._fi++, speed) / speed;
 
 
-        // const q = qFromVectors(sub(dd, this.position, this.lookAt), this.lookAt);
-        // const q = qFromVectors([0, 1, 0], sub(dd, this.position, this.lookAt));
-        // const q = qFromVectors([0, 0, 1], sub(dd, this.lookAt, this.position));
-        const q = qFromUnitVectors([0, 0, 1], normalize(dd, sub(dd, this.position, this.lookAt)));
+        // const q = qFromVectors(sub(dd, this.observed.position, this.observed.lookAt), this.observed.lookAt);
+        // const q = qFromVectors([0, 1, 0], sub(dd, this.observed.position, this.observed.lookAt));
+        // const q = qFromVectors([0, 0, 1], sub(dd, this.observed.lookAt, this.observed.position));
+        const q = qFromUnitVectors([0, 0, 1], normalize(dd, sub(dd, this.observed.position, this.observed.lookAt)));
         // qunit(q, q);
 // set(this.up, q[1], q[2], q[3]);
         const r = [0, 0, 0, 0],
@@ -219,17 +249,25 @@
         // qmult(r, qmult(r, q, [0, 0, 0, -1]), i);
         qmult(r, qmult(r, q, [0, this.offset[0], this.offset[1], this.offset[2]]), qconj(i, q));
 
-        // add(this.position, this.position, [r[1], r[2], r[3]]);
+        // add(this.observed.position, this.observed.position, [r[1], r[2], r[3]]);
 
         qmult(r, qmult(r, q, [0, 0, 1, 0]), i);
 
         // qunit(r, r);
-        set(this.up, 0, 1, 0);
+        // set(this.up, 0, 1, 0);
+        set(this.observed.up, 0, 1, 0);
         // set(this.up, r[1], r[2], r[3]);
         // cross(this.up, [0, 1, 0], [-r[1], -r[2], -r[3]]);
+        // cross(this.up, tp, this.target.velocity]);
         // set(this.up, -r[1], -r[2], -r[3]);
         // console.log(this.up, this.offset);
       }
+
+      set lookAt (mass) { console.log('now looking at', mass); if (!mass) throw new Error('looking at nothing!'); this._lookAtMass = mass; this._li = 0; }
+      set follow (mass) { console.log('now following', mass); this._followMass = mass; this._pi = 0; }
+
+      get lookAt () { return this._lookAtMass; }
+      get follow () { return this._followMass; }
 
       set lookAtIndex (index) {
         if (index !== this._lookAtIndex) this._li = 0;
@@ -317,7 +355,8 @@
     }
 
     class Observer extends Mass {
-      get name() { return 'Observer'; }
+      get name() { return this._name || 'Observer'; }
+      set name(value) { this._name = value; }
     }
 
     class Tweet extends Mass {
@@ -405,12 +444,18 @@
       'retweet+': incrementRetweets,
 
       // controls
-      'xn': event => emitMass(-vBoost),
-      'xp': event => emitMass(vBoost),
-      'yn': event => emitMass(0, -vBoost),
-      'yp': event => emitMass(0, vBoost),
-      'zn': event => emitMass(0, 0, -vBoost),
-      'zp': event => emitMass(0, 0, vBoost),
+      '+xn': event => setBoost(-vBoost),
+      '-xn': event => unsetBoost(-vBoost),
+      '+xp': event => setBoost(vBoost),
+      '-xp': event => unsetBoost(vBoost),
+      '+yn': event => setBoost(0, -vBoost),
+      '-yn': event => unsetBoost(0, -vBoost),
+      '+yp': event => setBoost(0, vBoost),
+      '-yp': event => unsetBoost(0, vBoost),
+      '+zn': event => setBoost(0, 0, -vBoost),
+      '-zn': event => unsetBoost(0, 0, -vBoost),
+      '+zp': event => setBoost(0, 0, vBoost),
+      '-zp': event => unsetBoost(0, 0, vBoost),
 
       // internal
       'absorbed': absorbed,
@@ -422,6 +467,7 @@
       'connected': () => noticeEl.classList.add('connected'),
       'tweet': event => trumpTweetEl.classList.remove('show'),
       'absorbed': event => absorbedEl.classList.remove('show'),
+      'absorbedBy': event => absorbedByEl.classList.remove('show'),
       'poof': event => poofEl.classList.remove('show'),
       'newmass': (event, view) => {
         view.select('#positions').set('width', positions.length);
@@ -437,7 +483,6 @@
       'sideview': [-3500, 0, 0]
     };
 
-    const camera = new Camera();
 
     const trump = new Trump(100000, [ 255,   255,    0, 0]),
           universe = [trump],
@@ -450,6 +495,8 @@
           emissions = [],
           events = [['oldTweets']],
           uievents = [];
+
+    const camera = new Camera({follow: trump, lookAt: trump});
 
     let oldTweets;
 
@@ -500,33 +547,40 @@
 
 
 
-
-    function addObserver(event) {
-      if (observers.length === 0) camera.positionIndex = universe.length;
+    let totalObserverCount = 0;
+    function addObserver([_, totalConnected]) {
+      // if (observers.length === 0) camera.positionIndex = universe.length;
 
       if (observers.length < MAX_OBSERVERS) {
         const {position: tp, velocity: tv} = trump;
         const observer = addMass(new Observer(1, COLORS.observer, ORBIT_PARAMETERS.observer.p(tp, tv), ORBIT_PARAMETERS.observer.v(tp, tv)));
 
+        observer.name = `Observer ${totalObserverCount++}`;
+
         observers.push(observer);
+
+        if (observers.length === 1) camera.follow = observer;
       }
       else {
         const observer = observers[Math.round(Math.random() * (observers.length - 1))];
+        observer.name = `Observer ${totalObserverCount++}`;
         observer.mass++;
       }
+
+      setStat('totalSouls', totalConnected);
     }
 
     function addOldTweets(event) {
       console.log('adding old tweets', event);
       const {position: tp, velocity: tv} = trump;
-      oldTweets = new OldTweets(1000, [0, 1, 1.2, 1], ORBIT_PARAMETERS.oldTweets.p(tp, tv), ORBIT_PARAMETERS.oldTweets.v(tp, tv));
+      oldTweets = new OldTweets((oldTweets || {mass: 1000}).mass, [0, 1, 1.2, 1], ORBIT_PARAMETERS.oldTweets.p(tp, tv), ORBIT_PARAMETERS.oldTweets.v(tp, tv));
 
       addMass(oldTweets);
       tweets.push(oldTweets);
     }
 
     function addTweet(event) {
-      camera.lookAtIndex = universe.length;
+      // camera.lookAtIndex = universe.length;
       // this should be calculated based on current trump mass (and, maybe, positions/velocities of orbiting masses?)
       const {position: tp, velocity: tv} = trump;
 
@@ -548,6 +602,7 @@
       tweetMap[tweet.tweetID] = tweet;
 
       uievents.push(['tweet']);
+      camera.lookAt = tweet; // get camera out of here (event?)
     }
 
     function addRetweet(event) {
@@ -633,17 +688,31 @@
       sizes.splice(index, 1);
       colors.splice(index, 1);
 
-      if (camera.positionIndex >= index && camera.positionIndex > 0) {
-        if (camera.positionIndex === index) {
-          camera.positionIndex = positions.length - 1;
-          uievents.push(['poof', mass])
-          enterState('looking'); // what?!
-        }
-        else camera.positionIndex--;
+      if (camera.follow === mass) {
+        camera.follow = observers[0] || trump;
+        uievents.push(['poof', mass]);
+        enterState('looking') // get camera out of here!
       }
-      if (camera.lookAtIndex >= index) {
-        previousLookAt();
-      }
+
+      // if (camera.positionIndex >= index && camera.positionIndex > 0) {
+      //   if (camera.positionIndex === index) {
+      //     camera.positionIndex = positions.length - 1;
+      //     uievents.push(['poof', mass])
+      //     enterState('looking'); // what?!
+      //   }
+      //   else camera.positionIndex--;
+      // }
+      // if (camera.lookAtIndex >= index) {
+      //   previousLookAt();
+      // }
+    }
+
+    function setBoost(mass, x, y, z) {
+
+    }
+
+    function unsetBoost(mass, x, y, z) {
+      // sub(mass.boost,
     }
 
     // x,y,z from camera/observer pov
@@ -699,10 +768,10 @@
     let trumpScaleFactor = 5;
     <root>
       <camera proxy={false}
-              position={t => camera.position}
-              lookAt={t => camera.lookAt}
-              fov={t => camera.fov}
-              up={t => camera.up} />
+              position={t => camera.observed.position}
+              lookAt={t => camera.observed.lookAt}
+              fov={t => camera.observed.fov}
+              up={t => camera.observed.up} />
       <cartesian range={[[-1, 1], [-1, 1], [-1, 1]]}
                  scale={[1, 1, 1]}>
         <cartesian range={[[-1, 1], [-1, 1], [-1, 1]]}
@@ -779,17 +848,22 @@
             sizes.splice(index, 1);
             colors.splice(index, 1);
 
-            if (camera.positionIndex >= index && camera.positionIndex > 0) {
-              if (camera.positionIndex === index) {
-                camera.positionIndex = positions.length - 1;
+            if (camera.follow === emission) {
                 uievents.push(['poof', emission]);
                 enterState('looking'); // what?!
-              }
-              else camera.positionIndex--;
             }
-            if (camera.lookAtIndex >= index) {
-              previousLookAt();
-            }
+
+            // if (camera.positionIndex >= index && camera.positionIndex > 0) {
+            //   if (camera.positionIndex === index) {
+            //     camera.positionIndex = positions.length - 1;
+            //     uievents.push(['poof', emission]);
+            //     enterState('looking'); // what?!
+            //   }
+            //   else camera.positionIndex--;
+            // }
+            // if (camera.lookAtIndex >= index) {
+            //   previousLookAt();
+            // }
           }
         }
       }
@@ -924,16 +998,16 @@
       function handleCollision(s1, s2, m1, m2, d1, d2, i, j, collisionList, collisions) {
         if (collisions.length === 0) {
         // if (!collisions.futureCollision) {
-          const threshold = (s1[0] + s2[0]) / 2;
+          const threshold = (s1[0] + s2[0]) / 4;
           if (d1 < threshold || d2 < threshold) { // better ordering of checks?
             if (m1 <= m2) {
               //wtf is this
               //the same universe[i] could be pushed multiple times!!!!!!!
               // collisionList.push([universe[i], universe[j], i]);
-              collisions.push([universe[i], universe[j], i]);
+              collisions.push([universe[i], universe[j], i, j]);
             }
             else {
-              universe[j].collisions.push([universe[j], universe[i], j]);
+              universe[j].collisions.push([universe[j], universe[i], j, i]);
               // universe[j].futureCollision = [universe[j], universe[i], j];
             }
           }
@@ -958,7 +1032,7 @@
         }
 
         for (let i = collisionList.length - 1; i >= 0; i--) {
-          const [smallerMass, greaterMass, smallerIndex] = collisionList[i];
+          const [smallerMass, greaterMass, smallerIndex, greaterIndex] = collisionList[i];
 
           if (smallerMass instanceof TweetSpawn) {
             tweetSpawn.splice(tweetSpawn.indexOf(smallerMass), 1);
@@ -996,13 +1070,23 @@
           sizes.splice(smallerIndex, 1);
           colors.splice(smallerIndex, 1);
 
-          if (camera.positionIndex >= smallerIndex && camera.positionIndex > 0) {
-            if (camera.positionIndex === smallerIndex) camera.positionIndex = positions.length - 1;
-            else camera.positionIndex--;
+          if (camera.follow === smallerMass) {
+            uievents.push(['absorbedBy', greaterMass.name]);
+            camera.follow = greaterMass;
           }
-          if (camera.lookAtIndex >= smallerIndex) {
-            previousLookAt();
-          }
+
+          // if (camera.positionIndex >= smallerIndex && camera.positionIndex > 0) {
+          //   if (camera.positionIndex === smallerIndex) {
+          //     //should do this some other way?
+          //     uievents.push(['absorbedBy', greaterMass.name]);
+          //     camera.positionIndex = greaterIndex >= smallerIndex ? greaterIndex - 1 : greaterIndex;
+          //   }
+          //   // if (camera.positionIndex === smallerIndex) camera.positionIndex = positions.length - 1;
+          //   else camera.positionIndex--;
+          // }
+          // if (camera.lookAtIndex >= smallerIndex) {
+          //   previousLookAt();
+          // }
         }
 
         collisionList.splice(0);
@@ -1011,7 +1095,7 @@
     }
 
 
-    const stats = {};
+    const stats = {totalSouls: 0};
     function incrementStat(target, relation, object) {
       stats[target] = stats[target] || {};
       stats[target][relation] = stats[target][relation] || {};
@@ -1019,6 +1103,10 @@
       // return (stats[target][relation][object] = ((stats[target][relation] = (stats[target] = stats[target] || {})[relation] || {})[object] || 0) + 1);
 
       // stats[target][relation][object] = (stats[target][relation][object] || 0) + 1;
+    }
+
+    function setStat(target, value) {
+      stats[target] = value;
     }
 
 
@@ -1035,7 +1123,8 @@
       const masses = Math.max(0, universe.length - 1);
       orbitStatisticsQuantityEl.innerHTML = masses + ' mass' + (masses > 1 ? 'es' : '');
 
-      const currentMass = universe[camera.positionIndex],
+      // const currentMass = universe[camera.positionIndex],
+      const currentMass = camera.follow,
             {mass, name, position, velocity} = currentMass;
 
       const distance = magnitude(sub(dd, currentMass.position, trump.position));
@@ -1047,8 +1136,11 @@
       distanceQuantityEl.innerHTML = distance.toFixed(1);
       massVelocityQuantityEl.innerHTML = `[${velocity[0].toFixed(1)}, ${velocity[1].toFixed(1)}, ${velocity[2].toFixed(1)}] ${magnitude(velocity).toFixed(1)}`;
 
+      const {totalSouls} = stats;
+      soulsQuantityEl.innerHTML = `${totalSouls} soul${totalSouls === 1 ? '' : 's'}`;
 
-      const lookAtMass = universe[camera.lookAtIndex];
+      // const lookAtMass = universe[camera.lookAtIndex];
+      const lookAtMass = camera.lookAt;
       lookAtMassNameEl.innerHTML = lookAtMass.name;
 
       lookAtMassQuantityEl.innerHTML = lookAtMass.mass.toFixed(1);
@@ -1085,7 +1177,8 @@
         guiUpdates.push(() => statsEl.innerHTML = getStats());
 
         enterState('start');
-        camera.lookAtIndex = 0;
+        // camera.lookAtIndex = 0;
+        camera.lookAt = trump;
         // camera.positionIndex = 0;
         camera.targetOffset =  views.overview;
       }
@@ -1103,10 +1196,14 @@
 
         overviewEl.innerHTML = 'Overview';
 
-        const [lookAtIndex, positionIndex, targetOffset] = last.pop();
+        const [lookAt, follow, targetOffset] = last.pop();
+        // const [lookAtIndex, positionIndex, targetOffset] = last.pop();
 
-        camera.lookAtIndex = lookAtIndex;
-        camera.positionIndex = positionIndex;
+        camera.follow = follow;
+        camera.lookAt = lookAt;
+
+        // camera.lookAtIndex = lookAtIndex;
+        // camera.positionIndex = positionIndex;
         copy(camera.targetOffset, targetOffset);
       }
       else {
@@ -1114,11 +1211,15 @@
 
         overviewEl.innerHTML = 'Orbit';
 
-        last.push([camera.lookAtIndex, camera.positionIndex, copy([0, 0, 0], camera.targetOffset)]);
+        last.push([camera.lookAt, camera.follow, vnew(camera.targetOffset)]);
 
         enterState('start');
-        camera.lookAtIndex = 0;
-        camera.positionIndex = 0;
+
+        camera.follow = trump;
+        camera.lookAt = trump;
+
+        // camera.lookAtIndex = 0;
+        // camera.positionIndex = 0;
         camera.targetOffset = views.overview;
       }
     }
@@ -1139,16 +1240,43 @@
       return nextLookAt();
     });
 
-    function nextLookAt() {
-      camera.lookAtIndex = (camera.lookAtIndex + 1) % universe.length;
-      return camera.lookAtIndex === camera.positionIndex ? nextLookAt() : camera.lookAtIndex;
+    function nextLookAt(allowSelf) {
+      const index = (universe.indexOf(camera.lookAt) + 1) % universe.length,
+            mass = universe[index];
+
+      x(allowSelf, mass, nextLookAt);
     }
 
-    function previousLookAt() {
-      camera.lookAtIndex === 0 ? camera.lookAtIndex = universe.length - 1 : camera.lookAtIndex--;
-      return camera.lookAtIndex === camera.positionIndex ? previousLookAt() : camera.lookAtIndex;
+    function previousLookAt(allowSelf) {
+      const index = ((universe.indexOf(camera.lookAt) - 1) + universe.length) % universe.length,
+            mass = universe[index];
+
+      x(allowSelf, mass, previousLookAt);
     }
 
+    function x(allowSelf, mass, fn) {
+      if(!allowSelf && camera.follow === mass) fn(true);
+      else camera.lookAt = mass;
+    }
+
+    function nextFollow(allowSelf) {
+      const index = (universe.indexOf(camera.follow) + 1) % universe.length,
+            mass = universe[index];
+
+      y(allowSelf, mass, nextFollow);
+    }
+
+    function previousFollow(allowSelf) {
+      const index = ((universe.indexOf(camera.follow) - 1) + universe.length) % universe.length,
+            mass = universe[index];
+
+      y(allowSelf, mass, previousFollow);
+    }
+
+    function y(allowSelf, mass, fn) {
+      if(!allowSelf && camera.follow === mass) fn(true);
+      else camera.follow = mass;
+    }
 
 
     module.exports = {
@@ -1187,10 +1315,14 @@
         'backward': () => velocities[selectedMassIndex][2]++,
         'up': () => velocities[selectedMassIndex][1]++,
         'down': () => velocities[selectedMassIndex][1]--,
-        'lookAtTrump': () => camera.lookAtIndex = 0,
-        'overview': () => {camera.lookAtIndex = 0; camera.positionIndex = 0; camera.targetOffset =  views.overview;},
-        'frontview': () => {camera.lookAtIndex = 0; camera.positionIndex = 0; camera.targetOffset =  views.frontview;},
-        'sideview': () => {camera.lookAtIndex = 0; camera.positionIndex = 0; camera.targetOffset =  views.sideview;},
+        // 'lookAtTrump': () => camera.lookAtIndex = 0,
+        // 'overview': () => {camera.lookAtIndex = 0; camera.positionIndex = 0; camera.targetOffset =  views.overview;},
+        // 'frontview': () => {camera.lookAtIndex = 0; camera.positionIndex = 0; camera.targetOffset =  views.frontview;},
+        // 'sideview': () => {camera.lookAtIndex = 0; camera.positionIndex = 0; camera.targetOffset =  views.sideview;},
+        'lookAtTrump': () => camera.lookAt = trump,
+        'overview': () => {camera.lookAt = trump; camera.follow = trump; camera.targetOffset =  views.overview;},
+        'frontview': () => {camera.lookAt = trump; camera.follow = trump; camera.targetOffset =  views.frontview;},
+        'sideview': () => {camera.lookAt = trump; camera.follow = trump; camera.targetOffset =  views.sideview;},
         'speed+': () => ++stepsPerSecond,
         'speed-': () => stepsPerSecond = Math.max(1, stepsPerSecond - 1),
         'ticks+': () => ++ticksPerStep,
@@ -1277,10 +1409,16 @@
           }
         },
         'prevMass': () => {
-          return camera.positionIndex === 0 ? camera.positionIndex = universe.length - 1 : camera.positionIndex--;
+          nextFollow();
+          // const index = universe.indexOf(camera.follow);
+
+          // camera.follow =
+
+          // return camera.positionIndex === 0 ? camera.positionIndex = universe.length - 1 : camera.positionIndex--;
         },
         'nextMass': () => {
-          return camera.positionIndex = (camera.positionIndex + 1) % universe.length;
+          previousFollow();
+          // return camera.positionIndex = (camera.positionIndex + 1) % universe.length;
         }
       }
     };
@@ -1442,6 +1580,12 @@
             absorbedNameEl.innerHTML = absorbed;
             absorbedByNameEl.innerHTML = by;
           }
+          else if (name === 'absorbedBy') {
+            const [by] = args;
+
+            absorbedByEl.classList.add('show');
+            absorbedByByNameEl.innerHTML = by;
+          }
           else if (name === 'poof') {
             const [poof, mass] = args;
 
@@ -1456,8 +1600,8 @@
     }
 
     function createSocket(onopen = () => {}) {
-      // const socket = new WebSocket(`ws://${window.location.hostname}:8080`);
-      const socket = new WebSocket(`ws://104.236.242.248:8080`);
+      const socket = new WebSocket(`ws://${window.location.hostname}:8080`);
+      // const socket = new WebSocket(`ws://104.236.242.248:8080`);
       let opened;
       socket.onopen = () => {
         opened = true;
@@ -1741,10 +1885,12 @@
      <info>Don't worry, CNN is orbiting it!</info>
     </trump-tweet>
     <absorbed><absorbed-name></absorbed-name> was absorbed by <absorbed-by-name></absorbed-by-name>!</absorbed>
+    <absorbed-by>You Were Absorbed By <absorbed-by-by-name></absorbed-by-by-name>!</absorbed-by>
     <poof>You ran out of mass!</poof>
     <commands></commands>
 
     <tag><trump>TRUMP</trump>orbit <brand>alpha preview</brand> <version>uncommitted</version></tag>
+    <souls><souls-quantity></souls-quantity></souls>
     <overview>Overview</overview>
     <stats>Stats</stats>
     <help>?</help>

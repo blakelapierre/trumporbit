@@ -1,7 +1,9 @@
-FROM alpine
+FROM node:slim
 
-RUN apk --no-cache add nodejs libc6-compat wget && rm -rf /tmp/*
+RUN apt-get update && apt-get install -y libc6-dev
 
 ADD ./app /app
+
+RUN cd /app && npm install uws
 
 CMD node /app/.dist/index.js < tweets

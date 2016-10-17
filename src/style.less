@@ -430,6 +430,48 @@ hud {
     }
   }
 
+  @keyframes absorbed-by-show {
+    0% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    99% {
+      opacity: 0;
+      transform: scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(0);
+    }
+  }
+
+  absorbed-by {
+    display: none;
+    position: fixed;
+
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    font-size: 4vw;
+
+    align-items: center;
+    justify-content: center;
+
+    background-color: rgba(0, 0, 0, 1);
+
+    &.show {
+      display: flex;
+
+      animation: absorbed-by-show 2s ease-in-out forwards;
+    }
+
+    absorbed-by-by-name {
+
+    }
+  }
+
   poof {
     display: none;
 
@@ -599,6 +641,17 @@ hud {
     100% {
       color: rgba(255, 255, 255, 0.33);
     }
+  }
+
+  souls {
+    position: fixed;
+
+    left: 0;
+    bottom: 0;
+
+    margin: 1vw;
+
+    cursor: pointer;
   }
 
   overview {

@@ -1,0 +1,21 @@
+{
+  "config": {
+    "target": "ws://localhost:8080",
+    "phases": [
+      {"duration": 30, "arrivalRate": 1},
+      {"duration": 30, "arrivalRate": 1},
+      {"duration": 30, "arrivalRate": 1},
+      {"duration": 30, "arrivalRate": 1}
+    ]
+  },
+  "scenarios": [
+    {
+      "engine": "ws",
+      "flow": [
+        {"send": "command"},
+        {"think": 60},
+        {"send": "command"}
+      ]
+    }
+  ]
+}
