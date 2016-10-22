@@ -10,5 +10,6 @@ while read path event file; do
     kill -s 9 $pid;
   fi
   echo -e "\e[32mStarting Build\e[93m"
+  # pid not correctly set here
   (cabal build && echo -e "\e[39m" && (cabal run < fifo & (sleep 1 && echo "sending tweets" && cat tweets > fifo))) >&1 & pid=$!
 done < <(cat <(echo "first build") <(inotifywait -qrme close_write **/*.hs))
