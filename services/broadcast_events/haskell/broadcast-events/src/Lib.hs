@@ -1,3 +1,5 @@
+-- https://github.com/WeAreWizards/haskell-websockets-tsung-benchmark/blob/master/code/src/Main.hs
+
 {-# LANGUAGE OverloadedStrings #-}
 module Lib
     ( start
