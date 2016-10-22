@@ -59,7 +59,7 @@ start = do
 
     contents <- getContents
     forkIO $ do
-      foldrChunks (\a b -> writeChan bcast (fromStrict a) >> b) (return contents) contents
+      foldrChunks (\a b -> when (fromStrict a /= empty) (writeChan bcast (fromStrict a)) >> b) (return contents) contents
       return ()
 
     connectionCount <- newMVar 0
