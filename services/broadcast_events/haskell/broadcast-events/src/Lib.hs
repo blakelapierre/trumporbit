@@ -18,7 +18,7 @@ import Network.Wai.Handler.Warp (run, runSettings, setOnException, setOnOpen, se
 import Network.Wai.Handler.WebSockets as WaiWS
 import Network.WebSockets (acceptRequest, receiveDataMessage, sendTextData, PendingConnection, defaultConnectionOptions, DataMessage(..))
 
-import System.IO (hSetBuffering, isEOF, BufferMode( NoBuffering ))
+import System.IO (hSetBuffering, isEOF, stdin, BufferMode( NoBuffering ))
 
 
 handleWS :: InChan ByteString -> PendingConnection -> IO ()
@@ -49,9 +49,10 @@ start = do
     putStrLn "Starting"
     (bcast, _) <- newChan
 
+    hSetBuffering stdin NoBuffering
+
     contents <- getContents
     forkIO $ do
-      -- runs one line behind
       foldrChunks (\a b -> writeChan bcast (fromStrict a) >> b) (return contents) contents
       return ()
 
