@@ -8,27 +8,32 @@ module Lib
 
 import Prelude hiding (getContents, hGet, interact, scanl, foldl)
 
-import Control.Concurrent (forkIO)
+import Control.Concurrent (forkIO, newMVar, putMVar, readMVar, takeMVar, MVar)
 import Control.Concurrent.Chan.Unagi (InChan, getChanContents, newChan, readChan, dupChan, writeChan, writeList2Chan)
 import Control.Exception
 import Control.Monad (forever, when)
 import Data.ByteString.Lazy (ByteString, empty, fromStrict, foldl, foldrChunks, getContents, hGet, interact, pack, scanl, toChunks, toStrict, unpack)
+import Data.ByteString.Lazy.Builder (intDec, stringUtf8, toLazyByteString)
 import Data.Either
-import Network.Wai.Handler.Warp (run, runSettings, setOnException, setOnOpen, setPort, defaultSettings)
+import Data.Monoid (Monoid, mappend)
+import Network.Wai.Handler.Warp (run, runSettings, setOnException, setOnClose, setOnOpen, setPort, defaultSettings)
 import Network.Wai.Handler.WebSockets as WaiWS
 import Network.WebSockets (acceptRequest, receiveDataMessage, sendTextData, PendingConnection, defaultConnectionOptions, DataMessage(..))
 
 import System.IO (hSetBuffering, isEOF, stdin, BufferMode( NoBuffering ))
 
+(<>) :: Monoid a => a -> a -> a
+(<>) = mappend
 
-handleWS :: InChan ByteString -> PendingConnection -> IO ()
-handleWS bcast pending = do
+
+handleWS :: InChan ByteString -> MVar Int -> PendingConnection -> IO ()
+handleWS bcast connectionCount pending = do
     localChan <- dupChan bcast
     connection <- acceptRequest pending
 
-    print "New Connection"
+    count <- readMVar connectionCount
 
-    writeChan bcast "o"
+    sendTextData connection (toLazyByteString $ stringUtf8 "o," <> (intDec count))
 
     _ <- forkIO $ forever $ do
         message <- readChan localChan
@@ -41,6 +46,7 @@ handleWS bcast pending = do
             loop
 
     loop
+
 
 
 start :: IO ()
@@ -56,4 +62,28 @@ start = do
       foldrChunks (\a b -> writeChan bcast (fromStrict a) >> b) (return contents) contents
       return ()
 
-    run 8080 (WaiWS.websocketsOr defaultConnectionOptions (handleWS bcast) undefined)
+    connectionCount <- newMVar 0
+
+    -- run 8080 (WaiWS.websocketsOr defaultConnectionOptions (handleWS bcast connectionCount) undefined)
+
+    runSettings ((
+      setOnOpen (openHandler connectionCount bcast)
+      . setOnClose (closeHandler connectionCount bcast)
+      . setOnException (\_ e -> print ("Exception" ++ show e))
+      . setPort 8080) defaultSettings)
+      $ WaiWS.websocketsOr defaultConnectionOptions (handleWS bcast connectionCount) undefined
+
+      where
+        closeHandler connectionCount bcast addr = do
+          count <- takeMVar connectionCount
+          putMVar connectionCount (count - 1)
+
+          writeChan bcast (toLazyByteString $ stringUtf8 "o-," <> (intDec (count - 1)))
+
+        openHandler connectionCount bcast addr = do
+          count <- takeMVar connectionCount
+          putMVar connectionCount (count + 1)
+
+          writeChan bcast (toLazyByteString $ stringUtf8 "o," <> (intDec (count + 1)))
+
+          return True
