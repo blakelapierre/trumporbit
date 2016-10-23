@@ -1,0 +1,1935 @@
+<mathbox tabindex="2">
+  <script type="mathbox/jsx">
+    const trumpColors = [[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]],
+    [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[1.00392,0.83137,0.8,1],[1.24706,0.97255,0.76078,1],[1.40392,1.11373,0.78431,1],[1.4902,1.21569,0.87059,1],[1.52941,1.26275,0.94118,1],[1.41961,1.19216,0.91765,1],[1.40392,1.21569,0.98039,1],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]],
+    [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0.94118,0.75294,0.77647,1],[1.30196,0.94118,0.61961,1],[1.41961,1.01961,0.63529,1],[1.41961,1.08235,0.73725,1],[1.41961,1.1451,0.80784,1],[1.45098,1.20784,0.91765,1],[1.4902,1.28627,1.01961,1],[1.48235,1.26275,0.98824,1],[1.47451,1.21569,0.92549,1],[1.43529,1.19216,0.88627,1],[1.46667,1.26275,0.97255,1],[1.48235,1.30196,1.05098,1],[1.34118,1.2549,1.17647,1],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]],
+    [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[1.22353,0.86275,0.57255,1],[1.35686,0.94902,0.58039,1],[1.36471,0.95686,0.61176,1],[1.40392,1.03529,0.69804,1],[1.38824,1.10588,0.79216,1],[1.41176,1.17647,0.87843,1],[1.44314,1.19216,0.92549,1],[1.41961,1.16863,0.90196,1],[1.41961,1.11373,0.80784,1],[1.40392,1.06667,0.75294,1],[1.35686,1.06667,0.75294,1],[1.32549,1.01176,0.6902,1],[1.35686,1.0902,0.80784,1],[1.44314,1.23137,1.01961,1],[1.23137,1.09804,1.05098,1],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]],
+    [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[1.1451,0.76863,0.47059,1],[1.32549,0.93333,0.54902,1],[1.34118,0.93333,0.54902,1],[1.34902,0.91765,0.54902,1],[1.38039,1.02745,0.70588,1],[1.36471,1.07451,0.77647,1],[1.33333,1.02745,0.71373,1],[1.3098,0.94902,0.63529,1],[1.33333,1.00392,0.69804,1],[1.36471,0.98039,0.68235,1],[1.34118,0.93333,0.63529,1],[1.32549,0.92549,0.61961,1],[1.35686,0.98824,0.6902,1],[1.38824,1.05098,0.76863,1],[1.46667,1.23922,1.01961,1],[1.42745,1.23137,1.03529,1],[1.12157,1.04314,1.04314,1],[0,0,0,0],[0,0,0,0],[0,0,0,0]],
+    [[0,0,0,0],[0,0,0,0],[0,0,0,0],[1.0902,0.71373,0.44706,1],[1.23137,0.80784,0.46275,1],[1.34902,0.91765,0.53333,1],[1.34118,0.91765,0.52549,1],[1.35686,0.95686,0.56471,1],[1.40392,1.05098,0.70588,1],[1.32549,0.95686,0.62745,1],[1.20784,0.79216,0.46275,1],[1.21569,0.80784,0.49412,1],[1.24706,0.83137,0.48627,1],[1.27843,0.84706,0.54118,1],[1.29412,0.83922,0.52549,1],[1.31765,0.86275,0.54118,1],[1.38824,0.96471,0.65882,1],[1.45098,1.09804,0.82353,1],[1.48235,1.16863,0.93333,1],[1.49804,1.28627,1.06667,1],[1.41961,1.22353,1.01176,1],[0,0,0,0],[0,0,0,0],[0,0,0,0]],
+    [[0,0,0,0],[0,0,0,0],[0.90196,0.58824,0.42353,1],[1.08235,0.69804,0.38431,1],[1.20784,0.8,0.46275,1],[1.30196,0.87843,0.53333,1],[1.32549,0.88627,0.52549,1],[1.35686,0.91765,0.56471,1],[1.35686,0.90196,0.58039,1],[1.35686,0.89412,0.56471,1],[1.28627,0.82353,0.51765,1],[1.28627,0.79216,0.51765,1],[1.29412,0.78431,0.5098,1],[1.3098,0.81569,0.53333,1],[1.33333,0.8549,0.56471,1],[1.37255,0.90196,0.61176,1],[1.46667,1.05882,0.80784,1],[1.52941,1.16863,0.91765,1],[1.45882,1.11373,0.86275,1],[1.38824,1.05882,0.84706,1],[1.43529,1.18431,0.95686,1],[1.24706,1.06667,0.94902,1],[0,0,0,0],[0,0,0,0]],
+    [[0,0,0,0],[0,0,0,0],[0.95686,0.59608,0.36078,1],[1.24706,0.83137,0.53333,1],[1.29412,0.83137,0.50196,1],[1.27059,0.76078,0.41569,1],[1.2549,0.76078,0.41569,1],[1.30196,0.75294,0.42353,1],[1.36471,0.81569,0.50196,1],[1.38824,0.86275,0.57255,1],[1.37255,0.8549,0.57255,1],[1.37255,0.86275,0.58824,1],[1.41176,0.89412,0.62745,1],[1.42745,0.90196,0.63529,1],[1.38824,0.87843,0.61176,1],[1.38824,0.9098,0.64314,1],[1.43529,0.98039,0.71373,1],[1.52157,1.10588,0.8549,1],[1.46667,1.0902,0.8549,1],[1.40392,1.05098,0.83137,1],[1.34902,1.01176,0.8,1],[1.29412,1.06667,0.93333,1],[0,0,0,0],[0,0,0,0]],
+    [[0,0,0,0],[0.58039,0.26667,0.20392,1],[0.8549,0.44706,0.25098,1],[1.1451,0.68235,0.4,1],[1.1451,0.65098,0.35294,1],[1.20784,0.65098,0.3451,1],[1.23137,0.65882,0.32941,1],[1.3098,0.71373,0.39216,1],[1.39608,0.78431,0.49412,1],[1.44314,0.83137,0.57255,1],[1.45882,0.84706,0.58824,1],[1.45882,0.88627,0.64314,1],[1.45882,0.9098,0.6902,1],[1.47451,0.91765,0.70588,1],[1.41961,0.87843,0.64314,1],[1.44314,0.87059,0.63529,1],[1.45882,0.90196,0.64314,1],[1.4902,0.96471,0.72941,1],[1.45882,0.96471,0.73725,1],[1.39608,0.96471,0.76863,1],[1.37255,1.02745,0.8549,1],[1.39608,1.16078,1.03529,1],[0,0,0,0],[0,0,0,0]],
+    [[0,0,0,0],[0.65098,0.29804,0.24314,1],[1.00392,0.55686,0.35294,1],[1.12157,0.65098,0.38431,1],[1.15294,0.64314,0.40784,1],[1.24706,0.64314,0.36863,1],[1.33333,0.66667,0.36078,1],[1.36471,0.69804,0.4,1],[1.43529,0.73725,0.47059,1],[1.55294,0.83922,0.60392,1],[1.59216,0.86275,0.62745,1],[1.6,0.90196,0.6902,1],[1.58431,0.96471,0.80784,1],[1.56078,0.97255,0.81569,1],[1.52157,0.87843,0.69804,1],[1.59216,0.90196,0.71373,1],[1.55294,0.95686,0.75294,1],[1.52941,0.99608,0.78431,1],[1.45098,0.93333,0.72157,1],[1.45098,0.97255,0.77647,1],[1.42745,1.08235,0.92549,1],[1.45882,1.24706,1.11373,1],[0,0,0,0],[0,0,0,0]],
+    [[0,0,0,0],[0.6902,0.31373,0.22745,1],[0.95686,0.51765,0.29804,1],[1.16078,0.68235,0.4549,1],[1.26275,0.70588,0.5098,1],[1.39608,0.72157,0.44706,1],[1.53725,0.83922,0.52549,1],[1.58431,0.88627,0.62745,1],[1.61569,0.9098,0.69804,1],[1.7098,1.00392,0.84706,1],[1.76471,1.01961,0.83137,1],[1.77255,1.08235,0.92549,1],[1.74902,1.11373,1.00392,1],[1.70196,1.12157,1.02745,1],[1.67843,1.08235,0.98039,1],[1.6549,1.06667,0.92549,1],[1.44314,0.98824,0.80784,1],[1.19216,0.80784,0.60392,1],[1.37255,0.99608,0.8,1],[1.56863,1.15294,0.94902,1],[1.43529,1.04314,0.88627,1],[1.40392,1.10588,0.95686,1],[0,0,0,0],[0,0,0,0]],
+    [[0,0,0,0],[0.80784,0.42353,0.32157,1],[1.07451,0.65882,0.43137,1],[1.28627,0.87059,0.66667,1],[1.32549,0.80784,0.61176,1],[1.46667,0.8,0.53333,1],[1.63137,0.96471,0.70588,1],[1.6549,1.0902,0.87059,1],[1.6549,1.15294,0.97255,1],[1.74902,1.30196,1.16863,1],[1.77255,1.24706,1.12941,1],[1.80392,1.2549,1.16863,1],[1.79608,1.27059,1.22353,1],[1.81961,1.36471,1.31765,1],[1.82745,1.38824,1.30196,1],[1.58431,1.15294,1.06667,1],[1.23922,0.8549,0.77647,1],[1.38039,0.99608,0.93333,1],[1.57647,1.17647,1.0902,1],[1.61569,1.18431,1.02745,1],[1.46667,1.04314,0.89412,1],[1.33333,1.04314,0.9098,1],[0,0,0,0],[0,0,0,0]],
+    [[0,0,0,0],[0.65882,0.30588,0.25098,1],[0.95686,0.61961,0.49412,1],[1.32549,0.97255,0.82353,1],[1.43529,0.93333,0.72941,1],[1.49804,0.86275,0.60392,1],[1.52157,0.89412,0.63529,1],[1.27843,0.76863,0.58039,1],[1.03529,0.54902,0.41569,1],[1.03529,0.56471,0.46275,1],[1.29412,0.81569,0.70588,1],[1.57647,1.06667,0.99608,1],[1.72549,1.12941,1.05882,1],[1.78824,1.19216,1.12157,1],[1.64706,1.13725,1.05882,1],[1.37255,0.94118,0.87059,1],[1.55294,1.15294,1.09804,1],[1.60784,1.09804,1.02745,1],[1.4902,0.93333,0.83922,1],[1.59216,1.1451,1.02745,1],[1.49804,1.07451,0.93333,1],[1.35686,1.0902,0.98039,1],[0.86275,0.67451,0.7451,1],[0,0,0,0]],
+    [[0,0,0,0],[0.61961,0.26667,0.15686,1],[0.87843,0.55686,0.46275,1],[1.23922,0.8549,0.7451,1],[1.45098,0.87059,0.65882,1],[1.52157,0.87843,0.61176,1],[1.52157,0.92549,0.68235,1],[1.48235,0.93333,0.80784,1],[1.50588,0.91765,0.84706,1],[1.59216,1.08235,0.98824,1],[1.38824,0.94118,0.88627,1],[1.19216,0.66667,0.61176,1],[1.46667,0.84706,0.75294,1],[1.79608,1.18431,1.03529,1],[1.52941,1.05098,0.95686,1],[1.32549,0.88627,0.83137,1],[1.45882,0.99608,0.91765,1],[1.28627,0.93333,0.87843,1],[1.56863,1.16078,1.07451,1],[1.59216,1.2,1.08235,1],[1.6,1.12157,0.98039,1],[1.32549,0.98824,0.87059,1],[0.87843,0.55686,0.57255,1],[0,0,0,0]],
+    [[0,0,0,0],[0.73725,0.32941,0.16471,1],[0.90196,0.5098,0.39216,1],[1.16078,0.6902,0.57255,1],[1.47451,0.82353,0.60392,1],[1.52157,0.82353,0.58039,1],[1.45098,0.84706,0.62745,1],[1.30196,0.71373,0.58039,1],[1.33333,0.70588,0.61961,1],[1.11373,0.72157,0.6902,1],[1.37255,1.00392,0.94902,1],[1.31765,0.83137,0.79216,1],[1.44314,0.8549,0.71373,1],[1.78824,1.15294,0.95686,1],[1.67843,1.15294,0.98824,1],[1.45882,0.93333,0.84706,1],[1.38039,0.98039,0.94118,1],[1.02745,0.84706,0.83137,1],[1.63137,1.27843,1.19216,1],[1.74118,1.41176,1.26275,1],[1.67059,1.18431,1.01176,1],[1.28627,0.91765,0.81569,1],[1.08235,0.70588,0.6902,1],[0,0,0,0]],
+    [[0,0,0,0],[1.00392,0.51765,0.28235,1],[0.94118,0.48627,0.33725,1],[1.09804,0.63529,0.5098,1],[1.43529,0.79216,0.56471,1],[1.50588,0.76863,0.54118,1],[1.57647,0.97255,0.76078,1],[1.51373,1.05098,0.89412,1],[1.52157,1.01176,0.91765,1],[1.22353,0.88627,0.83137,1],[1.50588,1.18431,1.12941,1],[1.52941,1.03529,0.98824,1],[1.61569,0.96471,0.76863,1],[1.70196,1.01961,0.82353,1],[1.80392,1.27059,1.08235,1],[1.67059,1.18431,1.04314,1],[1.72549,1.31765,1.23922,1],[1.74118,1.35686,1.26275,1],[1.78824,1.41961,1.2549,1],[1.84314,1.49804,1.3098,1],[1.72549,1.24706,1.06667,1],[1.37255,0.92549,0.83922,1],[1.27059,0.92549,0.99608,1],[0,0,0,0]],
+    [[0,0,0,0],[0.95686,0.54118,0.44706,1],[0.95686,0.46275,0.32157,1],[1.02745,0.54118,0.4549,1],[1.34902,0.73725,0.55686,1],[1.52941,0.80784,0.58039,1],[1.73333,1.12941,0.88627,1],[1.74118,1.2549,1.05098,1],[1.61569,1.0902,0.92549,1],[1.6,1.16078,1.03529,1],[1.60784,1.18431,1.11373,1],[1.66275,1.08235,0.97255,1],[1.63137,0.94118,0.77647,1],[1.64706,0.94902,0.77647,1],[1.84314,1.30196,1.13725,1],[1.74902,1.23922,1.0902,1],[1.75686,1.20784,1.04314,1],[1.87451,1.45098,1.29412,1],[1.86667,1.45098,1.27843,1],[1.83529,1.38039,1.2,1],[1.70196,1.16863,0.99608,1],[1.5451,1.10588,1.00392,1],[1.42745,1.12157,1.19216,1],[0,0,0,0]],
+    [[0,0,0,0],[0,0,0,0],[1.10588,0.54902,0.36078,1],[0.99608,0.46275,0.36078,1],[1.27059,0.70588,0.56471,1],[1.52157,0.80784,0.55686,1],[1.68627,1.02745,0.77647,1],[1.82745,1.29412,1.03529,1],[1.81176,1.27843,1.03529,1],[1.84314,1.33333,1.12941,1],[1.81961,1.3098,1.16078,1],[1.74118,1.18431,1.01961,1],[1.52157,0.83137,0.62745,1],[1.63922,0.97255,0.80784,1],[1.85098,1.2549,1.11373,1],[1.69412,1.12941,1.01961,1],[1.78039,1.20784,1.06667,1],[1.88235,1.35686,1.21569,1],[1.85882,1.36471,1.23922,1],[1.73333,1.1451,0.98039,1],[1.6549,1.06667,0.92549,1],[1.67059,1.19216,1.06667,1],[1.55294,1.23137,1.23922,1],[0,0,0,0]],
+    [[0,0,0,0],[0,0,0,0],[1.43529,0.69804,0.50196,1],[1.20784,0.55686,0.40784,1],[1.31765,0.72157,0.56471,1],[1.51373,0.81569,0.59608,1],[1.5451,0.79216,0.55686,1],[1.67843,0.95686,0.7451,1],[1.74902,1.10588,0.87843,1],[1.81961,1.24706,1.03529,1],[1.81176,1.26275,1.09804,1],[1.77255,1.17647,1.01961,1],[1.52941,0.8549,0.6902,1],[1.63922,1.03529,0.87843,1],[1.7098,1.1451,1.02745,1],[1.62353,1.12941,1.01961,1],[1.74902,1.16078,1.0902,1],[1.82745,1.30196,1.17647,1],[1.80392,1.26275,1.11373,1],[1.66275,1.04314,0.89412,1],[1.63137,1.01176,0.86275,1],[1.73333,1.26275,1.12157,1],[1.45882,1.2,1.23922,1],[0,0,0,0]],
+    [[0,0,0,0],[0,0,0,0],[1.28627,0.8,0.86275,1],[1.71765,1.00392,0.72941,1],[1.55294,0.89412,0.66667,1],[1.53725,0.77647,0.57255,1],[1.52157,0.72941,0.53333,1],[1.45882,0.69804,0.50196,1],[1.53725,0.80784,0.61176,1],[1.68627,0.98039,0.78431,1],[1.74118,1.0902,0.91765,1],[1.73333,1.08235,0.94118,1],[1.38824,0.69804,0.57255,1],[1.00392,0.37647,0.25882,1],[1.23137,0.55686,0.43137,1],[1.23137,0.57255,0.48627,1],[1.74118,1.11373,1.04314,1],[1.78039,1.22353,1.11373,1],[1.76471,1.2,1.05882,1],[1.6549,1.02745,0.88627,1],[1.63137,0.98039,0.82353,1],[1.60784,1.06667,0.94118,1],[0,0,0,0],[0,0,0,0]],
+    [[0,0,0,0],[0,0,0,0],[0,0,0,0],[1.78824,1.13725,0.89412,1],[1.6549,0.96471,0.72157,1],[1.53725,0.7451,0.52549,1],[1.57647,0.8,0.58039,1],[1.48235,0.72941,0.51765,1],[1.43529,0.6902,0.48627,1],[1.56863,0.8,0.61176,1],[1.7098,0.99608,0.77647,1],[1.74902,1.03529,0.8549,1],[1.63137,0.88627,0.70588,1],[1.41961,0.69804,0.5098,1],[1.6,0.98039,0.81569,1],[1.74902,1.16078,1.01176,1],[1.73333,1.07451,0.91765,1],[1.73333,1.12157,0.98039,1],[1.69412,1.05098,0.88627,1],[1.63137,1.00392,0.8549,1],[1.64706,1.01176,0.83922,1],[1.16863,0.73725,0.83922,1],[0,0,0,0],[0,0,0,0]],
+    [[0,0,0,0],[0,0,0,0],[0,0,0,0],[1.38824,0.84706,0.90196,1],[1.70196,0.93333,0.6902,1],[1.49804,0.72941,0.49412,1],[1.5451,0.76863,0.53333,1],[1.49804,0.70588,0.48627,1],[1.45882,0.70588,0.4549,1],[1.47451,0.73725,0.5098,1],[1.56863,0.80784,0.55686,1],[1.72549,1.00392,0.77647,1],[1.68627,0.94902,0.72157,1],[1.7098,1.01176,0.80784,1],[1.78039,1.08235,0.99608,1],[1.78039,1.1451,1.05882,1],[1.74902,1.2,1.01961,1],[1.68627,1.04314,0.87843,1],[1.63922,0.96471,0.78431,1],[1.61569,1.00392,0.82353,1],[1.6549,0.98824,0.8,1],[0,0,0,0],[0,0,0,0],[0,0,0,0]],
+    [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0.92549,0.42353,0.4,1],[1.43529,0.68235,0.50196,1],[1.4902,0.70588,0.5098,1],[1.45882,0.68235,0.4549,1],[1.45098,0.70588,0.44706,1],[1.43529,0.70588,0.4549,1],[1.41961,0.64314,0.41569,1],[1.46667,0.71373,0.47843,1],[1.6,0.91765,0.6902,1],[1.2,0.58039,0.47059,1],[0.46275,0.14118,0.16471,1],[0.54902,0.11765,0.12549,1],[1.52157,0.98039,0.87843,1],[1.63137,1.04314,0.89412,1],[1.6549,0.98824,0.78431,1],[1.63922,1.01961,0.8,1],[1.60784,0.95686,0.72941,1],[0,0,0,0],[0,0,0,0],[0,0,0,0]],
+    [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[1.35686,0.65098,0.48627,1],[1.32549,0.57255,0.37647,1],[1.43529,0.67451,0.43922,1],[1.49804,0.76863,0.51765,1],[1.55294,0.82353,0.58039,1],[1.56078,0.82353,0.55686,1],[1.47451,0.73725,0.47843,1],[1.36471,0.68235,0.5098,1],[0.93333,0.37647,0.37647,1],[0.44706,0.38431,0.38431,1],[0.65098,0.26667,0.2902,1],[1.38039,0.70588,0.69804,1],[1.55294,0.91765,0.79216,1],[1.66275,1.03529,0.80784,1],[1.63922,0.99608,0.76863,1],[1.61569,0.91765,0.66667,1],[0,0,0,0],[0,0,0,0],[0,0,0,0]],
+    [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[1.16078,0.57255,0.44706,1],[1.23922,0.52549,0.28235,1],[1.3098,0.58824,0.33725,1],[1.48235,0.73725,0.47843,1],[1.57647,0.83137,0.56471,1],[1.57647,0.80784,0.54118,1],[1.52941,0.75294,0.50196,1],[1.48235,0.65882,0.48627,1],[1.63137,0.69804,0.71373,1],[1.67059,0.73725,0.79216,1],[1.64706,0.60392,0.68235,1],[1.57647,0.84706,0.77647,1],[1.56863,0.83137,0.69804,1],[1.56078,0.88627,0.72941,1],[1.6,0.97255,0.77647,1],[1.56863,0.92549,0.65882,1],[0,0,0,0],[0,0,0,0],[0,0,0,0]],
+    [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0.72157,0.4549,0.36863,1],[1.28627,0.54902,0.2902,1],[1.28627,0.56471,0.31373,1],[1.44314,0.6902,0.43137,1],[1.46667,0.71373,0.4549,1],[1.44314,0.68235,0.42353,1],[1.47451,0.65098,0.41569,1],[1.36471,0.54902,0.31373,1],[1.20784,0.43137,0.32157,1],[1.35686,0.63529,0.63529,1],[1.37255,0.66667,0.68235,1],[1.38824,0.65882,0.49412,1],[1.52157,0.78431,0.60392,1],[1.5451,0.87843,0.69804,1],[1.61569,0.98824,0.78431,1],[1.34118,0.80784,0.62745,1],[0,0,0,0],[0,0,0,0],[0,0,0,0]],
+    [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0.06275,1],[1.11373,1.04314,0.98039,1],[1.30196,0.70588,0.48627,1],[1.28627,0.57255,0.30588,1],[1.38039,0.64314,0.39216,1],[1.45882,0.7451,0.5098,1],[1.38824,0.67451,0.44706,1],[1.50588,0.72941,0.5098,1],[1.50588,0.70588,0.47843,1],[1.43529,0.70588,0.51765,1],[1.37255,0.76078,0.62745,1],[1.45098,0.83137,0.72157,1],[1.63137,0.94118,0.79216,1],[1.67843,1.00392,0.83137,1],[1.58431,0.98039,0.8,1],[1.49804,0.89412,0.69804,1],[1.09804,0.73725,0.63529,1],[0.28235,0.36078,0.55686,1],[0,0,0,0],[0,0,0,0]],
+    [[0,0,0,0],[0,0,0,0],[0.26667,0.36863,0.64314,1],[0.23529,0.25098,0.3451,1],[0,0,0.02353,1],[1.26275,1.23137,1.16078,1],[1.66275,1.43529,1.3098,1],[1.09804,0.44706,0.21176,1],[1.22353,0.54118,0.32941,1],[1.31765,0.65882,0.4549,1],[1.30196,0.65098,0.46275,1],[1.35686,0.63529,0.43137,1],[1.64706,0.8549,0.65098,1],[1.67059,0.90196,0.7451,1],[1.72549,1.02745,0.90196,1],[1.71765,1.02745,0.87843,1],[1.68627,1.01961,0.87059,1],[1.63922,0.98039,0.81569,1],[1.38824,0.83922,0.65882,1],[1.21569,0.70588,0.52549,1],[1.46667,1.34902,1.3098,1],[0.29804,0.36078,0.52549,1],[0.29804,0.36863,0.54902,1],[0,0,0,0]],
+    [[0.23529,0.35294,0.61176,1],[0.21961,0.30588,0.49412,1],[0.21176,0.26667,0.38431,1],[0.18039,0.18039,0.25882,1],[0.00784,0,0.04706,1],[1.16863,1.13725,1.08235,1],[1.93725,1.87451,1.79608,1],[1.45098,1.23922,1.12157,1],[0.94118,0.46275,0.2902,1],[1.05882,0.47843,0.33725,1],[1.16078,0.54118,0.40784,1],[1.0902,0.47843,0.3451,1],[1.23137,0.54902,0.39216,1],[1.43529,0.6902,0.52549,1],[1.51373,0.75294,0.64314,1],[1.48235,0.72157,0.63529,1],[1.30196,0.66667,0.57255,1],[1.08235,0.59608,0.50196,1],[0.94902,0.51765,0.39216,1],[1.24706,1.00392,0.93333,1],[1.79608,1.82745,1.82745,1],[0.27451,0.36078,0.52549,1],[0.25098,0.30588,0.47059,1],[0.30588,0.36078,0.52549,1]],
+    [[0.18039,0.27451,0.46275,1],[0.20392,0.29804,0.47059,1],[0.21961,0.28235,0.43137,1],[0.17255,0.17255,0.27451,1],[0.03137,0.02353,0.12549,1],[1.03529,1.03529,0.99608,1],[2,1.97647,1.90588,1],[1.85098,1.81961,1.74118,1],[1.45098,1.34118,1.2549,1],[0.94118,0.62745,0.52549,1],[0.88627,0.41569,0.28235,1],[0.98039,0.44706,0.2902,1],[0.76863,0.33725,0.23529,1],[0.61961,0.21961,0.20392,1],[0.65882,0.23529,0.23529,1],[0.65882,0.22745,0.20392,1],[0.55686,0.26667,0.21961,1],[0.62745,0.32941,0.26667,1],[0.96471,0.76078,0.70588,1],[1.78824,1.81176,1.81961,1],[1.59216,1.64706,1.70196,1],[0.22745,0.28235,0.44706,1],[0.22745,0.25882,0.43137,1],[0.29804,0.33725,0.5098,1]],
+    [[0.15686,0.22745,0.41569,1],[0.18039,0.25098,0.41569,1],[0.20392,0.26667,0.40784,1],[0.15686,0.17255,0.29804,1],[0.09412,0.08627,0.21176,1],[0.49412,0.48627,0.52549,1],[1.92157,1.89804,1.81176,1],[1.9451,1.91373,1.85098,1],[1.82745,1.81176,1.75686,1],[1.50588,1.50588,1.45882,1],[1.00392,0.83922,0.82353,1],[0.82353,0.52549,0.4549,1],[0.64314,0.26667,0.22745,1],[0.43922,0.10196,0.09412,1],[0.26667,0.00784,0.01569,1],[0.3451,0.04706,0.04706,1],[0.59608,0.29804,0.29804,1],[1.12157,1.01176,1.00392,1],[1.78039,1.84314,1.87451,1],[0,0,0,0],[1.10588,1.16078,1.2549,1],[0.13333,0.18039,0.35294,1],[0.18824,0.23529,0.39216,1],[0.26667,0.30588,0.47843,1]],
+    [[0.13333,0.18824,0.36078,1],[0.15686,0.22745,0.38431,1],[0.16471,0.22745,0.39216,1],[0.13333,0.16471,0.29804,1],[0.07843,0.10196,0.21961,1],[0.13333,0.14902,0.27451,1],[1.68627,1.66275,1.58431,1],[1.88235,1.87451,1.81176,1],[1.92157,1.89804,1.84314,1],[1.81176,1.80392,1.74118,1],[1.66275,1.67059,1.61569,1],[1.37255,1.32549,1.29412,1],[0.98039,0.7451,0.7451,1],[0.4,0.08627,0.12549,1],[0.18824,0,0,1],[0.56471,0.4,0.43922,1],[1.45882,1.46667,1.51373,1],[1.90588,2,2,1],[1.97647,2,2,1],[0,0,0,0],[0.62745,0.6902,0.81569,1],[0.07843,0.14902,0.32157,1],[0.14902,0.19608,0.36863,1],[0.21961,0.26667,0.43922,1]]];
+
+
+    document.body.addEventListener('touchstart', goFullScreen);
+
+    //bad name
+    function goFullScreen() {
+      if (document.body.requestFullscreen) document.body.requestFullscreen();
+      else if (document.body.webkitRequestFullscreen) document.body.webkitRequestFullscreen();
+      else if (document.body.mozRequestFullscreen) document.body.mozRequestFullscreen();
+      else if (document.body.msRequestFullscreen) document.body.msRequestFullscreen();
+
+      document.body.removeEventListener('touchstart', goFullScreen);
+    }
+
+
+    const hud = document.querySelector('hud'),
+          enterLookingEl = document.querySelector('enter-looking'),
+          enterMovingEl = document.querySelector('enter-moving'),
+          lookingEl = document.querySelector('looking'),
+          movingEl = document.querySelector('moving');
+
+    enterLookingEl.addEventListener('click', event => enterState('looking'));
+    enterMovingEl.addEventListener('click', event => enterState('moving'));
+
+    // const states = {looking, moving};
+    let currentState, controls;
+
+    function enterState(state) {
+      if (currentState) hud.classList.remove(currentState);
+
+      hud.classList.add(state);
+
+      if (state === 'moving') {
+        camera.targetOffset = [0, 0, 0];
+        camera.targetFov = 100;
+
+        // universe[camera.positionIndex].color[3] = 0.25;
+
+        controls = attachVelocityControls();
+      }
+      else if (state === 'looking') {
+        camera.targetOffset = [0, 50, 0];
+        camera.targetFov = 60;
+
+        detachVelocityControls(controls);
+      }
+      else if (state === 'start') {
+        camera.targetOffset = [0, 70, 0];
+        camera.targetFov = 90;
+
+        detachVelocityControls(controls);
+      }
+
+      currentState = state;
+    }
+
+    function attachVelocityControls() {
+      return ['xn', 'xp', 'yn', 'yp', 'zn', 'zp'].map(n => {
+        const el = document.querySelector(n);
+
+        // el.onclick = event => {
+        //   events.push([n]);
+        //   event.stopPropagation();
+        // };
+
+        el.onmousedown = event => {
+          events.push([`+${n}`]);
+          event.stopPropagation();
+        };
+
+        el.onmouseup = event => {
+          events.push([`-${n}`]);
+          event.stopPropagation();
+        };
+
+        // el.addEventListener('click', event => {
+        //   events.push([n]);
+        //   event.stopPropagation();
+        // });
+
+        return el;
+      });
+    }
+
+    function detachVelocityControls(controls) {
+      (controls || []).forEach(c => c.onclick = undefined);
+    }
+
+    const velocityControlsEl = document.querySelector('velocity-controls'),
+          movingTriggerEl = document.querySelector('moving-trigger');
+
+    movingEl.addEventListener('click', event => {
+      enterState('start');
+    });
+
+    lookingEl.addEventListener('click', event => {
+      enterState('start');
+    });
+
+    movingTriggerEl.addEventListener('click', event => {
+      event.stopPropagation();
+      enterState('moving');
+    });
+
+    const orbitStatisticsQuantityEl = document.querySelector('orbit-statistics-quantity'),
+          massNameEls = document.getElementsByTagName('mass-name'),
+          lookAtMassNameEl = document.querySelector('look-at-mass-name'),
+          lookAtMassQuantityEl = document.querySelector('look-at-mass-quantity'),
+          lookAtDistanceQuantityEl = document.querySelector('look-at-distance-quantity'),
+          lookAtTrumpDistanceQuantityEl = document.querySelector('look-at-trump-distance-quantity'),
+          massQuantityEl = document.querySelector('mass-quantity'),
+          massVelocityQuantityEl = document.querySelector('mass-velocity-quantity'),
+          distanceQuantityEl = document.querySelector('distance-quantity'),
+          catchUpQuantityEl = document.querySelector('catch-up-quantity'),
+          soulsQuantityEl = document.querySelector('souls-quantity'),
+          trumpTweetEl = document.querySelector('trump-tweet'),
+          absorbedEl = document.querySelector('absorbed'),
+          absorbedNameEl = document.querySelector('absorbed-name'),
+          absorbedByNameEl = document.querySelector('absorbed-by-name'),
+          absorbedByEl = document.querySelector('absorbed-by'),
+          absorbedByByNameEl = document.querySelector('absorbed-by-by-name'),
+          poofEl = document.querySelector('poof'),
+          noticeEl = document.querySelector('notice');
+
+    const tagEl = document.querySelector('tag'),
+          currentLookAtEl = document.querySelector('current-look-at'),
+          commandsEl = document.querySelector('commands'),
+          overviewEl = document.querySelector('overview'),
+          statsEl = document.querySelector('stats'),
+          helpEl = document.querySelector('help'),
+          helpContentEl = document.querySelector('help-content'),
+          previousLookAtEl = document.querySelector('previous-look-at'),
+          nextLookAtEl = document.querySelector('next-look-at');
+
+    function vnew(v) {
+      return copy([0, 0, 0], v);
+    }
+
+    const speed = 60;
+    class Camera {
+      constructor({follow, lookAt}) {
+        this.follow = follow;
+        this.lookAt = lookAt;
+
+        this._targetPosition = [0, 0, 0];
+        this._targetLookAt = [0, 0, 0];
+        this._targetOffset = [0, 70, 0];
+        this._targetUp = [0, 0, 0];
+        this._targetFov = 90;
+
+        this._li = 0;
+        this._pi = 0;
+        this._oi = 0;
+        this._fi = 0;
+
+        this.observed = {
+          position: vnew(this._targetPosition),
+          lookAt: vnew(this._targetLookAt),
+          up: vnew(this._targetUp),
+          fov: this._targetFov
+        }
+
+        this.offset = vnew(this._targetOffset);
+        // this.position = copy([0, 0, 0], this._targetPosition);
+        // this.lookAt = copy([0, 0, 0], this._targetLookAt);
+        // this.up = [0, 0, 0];
+        // this.fov = 90;
+      }
+
+      get iOffset() { return add(dd, this.offset, scale(dd, sub(dd, this._targetOffset, this.offset), Math.min(this._oi, speed) / speed)); }
+      get iPosition() { return ;}
+
+      update() {
+        const p = this.follow.position,
+              // tp = universe[this.lookAtIndex].position,
+              tp = this.lookAt.position,
+              d = sub([0, 0, 0], p, tp),
+              // d = [p[0]-tp[0], p[1]-tp[1], p[2]-tp[2]],
+              m = magnitude(d);
+
+        if (m > 0) div (d, d, m);
+
+        // copy(this.position, this.iPosition);
+        // copy(this.lookAt, this.iLookAt);
+        copy(this.offset, this.iOffset);
+        // copy(this.up, this.iUp);
+
+        // this._li++;
+        // this._pi++;
+        this._oi++;
+        // this._fi++;
+
+        // add(this.offset, this.offset, scale(dd, sub(dd, this._targetOffset, this.offset), Math.min(this._oi++, speed) / speed));
+// console.log(this.offset);
+        add(this._targetPosition, p, scale(d, d, 100));
+        add(this._targetPosition, this._targetPosition, this.offset);
+
+        add(this.observed.position, this.observed.position, scale(dd, sub(dd, this.observed.position, this._targetPosition), -Math.min(this._pi++, speed) / speed));
+
+        add(this.observed.lookAt, this.observed.lookAt, scale(dd, sub(dd, this.lookAt.position, this.observed.lookAt), Math.min(this._li++, speed) / speed));
+
+        this.observed.fov = this.observed.fov + (this._targetFov - this.observed.fov) * Math.min(this._fi++, speed) / speed;
+
+
+        // const q = qFromVectors(sub(dd, this.observed.position, this.observed.lookAt), this.observed.lookAt);
+        // const q = qFromVectors([0, 1, 0], sub(dd, this.observed.position, this.observed.lookAt));
+        // const q = qFromVectors([0, 0, 1], sub(dd, this.observed.lookAt, this.observed.position));
+        const q = qFromUnitVectors([0, 0, 1], normalize(dd, sub(dd, this.observed.position, this.observed.lookAt)));
+        // qunit(q, q);
+// set(this.up, q[1], q[2], q[3]);
+        const r = [0, 0, 0, 0],
+              i = qinv([0, 0, 0, 0], q);
+
+              // console.log(q);
+
+        // qmult(r, qmult(r, q, [0, 0, 0, -1]), i);
+        qmult(r, qmult(r, q, [0, this.offset[0], this.offset[1], this.offset[2]]), qconj(i, q));
+
+        // add(this.observed.position, this.observed.position, [r[1], r[2], r[3]]);
+
+        qmult(r, qmult(r, q, [0, 0, 1, 0]), i);
+
+        // qunit(r, r);
+        // set(this.up, 0, 1, 0);
+        set(this.observed.up, 0, 1, 0);
+        // set(this.up, r[1], r[2], r[3]);
+        // cross(this.up, [0, 1, 0], [-r[1], -r[2], -r[3]]);
+        // cross(this.up, tp, this.target.velocity]);
+        // set(this.up, -r[1], -r[2], -r[3]);
+        // console.log(this.up, this.offset);
+      }
+
+      set lookAt (mass) { console.log('now looking at', mass); if (!mass) throw new Error('looking at nothing!'); this._lookAtMass = mass; this._li = 0; }
+      set follow (mass) { console.log('now following', mass); this._followMass = mass; this._pi = 0; }
+
+      get lookAt () { return this._lookAtMass; }
+      get follow () { return this._followMass; }
+
+      set lookAtIndex (index) {
+        if (index !== this._lookAtIndex) this._li = 0;
+        this._lookAtIndex = index;
+      }
+
+      set positionIndex (index) {
+        if (index !== this._positionIndex) this._pi = 0;
+        this._positionIndex = index;
+      }
+
+      set targetFov (fov) {
+        if (fov !== this.targetFov) this._fi = 0;
+        this._targetFov = fov;
+      }
+
+      get lookAtIndex() { return this._lookAtIndex || 0; }
+      get positionIndex() { return this._positionIndex || 0; }
+
+      get targetPosition() {
+        return universe[this.positionIndex].position;
+      }
+
+      get targetLookAt() {
+        return universe[this.lookAtIndex].position;
+      }
+
+      set targetOffset([x, y, z]) {
+        if (this._targetOffset[0] !== x || this._targetOffset[1] !== y || this._targetOffset[2] !== z) this._oi = 0;
+        set(this._targetOffset, x, y, z);
+      }
+
+      get targetOffset() { return this._targetOffset; }
+    }
+
+    class Mass {
+      constructor(mass, color, position = [0, 0, 0], velocity = [0, 0, 0], acceleration = [0, 0, 0], gravity = [0, 0, 0]) {
+        this._sizeContainer = [];
+        this.mass = mass;
+        this.color = color;
+        this.position = position;
+        this.velocity = velocity;
+        this.acceleration = acceleration;
+        this.gravity = gravity;
+        this.collisions = [];
+      }
+
+      set mass(value) { this._mass = value; this._sizeContainer[0] = 700 * Math.pow(3 / (4 * Math.PI) * value, 1 / 3); }
+      get mass() { return this._mass; }
+
+      get name() { return 'Mass'; }
+
+      get size() { return this._sizeContainer; }
+      get collisionSize() { return this.size; }
+      // get size() { return this.mass; }
+      // get size() { return 800 * Math.log2(this.mass + 1); }
+
+      positionHalfTick(ticksPerStep) {
+        const {position: p, velocity: v} = this;
+        add(p, p, div(dd, div(dd, v, ticksPerStep), 2));
+      }
+
+      velocityTick(ticksPerStep) {
+        const {
+          velocity: v,
+          acceleration: a,
+          gravity: g
+        } = this;
+
+        add(v, v, div(dd, add(dd, a, g), ticksPerStep));
+        // v[0] += (a[0] + g[0]) / ticksPerStep;
+        // v[1] += (a[1] + g[1]) / ticksPerStep;
+        // v[2] += (a[2] + g[2]) / ticksPerStep;
+      }
+    }
+
+    class Trump extends Mass {
+      constructor (...args) {
+        super(...args);
+        this.color = [2, 2, 0, 0.05];
+      }
+      get name() { return '<trump>TRUMP</trump>'; }
+      get size() { return 0; }
+      get collisionSize() { return super.size; }
+    }
+
+    class Observer extends Mass {
+      get name() { return this._name || 'Observer'; }
+      set name(value) { this._name = value; }
+    }
+
+    class Tweet extends Mass {
+      constructor(...args) {
+        super(...args);
+
+        this.likes = 0;
+        this.retweets = 0;
+        this.followers = 0; // only the oldTweets tweet should use this (new class?)
+      }
+      get name() { return 'Tweet'; }
+    }
+
+    class OldTweets extends Tweet {
+      get name() { return 'Tweet\'s of <trump>TRUMP</trump>\'s Past'; }
+    }
+
+    class TweetSpawn extends Mass { }
+
+    class Like extends TweetSpawn {
+      get name() { return 'Like'; }
+    }
+
+    class ReTweet extends TweetSpawn {
+      get name() { return 'Retweet'; }
+    }
+
+    class Follower extends TweetSpawn {
+      get name() { return 'New Follower'; }
+    }
+
+    class Media extends Mass {
+      constructor(mediaName, ...args) {
+        super(...args);
+        this.mediaName = mediaName;
+      }
+
+      get name() { return this.mediaName; }
+    };
+
+    class Emission extends Mass {
+      get name() { return 'Emission'; }
+    }
+
+    const COLORS = {
+      observer: [2, 2, 2, 1],
+      tweet: [0, 1, 1.2, 2],
+      retweet: [25 / 128, 207 / 128, 134 / 128, 2],
+      like: [190 / 128, 25 / 128, 49 / 128, 2],
+      follower: [0 / 128, 25 / 128, 256 / 128, 2],
+      cnn: [2, 2, 2, 1]
+    };
+
+    const ORBIT_PARAMETERS = {
+      'observer': {
+        p: (tp, tv) => [tp[0], tp[1], tp[2] + 1000],
+        v: (tp, tv) => [320, 0, 0]
+      },
+      'oldTweets': {
+        p: (tp, tv) => [tp[0] - 600, tp[1] - 600, tp[2]],
+        v: (tp, tv) => [315, 0, -315]
+      },
+      'tweet': {
+        p: (tp, tv) => [tp[0], tp[1], tp[2] + 450],
+        v: (tp, tv) => [525, 0, 0]
+      },
+      'media': {
+        p: (tp, tv) => [tp[0] + 70, tp[1] + 40, tp[2] + 450],
+        v: (tp, tv) => [525, 0, 0]
+      }
+    };
+
+    const eevents = {
+      // external
+      'observer+': addObserver,
+      'observer-': removeObserver,
+      'tweet': addTweet,
+      'like': addLike,
+      'retweet': addRetweet,
+      'follower-': event => {}, //?
+      'follower': addFollower,
+
+      'follower+': incrementFollowers,
+      'like+': incrementLikes,
+      'retweet+': incrementRetweets,
+
+      // controls
+      '+xn': event => setBoost(-vBoost),
+      '-xn': event => unsetBoost(-vBoost),
+      '+xp': event => setBoost(vBoost),
+      '-xp': event => unsetBoost(vBoost),
+      '+yn': event => setBoost(0, -vBoost),
+      '-yn': event => unsetBoost(0, -vBoost),
+      '+yp': event => setBoost(0, vBoost),
+      '-yp': event => unsetBoost(0, vBoost),
+      '+zn': event => setBoost(0, 0, -vBoost),
+      '-zn': event => unsetBoost(0, 0, -vBoost),
+      '+zp': event => setBoost(0, 0, vBoost),
+      '-zp': event => unsetBoost(0, 0, vBoost),
+
+      // internal
+      'absorbed': absorbed,
+      'oldTweets': addOldTweets,
+      'poof': poof
+    };
+
+    const uuievents = {
+      'connected': () => noticeEl.classList.add('connected'),
+      'tweet': event => trumpTweetEl.classList.remove('show'),
+      'absorbed': event => absorbedEl.classList.remove('show'),
+      'absorbedBy': event => absorbedByEl.classList.remove('show'),
+      'poof': event => poofEl.classList.remove('show'),
+      'newmass': (event, view) => {
+        view.select('#positions').set('width', positions.length);
+        view.select('#colors').set('width', colors.length);
+        view.select('#sizes').set('width', sizes.length);
+      },
+      'log': ([log, ...args]) => console.log('log', ...args)
+    };
+
+    const views = {
+      'overview': [0, 2500, 0],
+      'frontview': [0, 0, 3500],
+      'sideview': [-3500, 0, 0]
+    };
+
+
+    const trump = new Trump(100000, [ 255,   255,    0, 0]),
+          universe = [trump],
+          tweets = [],
+          tweetMap = {},
+          tweetSpawn = [],
+          spawningTweets = new Set(),
+          media = [],
+          observers = [],
+          emissions = [],
+          events = [['oldTweets']],
+          uievents = [];
+
+    const camera = new Camera({follow: trump, lookAt: trump});
+
+    let oldTweets;
+
+    let pendingTweetSpawn = 0;
+
+    const MAX_TWEET_SPAWN = 75,
+          MAX_OBSERVERS = 51,
+          MAX_TWEET_SPAWN_AGE = 60 * 5,
+          MAX_EMISSION_AGE = 60 * 5;
+
+    const vBoost = 10;
+
+    const [
+      positions,
+      velocities,
+      accelerations,
+      gravities,
+      masses,
+      sizes,
+      colors
+    ] = map(universe, ['position', 'velocity', 'acceleration', 'gravity', 'mass', 'size', 'color']);
+
+    function map(list, properties) {
+      return properties.map(p => list.map(item => item[p]));
+    }
+
+
+
+
+    function addMass(newMass) {
+      const {position, velocity, acceleration, gravity, mass, size, color} = newMass;
+
+      newMass.created = currentTick;
+
+      universe.push(newMass);
+      positions.push(position);
+      velocities.push(velocity);
+      accelerations.push(acceleration);
+      gravities.push(gravity);
+      masses.push(mass);
+      sizes.push(size);
+      colors.push(color);
+
+      uievents.push(['newmass']);
+
+      return newMass;
+    }
+
+
+
+    let totalObserverCount = 0;
+    function addObserver([_, totalConnected]) {
+      // if (observers.length === 0) camera.positionIndex = universe.length;
+
+      if (observers.length < MAX_OBSERVERS) {
+        const {position: tp, velocity: tv} = trump;
+        const observer = addMass(new Observer(1, COLORS.observer, ORBIT_PARAMETERS.observer.p(tp, tv), ORBIT_PARAMETERS.observer.v(tp, tv)));
+
+        observer.name = `Observer ${totalObserverCount++}`;
+
+        observers.push(observer);
+
+        if (observers.length === 1) camera.follow = observer;
+      }
+      else {
+        const observer = observers[Math.round(Math.random() * (observers.length - 1))];
+        observer.name = `Observer ${totalObserverCount++}`;
+        observer.mass++;
+      }
+
+      setStat('totalSouls', totalConnected);
+    }
+
+    function removeObserver([_, totalConnected]) {
+      setStat('totalSouls', totalConnected);
+    }
+
+    function addOldTweets(event) {
+      console.log('adding old tweets', event);
+      const {position: tp, velocity: tv} = trump;
+      oldTweets = new OldTweets((oldTweets || {mass: 1000}).mass, [0, 1, 1.2, 1], ORBIT_PARAMETERS.oldTweets.p(tp, tv), ORBIT_PARAMETERS.oldTweets.v(tp, tv));
+
+      addMass(oldTweets);
+      tweets.push(oldTweets);
+    }
+
+    function addTweet(event) {
+      // camera.lookAtIndex = universe.length;
+      // this should be calculated based on current trump mass (and, maybe, positions/velocities of orbiting masses?)
+      const {position: tp, velocity: tv} = trump;
+
+      const tweet = new Tweet(500, COLORS.tweet,
+                                   ORBIT_PARAMETERS.tweet.p(tp, tv),
+                                   ORBIT_PARAMETERS.tweet.v(tp, tv)),
+            cnn = new Media('CNN', 5, COLORS.cnn,
+                                      ORBIT_PARAMETERS.media.p(tp, tv),
+                                      ORBIT_PARAMETERS.media.v(tp, tv));
+
+      tweet.tweetID = event[1] || 'fake';
+
+      addMass(tweet);
+      addMass(cnn);
+
+      tweets.push(tweet);
+      media.push(cnn);
+
+      tweetMap[tweet.tweetID] = tweet;
+
+      uievents.push(['tweet']);
+      camera.lookAt = tweet; // get camera out of here (event?)
+    }
+
+    function addRetweet(event) {
+      addTweetSpawn(tweetMap[event[1]] || oldTweets, ReTweet, 1, COLORS.retweet);
+    }
+
+    function addLike(event) {
+      addTweetSpawn(tweetMap[event[1]] || oldTweets, Like, 1, COLORS.like);
+    }
+
+    function addFollower(event) {
+      addTweetSpawn(oldTweets, Follower, 1, COLORS.follower);
+    }
+
+    const spread = 700;
+
+    function addTweetSpawn(tweet, constructor, mass, color) {
+      if (!tweet) throw new Error('No tweet!!!!!!@!');
+
+      const {position: p, size: s} = tweet,
+            {position: tp, velocity: tv} = universe[0];
+
+      const x = 20;
+
+      const d = [0, 0, 0];
+
+      sub(d, tp, p);
+
+      const m = magnitude(d);
+
+      const position = [p[0] + d[0] / m * (50 + spread * Math.random())
+                       ,p[1] + d[1] / m * (50 + spread * Math.random())
+                       ,p[2] + d[2] / m * (50 + spread * Math.random())];
+
+      const spawn = new constructor(mass, color, position,
+                                  [tv[0] + d[0]/x, tv[1] + d[1]/x, tv[2] + d[2]/x]);
+      tweet.mass += spawn.mass;
+
+      addMass(spawn);
+      tweetSpawn.push(spawn);
+      pendingTweetSpawn--;
+    }
+
+    function absorbed(event) {
+      uievents.push(event);
+    }
+
+    function incrementLikes([_, id, likes]) {
+      const tweet = tweetMap[id] || oldTweets;
+      tweet.likes += likes;
+      spawningTweets.add(tweet);
+    }
+
+    function incrementRetweets([_, id]) {
+      const tweet = tweetMap[id] || oldTweets;
+      tweet.retweets++;
+      spawningTweets.add(tweet);
+    }
+
+    function incrementFollowers([_, followers]) {
+      oldTweets.followers += followers;
+    }
+
+    function poof([_, mass]) {
+      if (mass instanceof TweetSpawn) {
+        tweetSpawn.splice(tweetSpawn.indexOf(mass), 1);
+      }
+      else if (mass instanceof Tweet) {
+        tweets.splice(tweets.indexOf(mass), 1);
+        delete tweetMap[mass.tweetID];
+      }
+      else if (mass instanceof Observer) {
+        observers.splice(observers.indexOf(mass), 1);
+      }
+
+      const index = universe.indexOf(mass); // annoying lookup
+      universe.splice(index, 1);
+      positions.splice(index, 1);
+      velocities.splice(index, 1);
+      accelerations.splice(index, 1);
+      gravities.splice(index, 1);
+      masses.splice(index, 1);
+      sizes.splice(index, 1);
+      colors.splice(index, 1);
+
+      if (camera.follow === mass) {
+        camera.follow = observers[0] || trump;
+        uievents.push(['poof', mass]);
+        enterState('looking') // get camera out of here!
+      }
+
+      // if (camera.positionIndex >= index && camera.positionIndex > 0) {
+      //   if (camera.positionIndex === index) {
+      //     camera.positionIndex = positions.length - 1;
+      //     uievents.push(['poof', mass])
+      //     enterState('looking'); // what?!
+      //   }
+      //   else camera.positionIndex--;
+      // }
+      // if (camera.lookAtIndex >= index) {
+      //   previousLookAt();
+      // }
+    }
+
+    function setBoost(mass, x, y, z) {
+
+    }
+
+    function unsetBoost(mass, x, y, z) {
+      // sub(mass.boost,
+    }
+
+    // x,y,z from camera/observer pov
+    function emitMass(x = 0, y = 0, z = 0) {
+      const mass = universe[camera.positionIndex],
+            {position: p, velocity: v} = mass,
+            tp = universe[camera.lookAtIndex].position,
+            d = normalize([0, 0, 0], sub(dd, p, tp));
+            // d = [p[0]-tp[0], p[1]-tp[1], p[2]-tp[2]];
+      const emission = mass.mass * 0.05;
+
+      // sub(d, p, tp);
+            // m = magnitude(d);
+            // m = magnitude(d) || 1;
+
+      const u = [0, 0, 1];
+
+      const q = qFromUnitVectors(u, d);
+
+      // qunit(q, q);
+
+      const r = [0, 0, 0, 0],
+            i = qinv([0, 0, 0, 0], q);
+
+      qmult(r, qmult(r, q, [0, x, y, z - 1]), qconj(i, q));
+
+      add(v, v, [r[1], r[2], r[3]]);
+
+      const emissionVelocity = [-r[1], -r[2], -r[3]];
+
+      qunit(r, r);
+      // scale(dd, [-r[1], -r[2], -r[3]], (mass.mass + emission + 1) / 2);
+      scale(dd, emissionVelocity, mass.collisionSize[0] / 200); // why does this need ~200 here?
+
+      mass.mass -= emission;
+
+      // const e = addMass(new Emission(emission, COLORS.observer, add([0, 0, 0], mass.position, dd), add([0, 0, 0], mass.velocity, emissionVelocity)));
+      const e = addMass(new Emission(emission, COLORS.observer, add([0, 0, 0], mass.position, dd), [0, 0, 0]));
+
+      emissions.push(e);
+
+      if (mass.mass < 0.01) events.push(['poof', mass, i]);
+    }
+
+
+
+
+
+
+
+
+
+    let trumpScaleFactor = 5;
+    <root>
+      <camera proxy={false}
+              position={t => camera.observed.position}
+              lookAt={t => camera.observed.lookAt}
+              fov={t => camera.observed.fov}
+              up={t => camera.observed.up} />
+      <cartesian range={[[-1, 1], [-1, 1], [-1, 1]]}
+                 scale={[1, 1, 1]}>
+        <cartesian range={[[-1, 1], [-1, 1], [-1, 1]]}
+                   scale={[trumpColors[0].length * trumpScaleFactor, trumpColors.length * trumpScaleFactor, trumpColors.length * trumpScaleFactor]}
+                   position={t => trump.position}
+                   rotation={[Math.PI, 0, 0]}>
+          <area height={trumpColors.length} width={trumpColors[0].length} />
+          <matrix id="trump"
+                  width={trumpColors[0].length}
+                  height={trumpColors.length}
+                  data={trumpColors} />
+          <point points="<<" colors="<" size={1200 * trumpScaleFactor} shape="square" opacity={0.95}/>
+        </cartesian>
+
+        <array id="positions"
+               width={universe.length}
+               channels={3}
+               history={1}
+               data={positions} />
+        <array id="colors"
+               width={universe.length}
+               channels={4}
+               data={colors} />
+        <array id="sizes"
+               width={universe.length}
+               channels={1}
+               data={sizes} />
+        <point points="<<<" colors="<<" sizes="<" shape="circle" blending="mult" opacity={0.9}/>
+      </cartesian>
+    </root>
+
+    const speedlimit = 300000;
+    const pv1 = [0, 0, 0],
+          pv2 = [0, 0, 0],
+          oldp1 = [0, 0, 0],
+          oldp2 = [0, 0, 0],
+          dd = [0, 0, 0];
+
+
+    const collisionList = []; // where should this go?
+    let collisionIIndex = 0;
+
+    let /*ticksPerSecond = 60,*/
+        ticksPerStep = 30,
+        stepsPerSecond = 1;
+
+
+    let currentTick = 0;
+    function tick() {
+      currentTick++;
+
+      updateEmissions();
+      updateTweetSpawn();
+      positionHalfTick();
+      updateGravities();
+      universe.forEach(updateMassVelocityAndPartialPosition);
+      // updateVelocities();
+      resolveCollisions();
+
+      function updateEmissions() {
+        for (let i = emissions.length - 1; i >= 0; i--) {
+          const emission = emissions[i],
+                {created} = emission;
+
+          if (currentTick - created > MAX_EMISSION_AGE) {
+            emissions.splice(i, 1);
+            const index = universe.indexOf(emission); // annoying lookup
+            universe.splice(index, 1);
+            positions.splice(index, 1);
+            velocities.splice(index, 1);
+            accelerations.splice(index, 1);
+            gravities.splice(index, 1);
+            masses.splice(index, 1);
+            sizes.splice(index, 1);
+            colors.splice(index, 1);
+
+            if (camera.follow === emission) {
+                uievents.push(['poof', emission]);
+                enterState('looking'); // what?!
+            }
+
+            // if (camera.positionIndex >= index && camera.positionIndex > 0) {
+            //   if (camera.positionIndex === index) {
+            //     camera.positionIndex = positions.length - 1;
+            //     uievents.push(['poof', emission]);
+            //     enterState('looking'); // what?!
+            //   }
+            //   else camera.positionIndex--;
+            // }
+            // if (camera.lookAtIndex >= index) {
+            //   previousLookAt();
+            // }
+          }
+        }
+      }
+
+      function updateTweetSpawn() {
+        const {position: tp, velocity: tv} = trump;
+
+        for (let i = 0; i < tweetSpawn.length; i++) {
+          const spawn = tweetSpawn[i],
+                {mass, position: p, velocity: v, created} = spawn;
+
+          const age = currentTick - created;
+          const x = Math.max(1, ticksPerStep * 1 / Math.min(ticksPerStep * 1, age));
+
+          sub(dd, tp, p);
+          add(v, tv, (div(dd, dd, x)));
+
+          if (age > MAX_TWEET_SPAWN_AGE) {
+            const index = universe.indexOf(spawn);
+            if (index === -1) {
+              uievents.push(['log', '-1!', age, spawn, universe]);
+            }
+            else {
+              collisionList.push([spawn, trump, index]);
+            }
+          }
+        }
+
+        resolveCollisions();
+
+        //lots of unnecessary stuff going on here sometimes
+        spawningTweets.forEach(tweet => {
+          if ((tweetSpawn.length + pendingTweetSpawn) >= MAX_TWEET_SPAWN) return false;
+
+          if (tweet.likes > 0 && Math.random() > 0.5) {
+            tweet.likes--;
+            events.push(['like', tweet.tweetID]);
+            pendingTweetSpawn++;
+          }
+
+          if ((tweetSpawn.length + pendingTweetSpawn) >= MAX_TWEET_SPAWN) return false;
+
+          if (tweet.retweets > 0 && Math.random() > 0.5) {
+            tweet.retweets--;
+            events.push(['retweet', tweet.tweetID]);
+            pendingTweetSpawn++;
+          }
+
+          if ((tweetSpawn.length + pendingTweetSpawn) >= MAX_TWEET_SPAWN) return false;
+
+          if (tweet.followers > 0 && Math.random() > 0.5) {
+            tweet.followers--;
+            events.push(['follower']);
+            pendingTweetSpawn++;
+          }
+        });
+      }
+
+      function positionHalfTick() {
+        for (let i = 0; i < universe.length; i++) {
+          const mass = universe[i];
+
+          mass.positionHalfTick(ticksPerStep);
+          set(mass.gravity, 0, 0, 0);
+        }
+      }
+
+      // can be optimized quite a bit? ?
+      function updateGravities() {
+        for (let i = 0; i < universe.length; i++) updatePairs(i);
+      }
+
+      function updatePairs(i) {
+        const {
+          position: p1,
+          velocity: v1,
+          acceleration: a1,
+          gravity: g1,
+          mass: m1,
+          collisionSize: s1,
+          collisions
+        } = universe[i];
+
+        // if (futureCollision) {
+        //   collisionList.push(futureCollision);
+        // }
+
+        for (let j = i + 1; j < universe.length; j++) updatePair(p1, v1, a1, g1, m1, s1, i, j, collisions); // probably don't want to create a new object on every call?   ??!?!?!?
+        // for (let j = i + 1; j < universe.length; j++) updatePair(p1, v1, a1, g1, m1, s1, i, j, {futureCollision}); // probably don't want to create a new object on every call?   ??!?!?!?
+
+        if (collisions.length > 0) {
+          collisionList.push(collisions[0]);
+          if (collisions.length > 1) console.log('+1', collisions);
+          collisions.splice(0);
+        }
+
+        // F = ma ... a = F/m
+        div(g1, g1, m1);
+      }
+
+      function updatePair(p1, v1, a1, g1, m1, s1, i, j, collisions) {
+        const {
+          position: p2,
+          velocity: v2,
+          acceleration: a2,
+          mass: m2,
+          collisionSize: s2,
+          gravity: g2
+        } = universe[j];
+
+        sub(dd, p1, p2);
+
+        const t = -magnitude(dd) / (speedlimit * speedlimit),
+              o = t / ticksPerStep;
+
+        add(oldp1, p1, scale(dd, add(dd, v1, scale(dd, add(dd, v1, scale(dd, a1, o)), 0.5)), o));
+        add(oldp2, p2, scale(dd, add(dd, v2, scale(dd, add(dd, v2, scale(dd, a2, o)), 0.5)), o));
+
+        sub(pv1, oldp1, p2);
+        sub(pv2, oldp2, p1);
+
+        const d1 = dot(pv1, pv1),
+              d2 = dot(pv2, pv2),
+              m = m1 * m2;
+
+        if (d1 > 0) add(g2, g2, scale(dd, pv1, m / d1));
+        if (d2 > 0) add(g1, g1, scale(dd, pv2, m / d2));
+
+        handleCollision(s1, s2, m1, m2, d1, d2, i, j, collisionList, collisions);
+      }
+
+      function handleCollision(s1, s2, m1, m2, d1, d2, i, j, collisionList, collisions) {
+        if (collisions.length === 0) {
+        // if (!collisions.futureCollision) {
+          const threshold = (s1[0] + s2[0]) / 4;
+          if (d1 < threshold || d2 < threshold) { // better ordering of checks?
+            if (m1 <= m2) {
+              //wtf is this
+              //the same universe[i] could be pushed multiple times!!!!!!!
+              // collisionList.push([universe[i], universe[j], i]);
+              collisions.push([universe[i], universe[j], i, j]);
+            }
+            else {
+              universe[j].collisions.push([universe[j], universe[i], j, i]);
+              // universe[j].futureCollision = [universe[j], universe[i], j];
+            }
+          }
+        }
+      }
+
+      function updateMassVelocityAndPartialPosition(mass) {
+        mass.velocityTick(ticksPerStep);
+        mass.positionHalfTick(ticksPerStep);
+      }
+
+      function resolveCollisions() {
+        for (let i = collisionList.length - 1; i >= 0; i--) {
+          const [smallerMass, greaterMass] = collisionList[i];
+
+          greaterMass.mass += smallerMass.mass;
+
+          const ratio = smallerMass.mass / greaterMass.mass; // 0?
+
+          div(greaterMass.velocity, add(greaterMass.velocity, scale(greaterMass.velocity, greaterMass.velocity, greaterMass.mass), scale(dd, smallerMass.velocity, smallerMass.mass)), greaterMass.mass + smallerMass.mass);
+
+        }
+
+        for (let i = collisionList.length - 1; i >= 0; i--) {
+          const [smallerMass, greaterMass, smallerIndex, greaterIndex] = collisionList[i];
+
+          if (smallerMass instanceof TweetSpawn) {
+            tweetSpawn.splice(tweetSpawn.indexOf(smallerMass), 1);
+          }
+          else if (smallerMass instanceof Tweet) {
+            tweets.splice(tweets.indexOf(smallerMass), 1);
+            delete tweetMap[smallerMass.tweetID];
+
+            if (smallerMass instanceof OldTweets) events.push(['oldTweets']);
+          }
+          else if (smallerMass instanceof Observer) {
+            observers.splice(observers.indexOf(smallerMass), 1);
+          }
+          else if (smallerMass instanceof Emission) {
+            emissions.splice(emissions.indexOf(smallerMass), 1);
+          }
+
+          incrementStat(smallerMass.constructor.name, 'absorbedBy', greaterMass.constructor.name);
+
+          if (smallerMass instanceof Tweet ||
+              smallerMass instanceof Media ||
+              smallerMass instanceof Trump ||
+              greaterMass instanceof Tweet ||
+              greaterMass instanceof Media ||
+              greaterMass instanceof Trump) {
+            events.push(['absorbed', smallerMass.name, greaterMass.name]);
+          }
+
+          universe.splice(smallerIndex, 1);
+          positions.splice(smallerIndex, 1);
+          velocities.splice(smallerIndex, 1);
+          accelerations.splice(smallerIndex, 1);
+          gravities.splice(smallerIndex, 1);
+          masses.splice(smallerIndex, 1);
+          sizes.splice(smallerIndex, 1);
+          colors.splice(smallerIndex, 1);
+
+          if (camera.follow === smallerMass) {
+            uievents.push(['absorbedBy', greaterMass.name]);
+            camera.follow = greaterMass;
+          }
+
+          // if (camera.positionIndex >= smallerIndex && camera.positionIndex > 0) {
+          //   if (camera.positionIndex === smallerIndex) {
+          //     //should do this some other way?
+          //     uievents.push(['absorbedBy', greaterMass.name]);
+          //     camera.positionIndex = greaterIndex >= smallerIndex ? greaterIndex - 1 : greaterIndex;
+          //   }
+          //   // if (camera.positionIndex === smallerIndex) camera.positionIndex = positions.length - 1;
+          //   else camera.positionIndex--;
+          // }
+          // if (camera.lookAtIndex >= smallerIndex) {
+          //   previousLookAt();
+          // }
+        }
+
+        collisionList.splice(0);
+        collisionIIndex = 0;
+      }
+    }
+
+
+    const stats = {totalSouls: 0};
+    function incrementStat(target, relation, object) {
+      stats[target] = stats[target] || {};
+      stats[target][relation] = stats[target][relation] || {};
+      return (stats[target][relation][object] = (stats[target][relation][object] || 0) + 1);
+      // return (stats[target][relation][object] = ((stats[target][relation] = (stats[target] = stats[target] || {})[relation] || {})[object] || 0) + 1);
+
+      // stats[target][relation][object] = (stats[target][relation][object] || 0) + 1;
+    }
+
+    function setStat(target, value) {
+      stats[target] = value;
+    }
+
+
+
+
+
+
+    let selectedMassIndex = 0, savedColor = [0, 0, 0];
+    selectMass(selectedMassIndex);
+
+    if (window.location.search === '?nointro') document.querySelector('notice').classList.add('no-intro');
+
+    function updateMassesGUI() {
+      const masses = Math.max(0, universe.length - 1);
+      orbitStatisticsQuantityEl.innerHTML = masses + ' mass' + (masses > 1 ? 'es' : '');
+
+      // const currentMass = universe[camera.positionIndex],
+      const currentMass = camera.follow,
+            {mass, name, position, velocity} = currentMass;
+
+      const distance = magnitude(sub(dd, currentMass.position, trump.position));
+
+      massNameEls[0].innerHTML = name;
+      massNameEls[1].innerHTML = name;
+
+      massQuantityEl.innerHTML = mass.toFixed(2);
+      distanceQuantityEl.innerHTML = distance.toFixed(1);
+      massVelocityQuantityEl.innerHTML = `[${velocity[0].toFixed(1)}, ${velocity[1].toFixed(1)}, ${velocity[2].toFixed(1)}] ${magnitude(velocity).toFixed(1)}`;
+
+      const {totalSouls} = stats;
+      soulsQuantityEl.innerHTML = `${totalSouls || 0} soul${totalSouls === 1 ? '' : 's'}`;
+
+      // const lookAtMass = universe[camera.lookAtIndex];
+      const lookAtMass = camera.lookAt;
+      lookAtMassNameEl.innerHTML = lookAtMass.name;
+
+      lookAtMassQuantityEl.innerHTML = lookAtMass.mass.toFixed(1);
+
+      const lookAtDistance = magnitude(sub(dd, lookAtMass.position, position));
+      lookAtDistanceQuantityEl.innerHTML = lookAtDistance.toFixed(1);
+
+      if (camera.lookAtIndex > 0) {
+        const lookAtTrumpDistance = magnitude(sub(dd, lookAtMass.position, trump.position));
+        lookAtTrumpDistanceQuantityEl.innerHTML = lookAtTrumpDistance.toFixed(1);
+
+        currentLookAtEl.classList.remove('is-trump');
+      }
+      else {
+        currentLookAtEl.classList.add('is-trump');
+      }
+
+      guiUpdates.forEach(update => update());
+    }
+
+    statsEl.addEventListener('click', toggleStats);
+    overviewEl.addEventListener('click', toggleOverview);
+
+    const guiUpdates = [];
+
+    function toggleStats() {
+      if (statsEl.classList.contains('show')) {
+        statsEl.classList.remove('show');
+        statsEl.innerHTML = 'Stats';
+        guiUpdates.splice(0); // !
+      }
+      else {
+        statsEl.classList.add('show');
+        guiUpdates.push(() => statsEl.innerHTML = getStats());
+
+        enterState('start');
+        // camera.lookAtIndex = 0;
+        camera.lookAt = trump;
+        // camera.positionIndex = 0;
+        camera.targetOffset =  views.overview;
+      }
+
+      function getStats() {
+        return JSON.stringify(stats, undefined, 2);
+        // return stats.map(target => target.map(relation => relation.map(object => )))
+      }
+    }
+
+    const last = [];
+    function toggleOverview() {
+      if (overviewEl.classList.contains('show')) {
+        overviewEl.classList.remove('show');
+
+        overviewEl.innerHTML = 'Overview';
+
+        const [lookAt, follow, targetOffset] = last.pop();
+        // const [lookAtIndex, positionIndex, targetOffset] = last.pop();
+
+        camera.follow = follow;
+        camera.lookAt = lookAt;
+
+        // camera.lookAtIndex = lookAtIndex;
+        // camera.positionIndex = positionIndex;
+        copy(camera.targetOffset, targetOffset);
+      }
+      else {
+        overviewEl.classList.add('show');
+
+        overviewEl.innerHTML = 'Orbit';
+
+        last.push([camera.lookAt, camera.follow, vnew(camera.targetOffset)]);
+
+        enterState('start');
+
+        camera.follow = trump;
+        camera.lookAt = trump;
+
+        // camera.lookAtIndex = 0;
+        // camera.positionIndex = 0;
+        camera.targetOffset = views.overview;
+      }
+    }
+
+    tagEl.addEventListener('click', () => commandsEl.classList.toggle('show'));
+    helpEl.addEventListener('click', () => helpContentEl.classList.toggle('show'));
+
+
+    previousLookAtEl.addEventListener('click', event => {
+      event.stopPropagation();
+
+      return previousLookAt();
+    });
+
+    nextLookAtEl.addEventListener('click', event => {
+      event.stopPropagation();
+
+      return nextLookAt();
+    });
+
+    function nextLookAt(allowSelf) {
+      const index = (universe.indexOf(camera.lookAt) + 1) % universe.length,
+            mass = universe[index];
+
+      x(allowSelf, mass, nextLookAt);
+    }
+
+    function previousLookAt(allowSelf) {
+      const index = ((universe.indexOf(camera.lookAt) - 1) + universe.length) % universe.length,
+            mass = universe[index];
+
+      x(allowSelf, mass, previousLookAt);
+    }
+
+    function x(allowSelf, mass, fn) {
+      if(!allowSelf && camera.follow === mass) fn(true);
+      else camera.lookAt = mass;
+    }
+
+    function nextFollow(allowSelf) {
+      const index = (universe.indexOf(camera.follow) + 1) % universe.length,
+            mass = universe[index];
+
+      y(allowSelf, mass, nextFollow);
+    }
+
+    function previousFollow(allowSelf) {
+      const index = ((universe.indexOf(camera.follow) - 1) + universe.length) % universe.length,
+            mass = universe[index];
+
+      y(allowSelf, mass, previousFollow);
+    }
+
+    function y(allowSelf, mass, fn) {
+      if(!allowSelf && camera.follow === mass) fn(true);
+      else camera.follow = mass;
+    }
+
+
+    module.exports = {
+      editorPanel: false,
+      plugins: ['core'],
+      callback: start,
+      camera: {far: 1000000},
+      controls: [
+        [['A'], 'left'],
+        [['D'], 'right'],
+        [['W'], 'forward'],
+        [['S'], 'backward'],
+        [['Q'], 'up'],
+        [['Z'], 'down'],
+        [['H'], 'toggleHistory'],
+        [['T'], 'fakeTweet'],
+        [['R'], 'fakeRetweet'],
+        [['K'], 'fakeLike'],
+        [['L'], 'lookAtTrump'],
+        [['O'], 'overview'],
+        [['F'], 'frontview'],
+        [['V'], 'sideview'],
+        [[190], 'speed+'],
+        [[188], 'speed-'],
+        [['0'], 'ticks+'],
+        [['9'], 'ticks-'],
+        [[32], 'changePlayer'],
+        [[13], 'newMass'],
+        [[221], 'nextMass'],
+        [[219], 'prevMass']
+      ],
+      commands: {
+        'left': () => velocities[selectedMassIndex][0]--,
+        'right': () => velocities[selectedMassIndex][0]++,
+        'forward': () => velocities[selectedMassIndex][2]--,
+        'backward': () => velocities[selectedMassIndex][2]++,
+        'up': () => velocities[selectedMassIndex][1]++,
+        'down': () => velocities[selectedMassIndex][1]--,
+        // 'lookAtTrump': () => camera.lookAtIndex = 0,
+        // 'overview': () => {camera.lookAtIndex = 0; camera.positionIndex = 0; camera.targetOffset =  views.overview;},
+        // 'frontview': () => {camera.lookAtIndex = 0; camera.positionIndex = 0; camera.targetOffset =  views.frontview;},
+        // 'sideview': () => {camera.lookAtIndex = 0; camera.positionIndex = 0; camera.targetOffset =  views.sideview;},
+        'lookAtTrump': () => camera.lookAt = trump,
+        'overview': () => {camera.lookAt = trump; camera.follow = trump; camera.targetOffset =  views.overview;},
+        'frontview': () => {camera.lookAt = trump; camera.follow = trump; camera.targetOffset =  views.frontview;},
+        'sideview': () => {camera.lookAt = trump; camera.follow = trump; camera.targetOffset =  views.sideview;},
+        'speed+': () => ++stepsPerSecond,
+        'speed-': () => stepsPerSecond = Math.max(1, stepsPerSecond - 1),
+        'ticks+': () => ++ticksPerStep,
+        'ticks-': () => ticksPerStep = Math.max(1, ticksPerStep - 1),
+        'changePlayer'() {
+          unselectMass(selectedMassIndex);
+          (selectedMassIndex = (selectedMassIndex + 1) % positions.length);
+          selectMass(selectedMassIndex);
+        },
+        'toggleHistory': {
+          '#positions': {
+            'history'() {
+              // doesn't work :(
+              return 1;
+            }
+          }
+        },
+        'fakeTweet': {
+          '#positions': {
+            'width'() {
+              events.push(['tweet']);
+              return universe.length;
+            }
+          },
+          '#colors': {
+            'width'() { return universe.length; }
+          },
+          '#velocities': {
+            'width'() { return universe.length; }
+          },
+          '#sizes': {
+            'width'() { return universe.length; }
+          }
+        },
+        'fakeRetweet': {
+          '#positions': {
+            'width'() {
+              events.push(['retweet', 'fake']);
+              return universe.length;
+            }
+          },
+          '#colors': {
+            'width'() { return universe.length; }
+          },
+          '#velocities': {
+            'width'() { return universe.length; }
+          },
+          '#sizes': {
+            'width'() { return universe.length; }
+          }
+        },
+        'fakeLike': {
+          '#positions': {
+            'width'() {
+              events.push(['like', 'fake']);
+              return universe.length;
+            }
+          },
+          '#colors': {
+            'width'() { return universe.length; }
+          },
+          '#velocities': {
+            'width'() { return universe.length; }
+          },
+          '#sizes': {
+            'width'() { return universe.length; }
+          }
+        },
+        'newMass': {
+          '#positions': {
+            'width'() {
+              events.push(['observer+']);
+              return universe.length;
+            }
+          },
+          '#colors': {
+            'width'() { return universe.length; }
+          },
+          '#velocities': {
+            'width'() { return universe.length; }
+          },
+          '#sizes': {
+            'width'() { return universe.length; }
+          }
+        },
+        'prevMass': () => {
+          nextFollow();
+          // const index = universe.indexOf(camera.follow);
+
+          // camera.follow =
+
+          // return camera.positionIndex === 0 ? camera.positionIndex = universe.length - 1 : camera.positionIndex--;
+        },
+        'nextMass': () => {
+          previousFollow();
+          // return camera.positionIndex = (camera.positionIndex + 1) % universe.length;
+        }
+      }
+    };
+
+
+
+
+
+
+    function centerOnTrump() {
+      const {position: tp} = trump;
+      for (let i = universe.length - 1; i >= 0; i--) {
+        const {position: p} = universe[i];
+        sub(p, p, tp);
+      }
+    }
+
+
+    class Clock {
+      constructor(ticksPerStep) {
+        this.ticksPerStep = ticksPerStep;
+        this.startTime = this.currentTime;
+      }
+
+      get currentTime() { return new Date().getTime(); }
+
+      ticksTo(time) {
+        const dt = time - this.startTime;
+        return Math.floor((dt / 1000) * ticksPerStep);
+      }
+    }
+
+    function start(view) {
+      const socket = createSocket(() => uievents.push(['connected']));
+
+      const run = runner(universe, new Clock());
+
+      window.requestAnimationFrame(animate);
+
+      function runner(universe, clock, maxRunTime = 1000 / 10, GUIUpdateRate = 100) {
+        const {startTime} = clock;
+
+        let currentTick = 0,
+            lastGUIUpdate = 0,
+            currentTime;
+
+        return (runTime = clock.currentTime) => {
+          const t = clock.ticksTo(runTime);
+
+          centerOnTrump();
+          while (currentTick < t && ((currentTime = clock.currentTime) - runTime) < maxRunTime) {
+            handleEvents();
+            tick();
+            currentTick++;
+          }
+
+          if ((currentTime - lastGUIUpdate) > 100) {
+            updateMassesGUI();
+            lastGUIUpdate = currentTime;
+          }
+
+          if (t - currentTick > 0) {
+            catchUpQuantityEl.parentElement.style.display = 'block';
+            catchUpQuantityEl.innerHTML = currentTick - t;
+          }
+          else {
+            catchUpQuantityEl.parentElement.style.display = 'none';
+          }
+        };
+
+        function handleEvents() {
+          for (let i = 0; i < events.length; i++) {
+            const event = events[i];
+
+            (eevents[event[0]] || defaultHandler(event))(event, view);
+          }
+
+          events.splice(0);
+        }
+
+        function defaultHandler(event) {
+          console.log(`No eevents ${event[0]}!`)
+          return emptyFn;
+        }
+
+        function emptyFn() {}
+      }
+
+
+      // function runner(universe, startTime = new Date().getTime(), maxRunTime = 1000 / 10, GUIUpdateRate = 100) {
+      //   let currentTick = 0,
+      //       lastGUIUpdate = 0;
+
+      //   return (runTime = new Date().getTime()) => {
+      //     const dt = runTime - startTime,
+      //           t = Math.floor((dt / 1000) * ticksPerStep);
+
+      //     centerOnTrump();
+      //     let currentTime;
+      //     while (currentTick < t && ((currentTime = new Date().getTime()) - runTime) < maxRunTime) {
+      //       handleEvents();
+      //       tick();
+      //       currentTick++;
+      //     }
+
+      //     if ((currentTime - lastGUIUpdate) > 100) {
+      //       updateMassesGUI();
+      //       lastGUIUpdate = currentTime;
+      //     }
+
+      //     if (t - currentTick > 10) {
+      //       catchUpQuantityEl.parentElement.style.display = 'block';
+      //       catchUpQuantityEl.innerHTML = currentTick - t;
+      //     }
+      //     else {
+      //       catchUpQuantityEl.parentElement.style.display = 'none';
+      //     }
+      //   };
+
+      //   function handleEvents() {
+      //     for (let i = 0; i < events.length; i++) {
+      //       const event = events[i];
+
+      //       (eevents[event[0]] || defaultHandler(event))(event, view);
+      //     }
+
+      //     events.splice(0);
+      //   }
+
+      //   function defaultHandler(event) {
+      //     console.log(`No eevents ${event[0]}!`)
+      //     return emptyFn;
+      //   }
+
+      //   function emptyFn() {}
+      // }
+
+      function animate() {
+        run();
+
+        for (let i = 0; i < uievents.length; i++) {
+          const event = uievents[i];
+
+          (uuievents[event[0]] || (() => {}))(event, view);
+        }
+
+        camera.update();
+
+        void trumpTweetEl.offsetWidth;
+
+        for (let i = 0; i < uievents.length; i++) {
+          const [name, ...args] = uievents[i];
+
+          if (name === 'tweet') trumpTweetEl.classList.add('show');
+          else if (name === 'absorbed') {
+            const [absorbed, by] = args;
+
+            absorbedEl.classList.add('show');
+            absorbedNameEl.innerHTML = absorbed;
+            absorbedByNameEl.innerHTML = by;
+          }
+          else if (name === 'absorbedBy') {
+            const [by] = args;
+
+            absorbedByEl.classList.add('show');
+            absorbedByByNameEl.innerHTML = by;
+          }
+          else if (name === 'poof') {
+            const [poof, mass] = args;
+
+            poofEl.classList.add('show');
+          }
+        }
+
+        uievents.splice(0);
+
+        window.requestAnimationFrame(animate);
+      }
+    }
+
+    function createSocket(onopen = () => {}) {
+      // const socket = new WebSocket(`ws://${window.location.hostname}:8080`);
+      const socket = new WebSocket(`ws://104.236.242.248:8080`);
+      let opened;
+      socket.onopen = () => {
+        opened = true;
+        onopen();
+      };
+
+      socket.onmessage = (data, flags) => {
+        const parts = (data.data || '').split(',');
+        const name = parts[0];
+
+        switch (name) {
+          case 'r':
+            handle('retweet+', parts);
+            break;
+          case 't':
+            handle('tweet', parts);
+            break;
+          case 'o':
+            events.push(['observer+', parts[1]]);
+            break;
+          case 'o-':
+            events.push(['observer-', parts[1]]);
+            break;
+        }
+      };
+
+      socket.onclose = () => {
+        if (opened) window.location.reload();
+      };
+
+      return socket;
+    }
+
+    function handle(name, parts) {
+      const id = parts[1];
+      events.push([name, id]);
+
+      const likes = parseInt(parts[2], 10);
+      const followers = parseInt(parts[3], 10);
+
+      if (likes > 0) events.push(['like+', id, likes]);
+      events.push(['follower+', followers]);
+    }
+
+
+    function set (r, x, y, z) {
+      r[0] = x;
+      r[1] = y;
+      r[2] = z;
+      return r;
+    }
+
+    function copy (r, s) {
+      r[0] = s[0];
+      r[1] = s[1];
+      r[2] = s[2];
+      return r;
+    }
+
+    function add (r, u, v) {
+      r[0] = u[0] + v[0];
+      r[1] = u[1] + v[1];
+      r[2] = u[2] + v[2];
+      return r;
+    }
+
+    function sub (r, u, v) {
+      r[0] = u[0] - v[0];
+      r[1] = u[1] - v[1];
+      r[2] = u[2] - v[2];
+      return r;
+    }
+
+    function scale (r, v, s) {
+      r[0] = v[0] * s;
+      r[1] = v[1] * s;
+      r[2] = v[2] * s;
+      return r;
+    }
+
+    function div (r, v, d) {
+      if (d === 0) return copy(r, v);
+      r[0] = v[0] / d;
+      r[1] = v[1] / d;
+      r[2] = v[2] / d;
+      return r;
+    }
+
+    function cross (r, u, v) {
+      r[0] = u[1] * v[2] - u[2] * v[1];
+      r[1] = u[2] * v[0] - u[0] * v[2];
+      r[2] = u[0] * v[1] - u[1] * v[0];
+      return r;
+    }
+
+    function dot (u, v) {
+      return u[0] * v[0] + u[1] * v[1] + u[2] * v[2];
+    }
+
+    function magnitude(v) {
+      return Math.sqrt(v[0] * v[0] +
+                       v[1] * v[1] +
+                       v[2] * v[2]);
+    }
+
+    function normalize(r, v) {
+      return div(r, v, magnitude(v));
+    }
+
+    // http://lolengine.net/blog/2013/09/18/beautiful-maths-quaternion-from-vectors
+    function qFromVectors(u, v) {
+      cross(dd, u, v);
+      const q = [dot(u, v), dd[0], dd[1], dd[2]];
+      q[3] += qnorm(q);
+      return qunit(q, q);
+    }
+
+    // http://lolengine.net/blog/2013/09/18/beautiful-maths-quaternion-from-vectors
+    function qFromUnitVectors(v, u) {
+      const m = Math.sqrt(2 + 2 * dot(v, u));
+      div(dd, cross(dd, v, u), m);
+      return [m/2, dd[0], dd[1], dd[2]];
+    }
+
+
+    //http://mathworld.wolfram.com/Quaternion.html
+    function qmult(r, q1, q2) {
+
+      const v1 = [q1[1], q1[2], q1[3]],
+            v2 = [q2[1], q2[2], q2[3]],
+            s1 = scale([0, 0, 0], v2, q1[0]),
+            s2 = scale([0, 0, 0], v1, q2[0]);
+
+      add(dd, s1, add(dd, s2, cross(dd, v1, v2)));
+
+      r[0] = q1[0] * q2[0] - dot(v1, v2);
+      r[1] = dd[0];
+      r[2] = dd[1];
+      r[3] = dd[2];
+
+      return r;
+    }
+
+    function qconj(r, q) {
+      r[0] = q[0];
+      r[1] = -q[1];
+      r[2] = -q[2];
+      r[3] = -q[3];
+
+      return r;
+    }
+
+    // don't call with d = 0
+    function qdiv(r, q, d) {
+      r[0] = q[0] / d;
+      r[1] = q[1] / d;
+      r[2] = q[2] / d;
+      r[3] = q[3] / d;
+
+      return r;
+    }
+
+    function qnorm(q) {
+      return Math.sqrt(q[0] * q[0] +
+                       q[1] * q[1] +
+                       q[2] * q[2] +
+                       q[3] * q[3]);
+    }
+
+    // assumes unit q?
+    // function qinv(r, q) {
+    //   const s = 1 / (q[0] * q[0] + q[1] * q[1] + q[2] * q[2] + q[3] * q[3]);
+
+    //   r[0] = q[0] * s
+    //   r[1] = -q[1] * s
+    //   r[2] = -q[2] * s
+    //   r[3] = -q[3] * s
+
+    //   return r;
+    // }
+
+    function qinv(r, q) {
+      const n = qnorm(q);
+      return qdiv(r, qconj(r, q), n * n);
+    }
+
+    function qunit(r, q) {
+      const n = qnorm(q);
+      return qdiv(r, q, n);
+    }
+
+
+
+    // might want in the future, saves typing
+    function randomMass() {
+      addMass(new Mass(1, [255, 255, 0, 1], [universe[0].position[0] + Math.random() * 5000 - 2500, universe[0].position[1] + Math.random() * 5000 - 2500, universe[0].position[2] + Math.random() * 5000 - 2500], [Math.random() * 600 - 300, Math.random() * 600 - 300, Math.random() * 600 - 300]));
+    }
+
+    function unselectMass(selectedMassIndex) {
+      colors[selectedMassIndex][0] = savedColor[0];
+      colors[selectedMassIndex][1] = savedColor[1];
+      colors[selectedMassIndex][2] = savedColor[2];
+    }
+
+    function selectMass(selectedMassIndex) {
+      savedColor[0] = colors[selectedMassIndex][0];
+      savedColor[1] = colors[selectedMassIndex][1];
+      savedColor[2] = colors[selectedMassIndex][2];
+      // colors[selectedMassIndex][0] = 0;
+      // colors[selectedMassIndex][1] = 255;
+      // colors[selectedMassIndex][2] = 0;
+    }
+  </script>
+
+  <hud>
+    <start>
+      <enter-looking></enter-looking>
+      <enter-moving></enter-moving>
+    </start>
+
+    <looking>
+      <current-look-at>
+        <previous-look-at>&lt;</previous-look-at>
+        <display>
+          Looking At
+          <look-at-mass-name></look-at-mass-name>
+          <table>
+            <tbody>
+              <tr><td>Mass:</td><td><look-at-mass-quantity></look-at-mass-quantity></td></tr>
+              <tr><td>Distance to <mass-name></mass-name>:</td><td><look-at-distance-quantity></distance-quantity></td></tr>
+              <tr class="distance"><td>Distance to <trump>TRUMP</trump>:</td><td><look-at-trump-distance-quantity></distance-quantity></td></tr>
+            </tbody>
+          </table>
+        </display>
+        <next-look-at>&gt;</next-look-at>
+      </current-look-at>
+      <orbit-statistics><orbit-statistics-quantity></orbit-statistics-quantity> in orbit</orbit-statistics>
+      <moving-trigger></moving-trigger>
+    </looking>
+
+    <moving>
+      <current-mass>
+        <display>
+          <mass-name></mass-name>
+          <data>
+            <table>
+              <tbody>
+                <tr><td>Mass:</td><td><mass-quantity></mass-quantity></td></tr>
+                <tr><td>Distance to <trump>TRUMP</trump>:</td><td><distance-quantity></distance-quantity></td></tr>
+              </tbody>
+            </table>
+            <table>
+              <tbody>
+                <tr><td>Absolute (!) velocity:</td><td><mass-velocity-quantity></mass-velocity-quantity></td></tr>
+              </tbody>
+            </table>
+          </data>
+        </display>
+      </current-mass>
+
+      <velocity-controls>
+        <others>
+          <up>
+            <yp>⇧</yp></up>
+          <x>
+            <xn>⇦</xn>
+            <xp>⇨</xp>
+          </x>
+          <down>
+            <zn>⇧</zn>
+            <yn>⇩</yn>
+            <zp>⇩</zp>
+          </down>
+        </others>
+      </velocity-controls>
+    </moving>
+
+
+    <catch-up><catch-up-quantity></catch-up-quantity> ticks behind</catch-up>
+    <trump-tweet>
+     <warning><trump>TRUMP</trump> has tweeted, watch out!</warning>
+     <info>Don't worry, CNN is orbiting it!</info>
+    </trump-tweet>
+    <absorbed><absorbed-name></absorbed-name> was absorbed by <absorbed-by-name></absorbed-by-name>!</absorbed>
+    <absorbed-by>You Were Absorbed By <absorbed-by-by-name></absorbed-by-by-name>!</absorbed-by>
+    <poof>You ran out of mass!</poof>
+    <commands></commands>
+
+    <tag><trump>TRUMP</trump>orbit <brand>alpha preview</brand> <version>uncommitted</version></tag>
+    <souls><souls-quantity></souls-quantity></souls>
+    <overview>Overview</overview>
+    <stats>Stats</stats>
+    <help>?</help>
+    <help-content>
+     O 'overview
+     F 'frontview
+     S 'sideview
+     L 'lookAtTrump
+     ] 'nextMass
+     [ 'prevMass
+     T 'fakeTweet
+     R 'fakeRetweet
+     K 'fakeLike
+    ENTER 'newMass
+    SPACE 'change movement target
+     A 'decrease target x velocity (x-)
+     D 'increase target x velocity (x+)
+     W 'decrease target z velocity (z-)
+     V 'increase target z velocity (z+)
+     Q 'increase target y velocity (y-)
+     Z 'decrease target y velocity (y+)
+     . 'speed+
+     , 'speed-
+     0 'ticks+
+     9 'ticks-
+    </help-content>
+
+    <ask><a href="#give">Give a Gift</a></ask>
+  </hud>
+</mathbox>
+
+<notice>
+  <screen></screen>
+  <message>entering <trump>TRUMP</trump> orbit<message>
+  <statement>You are a brave soul</statement>
+</notice>

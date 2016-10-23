@@ -1,3 +1,6 @@
+dist
 node_modules
 .jshintrc
 .transpiled
+index.html
+src/style.css

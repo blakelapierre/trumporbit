@@ -4,6 +4,10 @@
 echo "Building Handler..."
 
 mkdir -p dist && \
+(while inotifywait -qe modify src/style.less
+  do
+    lessc src/style.less src/style.css
+  done) &
 (babel --presets es2015 --source-type 'module' --watch src --out-dir .transpiled & \
   (sleep 5 && \
     (tee >(read && browser-sync start --server --files "*.html|dist/*.js") \

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+mkfifo fifo &> /dev/null
+
+while read path event file; do
+  echo -e "\e[41m$path $event $file\e[49m"
+  killall broadcast-events-exe &> /dev/null
+
+  echo -e "\e[103m\e[30mStarting Build\e[49m\e[39m"
+  (cabal build && echo -e "\e[39m" && (echo -e "\e[42m\e[30mRunning\e[49m\e[39m" && cabal run < fifo & sleep 2 && echo -e "\e[44m\e[96msending tweets\e[49m\e[39m" && cat tweets > fifo)) >&1
+done < <(cat <(echo "first build") <(inotifywait -qrme close_write **/*.hs))
