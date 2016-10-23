@@ -1,0 +1,7 @@
+#!/bin/bash
+
+cp /lib64/libffi.so.6.0.2 ./libffi.so.6 && \
+
+cp ../dist/build/broadcast-events-exe/broadcast-events-exe ./broadcast-events-exe && \
+
+docker build -t trumporbit/broadcast-events-haskell .
