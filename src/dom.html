@@ -227,7 +227,7 @@
         this.observed.fov = this.observed.fov + (this._targetFov - this.observed.fov) * Math.min(this._fi++, speed) / speed;
 
 
-        const q = qFromUnitVectors([0, 0, 1], normalize(dd, sub(dd, this.observed.position, this.observed.lookAt))
+        const q = qFromUnitVectors([0, 0, 1], normalize(dd, sub(dd, this.observed.position, this.observed.lookAt)));
         const r = [0, 0, 0, 0],
               i = qinv([0, 0, 0, 0], q);
 
@@ -790,6 +790,8 @@
           qmult(r, qmult(r, q, [0, x, y, z]), qconj(i, q));
 
           qunit(r, r);
+
+          // r seems to not be right here in some cases
 
           if (mass.emissionCounter++ % EMISSION_RATE === 0) events.push(['emission', mass, [-r[1], -r[2], -r[3]]]);
 
