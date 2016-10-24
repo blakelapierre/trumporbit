@@ -35,7 +35,7 @@ handleWS bcast connectionCount pending = do
 
     count <- readMVar connectionCount
 
-    sendTextData connection (toLazyByteString $ stringUtf8 "o," <> (intDec count))
+    -- sendTextData connection (toLazyByteString $ stringUtf8 "o," <> (intDec count))
 
     contents <- getChanContents localChan
 
