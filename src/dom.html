@@ -53,13 +53,14 @@
           lookingEl = document.querySelector('looking'),
           movingEl = document.querySelector('moving');
 
-    enterLookingEl.addEventListener('click', event => enterState('looking'));
-    enterMovingEl.addEventListener('click', event => enterState('moving'));
+    enterLookingEl.addEventListener('click', event => console.log('go looking') & enterState('looking'));
+    enterMovingEl.addEventListener('click', event => console.log('go moving') & enterState('moving'));
 
     // const states = {looking, moving};
     let currentState, controls;
 
     function enterState(state) {
+      console.log('entering', state);
       if (currentState) hud.classList.remove(currentState);
 
       hud.classList.add(state);
@@ -92,12 +93,10 @@
       return ['xn', 'xp', 'yn', 'yp', 'zn', 'zp'].map(n => {
         const el = document.querySelector(n);
 
-        // el.onclick = event => {
-        //   events.push([n]);
-        //   event.stopPropagation();
-        // };
+        console.log('attaching on', n);
 
         el.onmousedown = event => {
+          console.log(n);
           events.push([`+${n}`]);
           event.stopPropagation();
         };
@@ -107,27 +106,28 @@
           event.stopPropagation();
         };
 
-        // el.addEventListener('click', event => {
-        //   events.push([n]);
-        //   event.stopPropagation();
-        // });
+        el.onclick = event => {
+          event.stopPropagation();
+        };
 
         return el;
       });
     }
 
     function detachVelocityControls(controls) {
-      (controls || []).forEach(c => c.onclick = undefined);
+      (controls || []).forEach(c => c.onmousedown = c.onmouseup = c.onclick = undefined);
     }
 
     const velocityControlsEl = document.querySelector('velocity-controls'),
           movingTriggerEl = document.querySelector('moving-trigger');
 
     movingEl.addEventListener('click', event => {
+      console.log('moving to start');
       enterState('start');
     });
 
     lookingEl.addEventListener('click', event => {
+      console.log('looking to start');
       enterState('start');
     });
 
@@ -144,6 +144,7 @@
           lookAtTrumpDistanceQuantityEl = document.querySelector('look-at-trump-distance-quantity'),
           massQuantityEl = document.querySelector('mass-quantity'),
           massVelocityQuantityEl = document.querySelector('mass-velocity-quantity'),
+          massAccelerationQuantityEl = document.querySelector('mass-acceleration-quantity'),
           distanceQuantityEl = document.querySelector('distance-quantity'),
           catchUpQuantityEl = document.querySelector('catch-up-quantity'),
           soulsQuantityEl = document.querySelector('souls-quantity'),
@@ -313,6 +314,8 @@
         this.velocity = velocity;
         this.acceleration = acceleration;
         this.gravity = gravity;
+        this.boost = [0, 0, 0];
+        this.emissionCounter = 0;
         this.collisions = [];
       }
 
@@ -459,6 +462,7 @@
       '-zp': event => unsetBoost(0, 0, vBoost),
 
       // internal
+      'emission': emission,
       'absorbed': absorbed,
       'oldTweets': addOldTweets,
       'poof': poof
@@ -494,6 +498,7 @@
           media = [],
           observers = [],
           emissions = [],
+          boostings = [],
           events = [['oldTweets']],
           uievents = [];
 
@@ -507,6 +512,9 @@
           MAX_OBSERVERS = 51,
           MAX_TWEET_SPAWN_AGE = 60 * 5,
           MAX_EMISSION_AGE = 60 * 5;
+
+    const EMISSION_RATE = 10,
+          EMISSION_SCALE_FACTOR = 5;
 
     const vBoost = 10;
 
@@ -651,6 +659,18 @@
       pendingTweetSpawn--;
     }
 
+    function emission ([_, mass, emissionDirection]) {
+      const {position: p, velocity: v} = mass;
+
+      const emission = mass.mass * 0.01 / ticksPerStep;
+
+      scale(dd, emissionDirection, mass.collisionSize[0] / 30); // why does this need ~30 here?
+
+      const e = addMass(new Emission(emission, COLORS.observer, add([0, 0, 0], mass.position, dd), add([0, 0, 0], newv(mass.velocity), scale(dd, dd, EMISSION_SCALE_FACTOR))));
+
+      emissions.push(e);
+    }
+
     function absorbed(event) {
       uievents.push(event);
     }
@@ -698,76 +718,26 @@
         uievents.push(['poof', mass]);
         enterState('looking') // get camera out of here!
       }
-
-      // if (camera.positionIndex >= index && camera.positionIndex > 0) {
-      //   if (camera.positionIndex === index) {
-      //     camera.positionIndex = positions.length - 1;
-      //     uievents.push(['poof', mass])
-      //     enterState('looking'); // what?!
-      //   }
-      //   else camera.positionIndex--;
-      // }
-      // if (camera.lookAtIndex >= index) {
-      //   previousLookAt();
-      // }
     }
 
-    function setBoost(mass, x, y, z) {
+    function setBoost(x = 0, y = 0, z = 0) {
+      const mass = camera.follow,
+            {boost} = mass;
 
+      add(boost, boost, [x, y, z]);
+
+      if (boostings.indexOf(mass) === -1) boostings.push(mass); // more efficient way?
     }
 
-    function unsetBoost(mass, x, y, z) {
-      // sub(mass.boost,
+    function unsetBoost(x = 0, y = 0, z = 0) {
+      const mass = camera.follow,
+            {acceleration, boost} = mass;
+
+      set(acceleration, 0, 0, 0);
+      sub(boost, boost, [x, y, z]);
+
+      boostings.splice(boostings.indexOf(mass), 1);
     }
-
-    // x,y,z from camera/observer pov
-    function emitMass(x = 0, y = 0, z = 0) {
-      const mass = universe[camera.positionIndex],
-            {position: p, velocity: v} = mass,
-            tp = universe[camera.lookAtIndex].position,
-            d = normalize([0, 0, 0], sub(dd, p, tp));
-            // d = [p[0]-tp[0], p[1]-tp[1], p[2]-tp[2]];
-      const emission = mass.mass * 0.05;
-
-      // sub(d, p, tp);
-            // m = magnitude(d);
-            // m = magnitude(d) || 1;
-
-      const u = [0, 0, 1];
-
-      const q = qFromUnitVectors(u, d);
-
-      // qunit(q, q);
-
-      const r = [0, 0, 0, 0],
-            i = qinv([0, 0, 0, 0], q);
-
-      qmult(r, qmult(r, q, [0, x, y, z - 1]), qconj(i, q));
-
-      add(v, v, [r[1], r[2], r[3]]);
-
-      const emissionVelocity = [-r[1], -r[2], -r[3]];
-
-      qunit(r, r);
-      // scale(dd, [-r[1], -r[2], -r[3]], (mass.mass + emission + 1) / 2);
-      scale(dd, emissionVelocity, mass.collisionSize[0] / 200); // why does this need ~200 here?
-
-      mass.mass -= emission;
-
-      // const e = addMass(new Emission(emission, COLORS.observer, add([0, 0, 0], mass.position, dd), add([0, 0, 0], mass.velocity, emissionVelocity)));
-      const e = addMass(new Emission(emission, COLORS.observer, add([0, 0, 0], mass.position, dd), [0, 0, 0]));
-
-      emissions.push(e);
-
-      if (mass.mass < 0.01) events.push(['poof', mass, i]);
-    }
-
-
-
-
-
-
-
 
 
     let trumpScaleFactor = 5;
@@ -820,7 +790,7 @@
     let collisionIIndex = 0;
 
     let /*ticksPerSecond = 60,*/
-        ticksPerStep = 30,
+        ticksPerStep = 60,
         stepsPerSecond = 1;
 
 
@@ -828,13 +798,43 @@
     function tick() {
       currentTick++;
 
+      updateBoosts();
       updateEmissions();
       updateTweetSpawn();
       positionHalfTick();
       updateGravities();
-      universe.forEach(updateMassVelocityAndPartialPosition);
-      // updateVelocities();
+      updateVelocities();
       resolveCollisions();
+
+      function updateBoosts() {
+        boostings.forEach(mass => {
+          const {boost, position: p, velocity: v} = mass,
+                tp = camera.lookAt.position,
+                d = normalize([0, 0, 0], sub(dd, p, tp)),
+                [x, y, z] = boost;
+
+          const u = [0, 0, 1];
+
+          const q = qFromUnitVectors(u, d);
+
+          const r = [0, 0, 0, 0],
+                i = qinv([0, 0, 0, 0], q);
+
+          qmult(r, qmult(r, q, [0, x, y, z]), qconj(i, q));
+
+          qunit(r, r);
+
+          if (mass.emissionCounter++ % EMISSION_RATE === 0) events.push(['emission', mass, [-r[1], -r[2], -r[3]]]);
+
+          scale(dd, [r[1], r[2], r[3]], EMISSION_SCALE_FACTOR * mass.mass);
+
+          copy(mass.acceleration, dd);
+
+          mass.mass -= mass.mass * 0.01 / ticksPerStep;
+
+          if (mass.mass < 0.01) events.push(['poof', mass, i]);
+        });
+      }
 
       function updateEmissions() {
         for (let i = emissions.length - 1; i >= 0; i--) {
@@ -854,21 +854,9 @@
             colors.splice(index, 1);
 
             if (camera.follow === emission) {
-                uievents.push(['poof', emission]);
-                enterState('looking'); // what?!
+              uievents.push(['poof', emission]);
+              enterState('looking'); // what?!
             }
-
-            // if (camera.positionIndex >= index && camera.positionIndex > 0) {
-            //   if (camera.positionIndex === index) {
-            //     camera.positionIndex = positions.length - 1;
-            //     uievents.push(['poof', emission]);
-            //     enterState('looking'); // what?!
-            //   }
-            //   else camera.positionIndex--;
-            // }
-            // if (camera.lookAtIndex >= index) {
-            //   previousLookAt();
-            // }
           }
         }
       }
@@ -1019,6 +1007,10 @@
         }
       }
 
+      function updateVelocities() {
+        universe.forEach(updateMassVelocityAndPartialPosition);
+      }
+
       function updateMassVelocityAndPartialPosition(mass) {
         mass.velocityTick(ticksPerStep);
         mass.positionHalfTick(ticksPerStep);
@@ -1130,7 +1122,7 @@
 
       // const currentMass = universe[camera.positionIndex],
       const currentMass = camera.follow,
-            {mass, name, position, velocity} = currentMass;
+            {mass, name, position, velocity, acceleration} = currentMass;
 
       const distance = magnitude(sub(dd, currentMass.position, trump.position));
 
@@ -1140,6 +1132,7 @@
       massQuantityEl.innerHTML = mass.toFixed(2);
       distanceQuantityEl.innerHTML = distance.toFixed(1);
       massVelocityQuantityEl.innerHTML = `[${velocity[0].toFixed(1)}, ${velocity[1].toFixed(1)}, ${velocity[2].toFixed(1)}] ${magnitude(velocity).toFixed(1)}`;
+      massAccelerationQuantityEl.innerHTML = `[${acceleration[0].toFixed(1)}, ${acceleration[1].toFixed(1)}, ${acceleration[2].toFixed(1)}] ${magnitude(acceleration).toFixed(1)}`;
 
       const {totalSouls} = stats;
       soulsQuantityEl.innerHTML = `${totalSouls || 0} soul${totalSouls === 1 ? '' : 's'}`;
@@ -1605,8 +1598,8 @@
     }
 
     function createSocket(onopen = () => {}) {
-      // const socket = new WebSocket(`ws://${window.location.hostname}:8080`);
-      const socket = new WebSocket(`ws://104.236.242.248:8080`);
+      const socket = new WebSocket(`ws://${window.location.hostname}:8080`);
+      // const socket = new WebSocket(`ws://104.236.242.248:8080`);
       let opened;
       socket.onopen = () => {
         opened = true;
@@ -1651,6 +1644,9 @@
       events.push(['follower+', followers]);
     }
 
+    function newv (s) {
+      return copy([0, 0, 0], s);
+    }
 
     function set (r, x, y, z) {
       r[0] = x;
@@ -1860,7 +1856,8 @@
             </table>
             <table>
               <tbody>
-                <tr><td>Absolute (!) velocity:</td><td><mass-velocity-quantity></mass-velocity-quantity></td></tr>
+                <tr><td>V:</td><td><mass-velocity-quantity></mass-velocity-quantity></td></tr>
+                <tr><td>A:</td><td><mass-acceleration-quantity></mass-acceleration-quantity></td></tr>
               </tbody>
             </table>
           </data>
