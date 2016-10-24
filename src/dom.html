@@ -46,6 +46,21 @@
       document.body.removeEventListener('touchstart', goFullScreen);
     }
 
+    let x = 10;
+    document.body.addEventListener('wheel', event => {
+      camera.followDistance += event.deltaY > 0 ? x : -x;
+      camera.followDistance = Math.max(0, camera.followDistance);
+    });
+
+    document.body.addEventListener('mousemove', ({clientX, clientY}) => {
+      const width = document.body.clientWidth,
+            height = document.body.clientHeight,
+            x = clientX / width - 0.5,
+            y = clientY / height - 0.5;
+
+      set(camera.targetOffset, x, y, 0);
+    });
+
 
     const hud = document.querySelector('hud'),
           enterLookingEl = document.querySelector('enter-looking'),
@@ -67,18 +82,21 @@
 
       if (state === 'moving') {
         camera.targetOffset = [0, 0, 0];
+        camera.followDistance = 70;
         camera.targetFov = 100;
 
         controls = attachVelocityControls();
       }
       else if (state === 'looking') {
-        camera.targetOffset = [0, 50, 0];
+        camera.targetOffset = [0, 1, 0];
+        camera.followDistance = 50;
         camera.targetFov = 60;
 
         detachVelocityControls(controls);
       }
       else if (state === 'start') {
-        camera.targetOffset = [0, 70, 0];
+        camera.targetOffset = [0, 1, 0];
+        camera.followDistance = 70;
         camera.targetFov = 90;
 
         detachVelocityControls(controls);
@@ -175,9 +193,11 @@
         this.follow = follow;
         this.lookAt = lookAt;
 
+        this.followDistance = 70;
+
         this._targetPosition = [0, 0, 0];
         this._targetLookAt = [0, 0, 0];
-        this._targetOffset = [0, 70, 0];
+        this._targetOffset = [0, 1, 0];
         this._targetUp = [0, 0, 0];
         this._targetFov = 90;
 
@@ -217,8 +237,10 @@
         this._oi++;
         // this._fi++;
 
-        add(this._targetPosition, p, scale(d, d, 100));
-        add(this._targetPosition, this._targetPosition, this.offset);
+        add(d, d, this.offset);
+        add(this._targetPosition, p, scale(d, d, this.followDistance));
+        // add(this._targetPosition, this._targetPosition, this.offset);
+        // add(this._targetPosition, scale(dd, normalize(dd, sub(dd, this._targetPosition, this.offset)), this.followDistance));
 
         add(this.observed.position, this.observed.position, scale(dd, sub(dd, this.observed.position, this._targetPosition), -Math.min(this._pi++, speed) / speed));
 
@@ -453,9 +475,9 @@
     };
 
     const views = {
-      'overview': [0, 2500, 0],
-      'frontview': [0, 0, 3500],
-      'sideview': [-3500, 0, 0]
+      'overview': [0, 1, 0],
+      'frontview': [0, 0, 1],
+      'sideview': [-1, 0, 0]
     };
 
 
@@ -688,22 +710,32 @@
     }
 
     function setBoost(x = 0, y = 0, z = 0) {
+      console.log('setBoost', x, y, z);
       const mass = camera.follow,
             {boost} = mass;
 
       add(boost, boost, [x, y, z]);
 
+      console.log(boost);
+
       if (boostings.indexOf(mass) === -1) boostings.push(mass); // more efficient way?
     }
 
     function unsetBoost(x = 0, y = 0, z = 0) {
+      console.log('unsetBoost', x, y, z);
       const mass = camera.follow,
             {acceleration, boost} = mass;
 
       set(acceleration, 0, 0, 0);
       sub(boost, boost, [x, y, z]);
 
-      boostings.splice(boostings.indexOf(mass), 1);
+      console.log(boost);
+
+      if (boost[0] === 0 && boost[1] === 0 && boost[2] === 0) {
+        console.log('removing');
+        const index = boostings.indexOf(mass);
+        if (index > -1) boostings.splice(index, 1);
+      }
     }
 
 
@@ -795,7 +827,7 @@
 
           if (mass.emissionCounter++ % EMISSION_RATE === 0) events.push(['emission', mass, [-r[1], -r[2], -r[3]]]);
 
-          scale(dd, [r[1], r[2], r[3]], EMISSION_SCALE_FACTOR * mass.mass);
+          scale(dd, [r[1], r[2], r[3]], EMISSION_SCALE_FACTOR * mass.mass / 2);
 
           copy(mass.acceleration, dd);
 
@@ -1230,12 +1262,12 @@
       callback: start,
       camera: {far: 1000000},
       controls: [
-        [['A'], 'left'],
-        [['D'], 'right'],
-        [['W'], 'forward'],
-        [['S'], 'backward'],
-        [['Q'], 'up'],
-        [['Z'], 'down'],
+        [['A'], '+left', '-left'],
+        [['D'], '+right', '-right'],
+        [['W'], '+forward', '-forward'],
+        [['S'], '+backward', '-backward'],
+        [['Q'], '+up', '-up'],
+        [['Z'], '+down', '-down'],
         [['H'], 'toggleHistory'],
         [['T'], 'fakeTweet'],
         [['R'], 'fakeRetweet'],
@@ -1254,12 +1286,18 @@
         [[219], 'prevMass']
       ],
       commands: {
-        'left': () => velocities[selectedMassIndex][0]--,
-        'right': () => velocities[selectedMassIndex][0]++,
-        'forward': () => velocities[selectedMassIndex][2]--,
-        'backward': () => velocities[selectedMassIndex][2]++,
-        'up': () => velocities[selectedMassIndex][1]++,
-        'down': () => velocities[selectedMassIndex][1]--,
+        '+left': repeat => !repeat ? setBoost(-vBoost) : undefined,
+        '-left': () => unsetBoost(-vBoost),
+        '+right': repeat => !repeat ? setBoost(vBoost) : undefined,
+        '-right': () => unsetBoost(vBoost),
+        '+forward': repeat => !repeat ? setBoost(0, 0, -vBoost) : undefined,
+        '-forward': () => unsetBoost(0, 0, -vBoost),
+        '+backward': repeat => !repeat ? setBoost(0, 0, vBoost) : undefined,
+        '-backward': () => unsetBoost(0, 0, vBoost),
+        '+up': repeat => !repeat ? setBoost(0, vBoost) : undefined,
+        '-up': () => unsetBoost(0, vBoost),
+        '+down': repeat => !repeat ? setBoost(0, -vBoost) : undefined,
+        '-down': () => unsetBoost(0, -vBoost),
         // 'lookAtTrump': () => camera.lookAtIndex = 0,
         // 'overview': () => {camera.lookAtIndex = 0; camera.positionIndex = 0; camera.targetOffset =  views.overview;},
         // 'frontview': () => {camera.lookAtIndex = 0; camera.positionIndex = 0; camera.targetOffset =  views.frontview;},
