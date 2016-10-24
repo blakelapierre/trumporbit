@@ -1583,39 +1583,65 @@
     }
 
     function createSocket(onopen = () => {}) {
-      // const socket = new WebSocket(`ws://${window.location.hostname}:8080`);
-      const socket = new WebSocket(`ws://104.236.242.248:8080`);
-      let opened;
-      socket.onopen = () => {
-        opened = true;
-        onopen();
-      };
+      try {
+        const socket = new WebSocket(`ws://${window.location.hostname}:8080`);
+        // const socket = new WebSocket(`ws://104.236.242.248:8080`);
+        let opened;
+        socket.onopen = () => {
+          opened = true;
+          resetReconnectTimer();
+          onopen();
+        };
 
-      socket.onmessage = (data, flags) => {
-        const parts = (data.data || '').split(',');
-        const name = parts[0];
+        socket.onmessage = (data, flags) => {
+          const parts = (data.data || '').split(',');
+          const name = parts[0];
 
-        switch (name) {
-          case 'r':
-            handle('retweet+', parts);
-            break;
-          case 't':
-            handle('tweet', parts);
-            break;
-          case 'o':
-            events.push(['observer+', parts[1]]);
-            break;
-          case 'o-':
-            events.push(['observer-', parts[1]]);
-            break;
-        }
-      };
+          switch (name) {
+            case 'r':
+              handle('retweet+', parts);
+              break;
+            case 't':
+              handle('tweet', parts);
+              break;
+            case 'o':
+              events.push(['observer+', parts[1]]);
+              break;
+            case 'o-':
+              events.push(['observer-', parts[1]]);
+              break;
+          }
+        };
 
-      socket.onclose = () => {
-        if (opened) window.location.reload();
-      };
+        socket.onclose = () => {
+          if (opened) window.location.reload();
+        };
 
-      return socket;
+        socket.onerror = event => {
+          console.log('error', event);
+
+          const waitTime = getReconnectTimer();
+          console.log(`attempting reconnect in ${waitTime} ms`);
+          setTimeout(() => createSocket(onopen), waitTime);
+        };
+
+        return socket;
+      }
+      catch (e) {
+        console.log('caught!', e);
+      }
+    }
+
+    let reconnectTimer = 1000;
+    function resetReconnectTimer() {
+      reconnectTimer = 1000;
+    }
+
+    function getReconnectTimer() {
+      const timer = reconnectTimer;
+      reconnectTimer *= 1.5;
+      reconnectTimer = Math.min(60 * 1000, reconnectTimer);
+      return timer;
     }
 
     function handle(name, parts) {
@@ -1913,5 +1939,6 @@
 <notice>
   <screen></screen>
   <message>entering <trump>TRUMP</trump> orbit<message>
-  <statement>You are a brave soul</statement>
+  <standby>please standby</standby>
+  <failure>you are failing to connect</failure>
 </notice>

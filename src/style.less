@@ -758,6 +758,24 @@ trump {
     }
   }
 
+  @keyframes fade {
+    0% {
+      color: rgba(255, 255, 255, 1);
+    }
+    100% {
+      color: darken(desaturate(rgba(255, 255, 255, 1), 50%), 90%);
+    }
+  }
+
+  @keyframes trump-fade {
+    0% {
+      color: rgba(255, 215, 0, 1);
+    }
+    100% {
+      color: darken(desaturate(rgba(255, 215, 0, 1), 70%), 30%);
+    }
+  }
+
   @keyframes fade-color-in-and-out {
     0% {
       color: rgba(255, 255, 255, 0);
@@ -766,6 +784,18 @@ trump {
       color: rgba(255, 255, 255, 1);
     }
     100% {
+      color: rgba(255, 255, 255, 0);
+    }
+  }
+
+  @keyframes cycle {
+    20% {
+      color: rgba(255, 255, 255, 0);
+    }
+    50% {
+      color: rgba(255, 255, 255, 1);
+    }
+    80% {
       color: rgba(255, 255, 255, 0);
     }
   }
@@ -803,22 +833,22 @@ trump {
     &.connected {
       transform: scale(0);
 
-      animation: fade-color-out 11s ease-in-out;
+      animation: fade-color-out 4s ease-in-out;
 
       screen {
-        animation: fade-background-out 6s 3s ease-in-out forwards;
+        animation: fade-background-out 3s ease-in-out forwards;
       }
 
       message {
-        animation: fade-color-out 6s 1s ease-in-out forwards;
+        animation: fade-color-out 2.75s ease-in-out forwards;
         trump {
-          animation: fade-color-out 6s 3s ease-in-out forwards;
+          animation: fade-color-out 3s ease-in-out forwards;
 
         }
       }
 
-      statement {
-        animation: fade-color-in-and-out 6s 2s ease-in-out;
+      standby, failure {
+        animation: none;
       }
     }
 
@@ -846,18 +876,22 @@ trump {
       align-items: center;
       justify-content: center;
 
+      animation: fade 5s ease-out forwards;
+
       trump {
         margin: 0 1vw;
         font-size: 7vw;
+
+        animation: trump-fade 5s ease-out forwards;
       }
     }
 
-    statement {
+    standby {
       position: absolute;
 
       left: 0;
       right: 0;
-      bottom: 10%;
+      bottom: 33%;
 
       display: flex;
 
@@ -867,6 +901,27 @@ trump {
 
       align-items: center;
       justify-content: center;
+
+      animation: cycle 8s 0s ease-in-out infinite;
+    }
+
+    failure {
+      position: absolute;
+
+      left: 0;
+      right: 0;
+      bottom: 33%;
+
+      display: flex;
+
+      font-size: 2vw;
+
+      color: rgba(255, 255, 255, 0);
+
+      align-items: center;
+      justify-content: center;
+
+      animation: cycle 8s 4s ease-in-out infinite;
     }
   }
 // }
