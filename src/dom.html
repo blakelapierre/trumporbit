@@ -69,8 +69,6 @@
         camera.targetOffset = [0, 0, 0];
         camera.targetFov = 100;
 
-        // universe[camera.positionIndex].color[3] = 0.25;
-
         controls = attachVelocityControls();
       }
       else if (state === 'looking') {
@@ -196,10 +194,6 @@
         }
 
         this.offset = vnew(this._targetOffset);
-        // this.position = copy([0, 0, 0], this._targetPosition);
-        // this.lookAt = copy([0, 0, 0], this._targetLookAt);
-        // this.up = [0, 0, 0];
-        // this.fov = 90;
       }
 
       get iOffset() { return add(dd, this.offset, scale(dd, sub(dd, this._targetOffset, this.offset), Math.min(this._oi, speed) / speed)); }
@@ -207,10 +201,8 @@
 
       update() {
         const p = this.follow.position,
-              // tp = universe[this.lookAtIndex].position,
               tp = this.lookAt.position,
               d = sub([0, 0, 0], p, tp),
-              // d = [p[0]-tp[0], p[1]-tp[1], p[2]-tp[2]],
               m = magnitude(d);
 
         if (m > 0) div (d, d, m);
@@ -225,8 +217,6 @@
         this._oi++;
         // this._fi++;
 
-        // add(this.offset, this.offset, scale(dd, sub(dd, this._targetOffset, this.offset), Math.min(this._oi++, speed) / speed));
-// console.log(this.offset);
         add(this._targetPosition, p, scale(d, d, 100));
         add(this._targetPosition, this._targetPosition, this.offset);
 
@@ -237,32 +227,15 @@
         this.observed.fov = this.observed.fov + (this._targetFov - this.observed.fov) * Math.min(this._fi++, speed) / speed;
 
 
-        // const q = qFromVectors(sub(dd, this.observed.position, this.observed.lookAt), this.observed.lookAt);
-        // const q = qFromVectors([0, 1, 0], sub(dd, this.observed.position, this.observed.lookAt));
-        // const q = qFromVectors([0, 0, 1], sub(dd, this.observed.lookAt, this.observed.position));
-        const q = qFromUnitVectors([0, 0, 1], normalize(dd, sub(dd, this.observed.position, this.observed.lookAt)));
-        // qunit(q, q);
-// set(this.up, q[1], q[2], q[3]);
+        const q = qFromUnitVectors([0, 0, 1], normalize(dd, sub(dd, this.observed.position, this.observed.lookAt))
         const r = [0, 0, 0, 0],
               i = qinv([0, 0, 0, 0], q);
 
-              // console.log(q);
-
-        // qmult(r, qmult(r, q, [0, 0, 0, -1]), i);
         qmult(r, qmult(r, q, [0, this.offset[0], this.offset[1], this.offset[2]]), qconj(i, q));
-
-        // add(this.observed.position, this.observed.position, [r[1], r[2], r[3]]);
 
         qmult(r, qmult(r, q, [0, 0, 1, 0]), i);
 
-        // qunit(r, r);
-        // set(this.up, 0, 1, 0);
         set(this.observed.up, 0, 1, 0);
-        // set(this.up, r[1], r[2], r[3]);
-        // cross(this.up, [0, 1, 0], [-r[1], -r[2], -r[3]]);
-        // cross(this.up, tp, this.target.velocity]);
-        // set(this.up, -r[1], -r[2], -r[3]);
-        // console.log(this.up, this.offset);
       }
 
       set lookAt (mass) { console.log('now looking at', mass); if (!mass) throw new Error('looking at nothing!'); this._lookAtMass = mass; this._li = 0; }
@@ -342,9 +315,6 @@
         } = this;
 
         add(v, v, div(dd, add(dd, a, g), ticksPerStep));
-        // v[0] += (a[0] + g[0]) / ticksPerStep;
-        // v[1] += (a[1] + g[1]) / ticksPerStep;
-        // v[2] += (a[2] + g[2]) / ticksPerStep;
       }
     }
 
@@ -558,8 +528,6 @@
 
     let totalObserverCount = 0;
     function addObserver([_, totalConnected]) {
-      // if (observers.length === 0) camera.positionIndex = universe.length;
-
       if (observers.length < MAX_OBSERVERS) {
         const {position: tp, velocity: tv} = trump;
         const observer = addMass(new Observer(1, COLORS.observer, ORBIT_PARAMETERS.observer.p(tp, tv), ORBIT_PARAMETERS.observer.v(tp, tv)));
@@ -593,7 +561,6 @@
     }
 
     function addTweet(event) {
-      // camera.lookAtIndex = universe.length;
       // this should be calculated based on current trump mass (and, maybe, positions/velocities of orbiting masses?)
       const {position: tp, velocity: tv} = trump;
 
@@ -940,12 +907,7 @@
           collisions
         } = universe[i];
 
-        // if (futureCollision) {
-        //   collisionList.push(futureCollision);
-        // }
-
-        for (let j = i + 1; j < universe.length; j++) updatePair(p1, v1, a1, g1, m1, s1, i, j, collisions); // probably don't want to create a new object on every call?   ??!?!?!?
-        // for (let j = i + 1; j < universe.length; j++) updatePair(p1, v1, a1, g1, m1, s1, i, j, {futureCollision}); // probably don't want to create a new object on every call?   ??!?!?!?
+        for (let j = i + 1; j < universe.length; j++) updatePair(p1, v1, a1, g1, m1, s1, i, j, collisions); //
 
         if (collisions.length > 0) {
           collisionList.push(collisions[0]);
@@ -990,18 +952,14 @@
 
       function handleCollision(s1, s2, m1, m2, d1, d2, i, j, collisionList, collisions) {
         if (collisions.length === 0) {
-        // if (!collisions.futureCollision) {
           const threshold = (s1[0] + s2[0]) / 4;
           if (d1 < threshold || d2 < threshold) { // better ordering of checks?
             if (m1 <= m2) {
               //wtf is this
-              //the same universe[i] could be pushed multiple times!!!!!!!
-              // collisionList.push([universe[i], universe[j], i]);
               collisions.push([universe[i], universe[j], i, j]);
             }
             else {
               universe[j].collisions.push([universe[j], universe[i], j, i]);
-              // universe[j].futureCollision = [universe[j], universe[i], j];
             }
           }
         }
@@ -1071,19 +1029,6 @@
             uievents.push(['absorbedBy', greaterMass.name]);
             camera.follow = greaterMass;
           }
-
-          // if (camera.positionIndex >= smallerIndex && camera.positionIndex > 0) {
-          //   if (camera.positionIndex === smallerIndex) {
-          //     //should do this some other way?
-          //     uievents.push(['absorbedBy', greaterMass.name]);
-          //     camera.positionIndex = greaterIndex >= smallerIndex ? greaterIndex - 1 : greaterIndex;
-          //   }
-          //   // if (camera.positionIndex === smallerIndex) camera.positionIndex = positions.length - 1;
-          //   else camera.positionIndex--;
-          // }
-          // if (camera.lookAtIndex >= smallerIndex) {
-          //   previousLookAt();
-          // }
         }
 
         collisionList.splice(0);
