@@ -46,7 +46,7 @@
       document.body.removeEventListener('touchstart', goFullScreen);
     }
 
-    let x = 10;
+    let x = 1;
     document.body.addEventListener('wheel', event => {
       camera.followDistance += event.deltaY > 0 ? x : -x;
       camera.followDistance = Math.max(0, camera.followDistance);
@@ -58,7 +58,8 @@
             x = clientX / width - 0.5,
             y = clientY / height - 0.5;
 
-      set(camera.targetOffset, x, y, 0);
+      // set(camera.targetOffset, x, y, 0);
+      set(camera.targetLocalRotation, x * 2, y * 2, 1);
     });
 
 
@@ -81,22 +82,22 @@
       hud.classList.add(state);
 
       if (state === 'moving') {
-        camera.targetOffset = [0, 0, 0];
+        camera.targetOffset = [0, 0, 1];
         camera.followDistance = 70;
         camera.targetFov = 100;
 
         controls = attachVelocityControls();
       }
       else if (state === 'looking') {
-        camera.targetOffset = [0, 1, 0];
-        camera.followDistance = 50;
+        camera.targetOffset = [0, 1, 1];
+        camera.followDistance = 10;
         camera.targetFov = 60;
 
         detachVelocityControls(controls);
       }
       else if (state === 'start') {
-        camera.targetOffset = [0, 1, 0];
-        camera.followDistance = 70;
+        camera.targetOffset = [0, 1, 1];
+        camera.followDistance = 20;
         camera.targetFov = 90;
 
         detachVelocityControls(controls);
@@ -187,42 +188,50 @@
       return copy([0, 0, 0], v);
     }
 
-    const speed = 60;
+    const speed = 60 * 2;
     class Camera {
       constructor({follow, lookAt}) {
         this.follow = follow;
         this.lookAt = lookAt;
-
-        this.followDistance = 70;
 
         this._targetPosition = [0, 0, 0];
         this._targetLookAt = [0, 0, 0];
         this._targetOffset = [0, 1, 0];
         this._targetUp = [0, 0, 0];
         this._targetFov = 90;
+        this._targetFollowDistance = 70;
+        this._targetLocalRotation = [0, 0, 0];
 
         this._li = 0;
         this._pi = 0;
         this._oi = 0;
         this._fi = 0;
+        this._fdi = 0;
+        this._lri = 0;
 
         this.observed = {
           position: vnew(this._targetPosition),
           lookAt: vnew(this._targetLookAt),
           up: vnew(this._targetUp),
           fov: this._targetFov
-        }
+        };
 
         this.offset = vnew(this._targetOffset);
+        this.followDistance = this._targetFollowDistance;
+        this.localRotation = vnew(this._targetLocalRotation);
       }
 
       get iOffset() { return add(dd, this.offset, scale(dd, sub(dd, this._targetOffset, this.offset), Math.min(this._oi, speed) / speed)); }
       get iPosition() { return ;}
 
+      get iFollowDistance() { return this.followDistance + (this.followDistance - this._targetFollowDistance) / (Math.min(this._fdi, speed) / speed); }
+
+      get iLocalRotation() { return add(dd, this.localRotation, scale(dd, sub(dd, this._targetLocalRotation, this.localRotation), Math.min(this._lri, speed) / speed)); }
+
       update() {
         const p = this.follow.position,
               tp = this.lookAt.position,
-              d = sub([0, 0, 0], p, tp),
+              d = sub([0, 0, 0], tp, p),
               m = magnitude(d);
 
         if (m > 0) div (d, d, m);
@@ -230,15 +239,55 @@
         // copy(this.position, this.iPosition);
         // copy(this.lookAt, this.iLookAt);
         copy(this.offset, this.iOffset);
+        copy(this.localRotation, this.iLocalRotation);
         // copy(this.up, this.iUp);
 
-        // this._li++;
-        // this._pi++;
+        this._li++;
+        this._pi++;
         this._oi++;
-        // this._fi++;
+        this._fdi++;
+        this._lri++;
+        this._fi++;
 
-        add(d, d, this.offset);
-        add(this._targetPosition, p, scale(d, d, this.followDistance));
+        const q = qFromVectors2([0, 0, -1], d),
+              r = [0, 0, 0, 0],
+              i = qinv([0, 0, 0, 0], q);
+
+        const rotation = [Math.sin(this.localRotation[0]), Math.sin(this.localRotation[1]), Math.cos(this.localRotation[0]) + Math.cos(this.localRotation[1])],
+              rm = magnitude(rotation) || 1;
+
+        qmult(r, qmult(r, q, [0, rotation[0], rotation[1], rotation[2]]), qconj(i, q));
+        // qmult(r, qmult(r, qconj(i, q), [0, rotation[0] / rm, rotation[1] / rm, rotation[2] / rm]), q);
+        // qmult(r, qconj(i, q), qmult(r, [0, rotation[0] / rm, rotation[1] / rm, rotation[2] / rm], q));
+
+        qunit(r, r);
+
+        // console.log(r, d);
+
+        set(d, r[1], r[2], r[3]);
+        // add(d, p, d);
+        // sub(d, d, p);
+
+
+        // sub(dd, normalize(d, d), normalize(dd, p));
+
+        const om = magnitude(this.offset) || 1;
+
+        const q2 = qFromVectors2([0, 0, 1], vnew(d)),
+              r2 = [0, 0, 0, 0],
+              i2 = qinv([0, 0, 0, 0], q2);
+
+        qunit(q2, q2);
+
+        // not right!
+        qmult(r2, qmult(r2, q2, [0, this.offset[0] / om, this.offset[1] / om, this.offset[2] / om]), qconj(i2, q2));
+        // qmult(r2, qmult(r2, qconj(i, q2), [0, this.offset[0] / om, this.offset[1] / om, this.offset[2] / om]), q2);
+
+        qunit(r2, r2);
+
+        add(d, d, [r2[1], r2[2], r2[3]]);
+
+        add(this._targetPosition, p, scale(d, normalize(d, d), this.iFollowDistance));
         // add(this._targetPosition, this._targetPosition, this.offset);
         // add(this._targetPosition, scale(dd, normalize(dd, sub(dd, this._targetPosition, this.offset)), this.followDistance));
 
@@ -249,15 +298,25 @@
         this.observed.fov = this.observed.fov + (this._targetFov - this.observed.fov) * Math.min(this._fi++, speed) / speed;
 
 
-        const q = qFromUnitVectors([0, 0, 1], normalize(dd, sub(dd, this.observed.position, this.observed.lookAt)));
-        const r = [0, 0, 0, 0],
-              i = qinv([0, 0, 0, 0], q);
+        // const q = qFromUnitVectors([0, 0, 1], normalize(dd, sub(dd, this.observed.position, this.observed.lookAt)));
+        // const q = qFromUnitVectors(this.localRotation, normalize(dd, sub(dd, this.observed.position, this.observed.lookAt)));
+        // const r = [0, 0, 0, 0],
+        //       i = qinv([0, 0, 0, 0], q);
 
-        qmult(r, qmult(r, q, [0, this.offset[0], this.offset[1], this.offset[2]]), qconj(i, q));
+        // qmult(r, qmult(r, q, [0, this.offset[0], this.offset[1], this.offset[2]]), qconj(i, q));
 
-        qmult(r, qmult(r, q, [0, 0, 1, 0]), i);
+        // qmult(r, qmult(r, q, [0, 0, 1, 0]), i);
 
         set(this.observed.up, 0, 1, 0);
+
+        copy(this.observed.lookAt, p);
+
+        // console.log(this.observed.position, r);
+
+        // cross(this.observed.up, [0, 0, 1], sub(dd, this.observed.position, tp))
+        // cross(this.observed.up, this.observed.up, sub([0, 0, 0, 0], this.observed.position, this.observed.lookAt));
+
+        // cross(this.observed.up, sub(dd, p, tp), sub([0, 0, 0], this.observed.position, this.observed.lookAt));
       }
 
       set lookAt (mass) { console.log('now looking at', mass); if (!mass) throw new Error('looking at nothing!'); this._lookAtMass = mass; this._li = 0; }
@@ -298,6 +357,21 @@
       }
 
       get targetOffset() { return this._targetOffset; }
+
+      set targetLocalRotation([x, y, z]) {
+        if (this._targetLocalRotation[0] !== x || this._targetLocalRotation[1] !== y || this._targetLocalRotation[2] !== z) this._lri = 0;
+        set(this._targetLocalRotation, x, y, z);
+      }
+
+      get targetLocalRotation() { return this._targetLocalRotation; }
+
+      set followDistance(d) {
+        if (this._targetFollowDistance != d) this._fdi = 0;
+        this._targetFollowDistance = d;
+        console.log('set follow', d);
+      }
+
+      get followDistance() { return this._targetFollowDistance; }
     }
 
     class Mass {
@@ -1439,6 +1513,8 @@
 
       const run = runner(universe, new Clock());
 
+      enterState('start');
+
       window.requestAnimationFrame(animate);
 
       function runner(universe, clock, maxRunTime = 1000 / 10, GUIUpdateRate = 100) {
@@ -1731,10 +1807,16 @@
       return qunit(q, q);
     }
 
+    function qFromVectors2(u, v) {
+      cross(dd, u, v);
+      const q = [1 + dot(u, v), dd[0], dd[1], dd[2]];
+      return qunit(q, q);
+    }
+
     // http://lolengine.net/blog/2013/09/18/beautiful-maths-quaternion-from-vectors
-    function qFromUnitVectors(v, u) {
-      const m = Math.sqrt(2 + 2 * dot(v, u));
-      div(dd, cross(dd, v, u), m);
+    function qFromUnitVectors(u, v) {
+      const m = Math.sqrt(2 + 2 * dot(u, v));
+      div(dd, cross(dd, u, v), m);
       return [m/2, dd[0], dd[1], dd[2]];
     }
 
