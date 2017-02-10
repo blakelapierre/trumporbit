@@ -52,15 +52,15 @@
       camera.followDistance = Math.max(0, camera.followDistance);
     });
 
-    document.body.addEventListener('mousemove', ({clientX, clientY}) => {
-      const width = document.body.clientWidth,
-            height = document.body.clientHeight,
-            x = clientX / width - 0.5,
-            y = clientY / height - 0.5;
+    // document.body.addEventListener('mousemove', ({clientX, clientY}) => {
+    //   const width = document.body.clientWidth,
+    //         height = document.body.clientHeight,
+    //         x = clientX / width - 0.5,
+    //         y = clientY / height - 0.5;
 
-      // set(camera.targetOffset, x, y, 0);
-      set(camera.targetLocalRotation, x * 2, y * 2, 1);
-    });
+    //   // set(camera.targetOffset, x, y, 0);
+    //   set(camera.targetLocalRotation, x * 2, y * 2, 1);
+    // });
 
 
     const hud = document.querySelector('hud'),
@@ -89,16 +89,18 @@
         controls = attachVelocityControls();
       }
       else if (state === 'looking') {
+        camera.targetLocalRotation = [0, Math.PI / 5, 0];
         camera.targetOffset = [0, 1, 1];
-        camera.followDistance = 10;
+        camera.followDistance = 30;
         camera.targetFov = 60;
 
         detachVelocityControls(controls);
       }
       else if (state === 'start') {
+        camera.targetLocalRotation = [0, Math.PI / 3, 0];
         camera.targetOffset = [0, 1, 1];
-        camera.followDistance = 20;
-        camera.targetFov = 90;
+        camera.followDistance = 100;
+        camera.targetFov = 110;
 
         detachVelocityControls(controls);
       }
@@ -172,7 +174,8 @@
           absorbedByEl = document.querySelector('absorbed-by'),
           absorbedByByNameEl = document.querySelector('absorbed-by-by-name'),
           poofEl = document.querySelector('poof'),
-          noticeEl = document.querySelector('notice');
+          noticeEl = document.querySelector('notice'),
+          stateEl = document.querySelector('state');
 
     const tagEl = document.querySelector('tag'),
           currentLookAtEl = document.querySelector('current-look-at'),
@@ -279,9 +282,9 @@
 
         qunit(q2, q2);
 
-        // not right!
+        // // not right!
         qmult(r2, qmult(r2, q2, [0, this.offset[0] / om, this.offset[1] / om, this.offset[2] / om]), qconj(i2, q2));
-        // qmult(r2, qmult(r2, qconj(i, q2), [0, this.offset[0] / om, this.offset[1] / om, this.offset[2] / om]), q2);
+        // // qmult(r2, qmult(r2, qconj(i, q2), [0, this.offset[0] / om, this.offset[1] / om, this.offset[2] / om]), q2);
 
         qunit(r2, r2);
 
@@ -1275,9 +1278,21 @@
       }
     }
 
+    let given, needsStart;
+
+    stateEl.addEventListener('click', stateGiven);
+
+    setTimeout(stateGiven, 1000 * 5);
+
+    function stateGiven() {
+      given = true;
+      stateEl.classList.add('given');
+      noticeEl.classList.add('given');
+      if (needsStart) needsStart();
+    }
+
     tagEl.addEventListener('click', () => commandsEl.classList.toggle('show'));
     helpEl.addEventListener('click', () => helpContentEl.classList.toggle('show'));
-
 
     previousLookAtEl.addEventListener('click', event => {
       event.stopPropagation();
@@ -1334,6 +1349,7 @@
       editorPanel: false,
       plugins: ['core'],
       callback: start,
+      callback: jsxboxCallback,
       camera: {far: 1000000},
       controls: [
         [['A'], '+left', '-left'],
@@ -1508,7 +1524,13 @@
       }
     }
 
+    function jsxboxCallback(view) {
+      if (given) start(view); // global!!
+      else needsStart = () => start(view);
+    }
+
     function start(view) {
+      needsStart = undefined; // global!!
       const socket = createSocket(() => uievents.push(['connected']));
 
       const run = runner(universe, new Clock());
@@ -2017,6 +2039,14 @@
     <ask><a href="#give">Give a Gift</a></ask>
   </hud>
 </mathbox>
+
+<state>THIS SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THIS SOFTWARE OR THE USE OR OTHER DEALINGS IN THIS
+SOFTWARE.</state>
 
 <notice>
   <screen></screen>

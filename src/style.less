@@ -811,12 +811,48 @@ trump {
     }
   }
 
+  state {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    white-space: pre;
+
+    font-size: 1.8vw;
+    font-family: mono;
+
+    line-height: 1.5em;
+
+    color: #fff;
+    background-color: #000;
+
+    overflow: auto;
+
+    z-index: 3;
+
+    cursor: pointer;
+
+    &.given {
+      transform: scale(0);
+      animation: fade-background-out 1s ease-in-out, fade-color-out 1s ease-in-out;
+    }
+  }
+
   notice {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
+
+    display: none;
 
     font-size: 5vw;
 
@@ -826,101 +862,107 @@ trump {
 
     user-select: none;
 
+    cursor: pointer;
+
     &.no-intro {
       display: none;
     }
 
-    &.connected {
-      transform: scale(0);
+    &.given {
+      display: block;
 
-      animation: fade-color-out 4s ease-in-out;
+      &.connected {
+        transform: scale(0);
 
-      screen {
-        animation: fade-background-out 3s ease-in-out forwards;
-      }
+        animation: fade-color-out 2*3s ease-in-out;
 
-      message {
-        animation: fade-color-out 2.75s ease-in-out forwards;
-        trump {
-          animation: fade-color-out 3s ease-in-out forwards;
+        screen {
+          animation: fade-background-out 2*3s ease-in-out forwards;
+        }
+
+        message {
+          animation: fade-color-out 2*2.75s ease-in-out forwards;
+          trump {
+            animation: fade-color-out 2*3s ease-in-out forwards;
+          }
+        }
+
+        standby, failure {
+          animation: none;
         }
       }
 
-      standby, failure {
-        animation: none;
+      screen {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+
+        background-color: rgba(0, 0, 0, 1);
       }
-    }
 
-    screen {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      message {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
 
-      background-color: rgba(0, 0, 0, 1);
-    }
+        display: flex;
 
-    message {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
+        color: rgba(255, 255, 255, 1);
 
-      display: flex;
+        align-items: center;
+        justify-content: center;
 
-      color: rgba(255, 255, 255, 1);
+        animation: fade 5s ease-out forwards;
 
-      align-items: center;
-      justify-content: center;
+        trump {
+          margin: 0 1vw;
+          font-size: 7vw;
 
-      animation: fade 5s ease-out forwards;
-
-      trump {
-        margin: 0 1vw;
-        font-size: 7vw;
-
-        animation: trump-fade 5s ease-out forwards;
+          animation: trump-fade 5s ease-out forwards;
+        }
       }
-    }
 
-    standby {
-      position: absolute;
+      standby {
+        position: absolute;
 
-      left: 0;
-      right: 0;
-      bottom: 33%;
+        left: 0;
+        right: 0;
+        bottom: 33%;
 
-      display: flex;
+        display: flex;
 
-      font-size: 2vw;
+        font-size: 2vw;
 
-      color: rgba(255, 255, 255, 0);
+        color: rgba(255, 255, 255, 0);
 
-      align-items: center;
-      justify-content: center;
+        align-items: center;
+        justify-content: center;
 
-      animation: cycle 8s 0s ease-in-out infinite;
-    }
+        animation: cycle 8s 0s ease-in-out infinite;
+      }
 
-    failure {
-      position: absolute;
+      failure {
+        position: absolute;
 
-      left: 0;
-      right: 0;
-      bottom: 33%;
+        left: 0;
+        right: 0;
+        bottom: 33%;
 
-      display: flex;
+        display: flex;
 
-      font-size: 2vw;
+        font-size: 2vw;
 
-      color: rgba(255, 255, 255, 0);
+        color: rgba(255, 255, 255, 0);
 
-      align-items: center;
-      justify-content: center;
+        align-items: center;
+        justify-content: center;
 
-      animation: cycle 8s 4s ease-in-out infinite;
+        animation: cycle 8s 4s ease-in-out infinite;
+      }
     }
   }
 // }
