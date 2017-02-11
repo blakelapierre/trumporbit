@@ -1904,8 +1904,7 @@
     }
 
     function qunit(r, q) {
-      const n = qnorm(q);
-      return qdiv(r, q, n);
+      return qdiv(r, q, qnorm(q));
     }
 
 
