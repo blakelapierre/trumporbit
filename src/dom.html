@@ -1047,8 +1047,8 @@
         const t = -magnitude(dd) / (speedlimit * speedlimit),
               o = t / ticksPerStep;
 
-        updatePairInternal(oldp1, o, a1, v1, p1);
-        updatePairInternal(oldp2, o, a2, v2, p2);
+        updatePosition(oldp1, o, a1, v1, p1);
+        updatePosition(oldp2, o, a2, v2, p2);
 
         sub(pv1, oldp1, p2);
         sub(pv2, oldp2, p1);
@@ -1062,7 +1062,7 @@
         handleCollision(s1, s2, m1, m2, d1, d2, i, j, collisionList, collisions);
       }
 
-      function updatePairInternal(oldp, o, a, v, p) {
+      function updatePosition(oldp, o, a, v, p) {
         return add(oldp, p, scale(dd, add(dd, v, scale(dd, add(dd, v, scale(dd, a, o)), 0.5)), o));
       }
 
