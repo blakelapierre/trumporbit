@@ -1040,25 +1040,34 @@
           gravity: g2
         } = universe[j];
 
+        const m = m1 * m2;
+
         sub(dd, p1, p2);
 
         const t = -magnitude(dd) / (speedlimit * speedlimit),
               o = t / ticksPerStep;
 
-        add(oldp1, p1, scale(dd, add(dd, v1, scale(dd, add(dd, v1, scale(dd, a1, o)), 0.5)), o));
-        add(oldp2, p2, scale(dd, add(dd, v2, scale(dd, add(dd, v2, scale(dd, a2, o)), 0.5)), o));
+        updatePairInternal(oldp1, o, a1, v1, p1);
+        updatePairInternal(oldp2, o, a2, v2, p2);
 
         sub(pv1, oldp1, p2);
         sub(pv2, oldp2, p1);
 
         const d1 = dot(pv1, pv1),
-              d2 = dot(pv2, pv2),
-              m = m1 * m2;
+              d2 = dot(pv2, pv2);
 
-        if (d1 > 0) add(g2, g2, scale(dd, pv1, m / d1));
-        if (d2 > 0) add(g1, g1, scale(dd, pv2, m / d2));
+        updateGravity(d1, pv1, g2, m);
+        updateGravity(d2, pv2, g1, m);
 
         handleCollision(s1, s2, m1, m2, d1, d2, i, j, collisionList, collisions);
+      }
+
+      function updatePairInternal(oldp, o, a, v, p) {
+        return add(oldp, p, scale(dd, add(dd, v, scale(dd, add(dd, v, scale(dd, a, o)), 0.5)), o));
+      }
+
+      function updateGravity(d, pv, g, m) {
+        if (d > 0) add(g, g, scale(dd, pv, m / d));
       }
 
       function handleCollision(s1, s2, m1, m2, d1, d2, i, j, collisionList, collisions) {
@@ -1824,8 +1833,42 @@
     function qFromVectors(u, v) {
       cross(dd, u, v);
       const q = [dot(u, v), dd[0], dd[1], dd[2]];
-      q[3] += qnorm(q);
+      q[0] += qnorm(q);
       return qunit(q, q);
+    }
+
+    // http://web.archive.org/web/20161105145605/http://lolengine.net/blog/2014/02/24/quaternion-from-two-vectors-final
+    function qFromVectors2(u, v) {
+      const n = Math.sqrt(dot(u, u) * dot(v, v)),
+            r = n + dot(u, v);
+
+      if (r < 1e-6) { // why this value?!
+        console.log('small value', r);
+        if (Math.abs(dd[0]) > Math.abs(dd[2])) return qunit(q, [0, -dd[1], dd[2], 0]);
+        else return qunit(q, [0, 0, -dd[2], dd[1]]);
+      }
+      else {
+        cross(dd, u, v);
+        const q = [r, dd[0], dd[1], dd[2]];
+
+        return qunit(q, q);
+      }
+    }
+
+    function qFromUnitVectors2(u, v) {
+      const r = 1 + dot(u, v);
+
+      if (r < 1e-6) { // why this value?!
+        console.log('small value', r);
+        if (Math.abs(dd[0]) > Math.abs(dd[2])) return qunit(q, [0, -dd[1], dd[2], 0]);
+        else return qunit(q, [0, 0, -dd[2], dd[1]]);
+      }
+      else {
+        cross(dd, u, v);
+        const q = [r, dd[0], dd[1], dd[2]];
+
+        return qunit(q, q);
+      }
     }
 
     function qFromVectors2(u, v) {
